@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtInt64">
+	<Name>DBMSQLQueryStoreLastTempdbSpaceUsed</Name>
+	<HelpText>@DBMonitor:DBMSQLQueryStoreLastTempdbSpaceUsedHelp</HelpText>
+	<Label>@DBMonitor:DBMSQLQueryStoreLastTempdbSpaceUsed</Label>
+</AxEdt>

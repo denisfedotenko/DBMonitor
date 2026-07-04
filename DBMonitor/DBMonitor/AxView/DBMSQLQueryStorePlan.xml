@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStorePlan</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStorePlan extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DateTimeNull</Name>
+				<Source><![CDATA[
+    public static str DateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(utcDateTimeNull());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLQueryStorePlan</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups />
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>PlanId</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>QueryId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>PlanGroupId</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanGroupId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>EngineVersion</Name>
+			<ExtendedDataType>DBMSQLQueryStoreEngineVersion</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>CompatibilityLevel</Name>
+			<ExtendedDataType>DBMSQLQueryStoreCompatibilityLevel</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QueryPlanHash</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryPlanHash</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QueryPlan</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryPlan</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsOnlineIndexPlan</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanIsOnlineIndexPlan</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsTrivialPlan</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanIsTrivialPlan</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsParallelPlan</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanIsParallelPlan</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsForcedPlan</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanIsForcedPlan</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsNativelyCompiled</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanIsNativelyCompiled</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>ForceFailureCount</Name>
+			<ExtendedDataType>DBMSQLQueryStoreForceFailureCount</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>LastForceFailureReason</Name>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>DBMSQLQueryStoreLastForceFailureReason</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>LastForceFailureReasonDesc</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastForceFailureReasonDesc</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>CountCompiles</Name>
+			<ExtendedDataType>DBMSQLQueryStoreCountCompiles</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>InitialCompileStartTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreInitialCompileStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>LastCompileStartTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>LastExecutionTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastExecutionTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgCompileDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgCompileDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastCompileDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>PlanForcingType</Name>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>DBMSQLQueryStorePlanForcingType</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>PlanForcingTypeDesc</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanForcingTypeDesc</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>HasCompileReplayScript</Name>
+			<ExtendedDataType>DBMSQLQueryStoreHasCompileReplayScript</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsOptimizedPlanForcingDisabled</Name>
+			<ExtendedDataType>DBMSQLQueryStoreIsOptimizedPlanForcingDisabled</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>PlanType</Name>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>DBMSQLQueryStorePlanType</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>PlanTypeDesc</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanTypeDesc</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

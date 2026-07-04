@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStatsViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStatsViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asRecId;
+    str     asTotalElapsedTime;
+    str     asAvgElapsedTime;
+    str     asExecutionCount;
+    str     asMinElapsedTime;
+    str     asMaxElapsedTime;
+    str     asLastElapsedTime;
+    str     asLastExecutionTime;
+    str     asQueryPlan;
+    str     asStatementText;
+    str     asSQLHandle;
+    str     asPlanHandle;
+    str     asSQLText;
+    str     asStatementStartOffset;
+    str     asStatementEndOffset;
+    str     asPlanGenerationNum;
+    str     asCreationTime;
+    str     asTotalWorkerTime;
+    str     asLastWorkerTime;
+    str     asMinWorkerTime;
+    str     asMaxWorkerTime;
+    str     asTotalPhysicalReads;
+    str     asLastPhysicalReads;
+    str     asMinPhysicalReads;
+    str     asMaxPhysicalReads;
+    str     asTotalLogicalWrites;
+    str     asLastLogicalWrites;
+    str     asMinLogicalWrites;
+    str     asMaxLogicalWrites;
+    str     asTotalLogicalReads;
+    str     asLastLogicalReads;
+    str     asMinLogicalReads;
+    str     asMaxLogicalReads;
+    str     asTotalClrTime;
+    str     asLastClrTime;
+    str     asMinClrTime;
+    str     asMaxClrTime;
+    str     asQueryHash;
+    str     asQueryPlanHash;
+    str     asTotalRows;
+    str     asLastRows;
+    str     asMinRows;
+    str     asMaxRows;
+    str     asStatementSqlHandle;
+    str     asStatementContextId;
+    str     asTotalDop;
+    str     asLastDop;
+    str     asMinDop;
+    str     asMaxDop;
+    str     asTotalGrantKb;
+    str     asLastGrantKb;
+    str     asMinGrantKb;
+    str     asMaxGrantKb;
+    str     asTotalUsedGrantKb;
+    str     asLastUsedGrantKb;
+    str     asMinUsedGrantKb;
+    str     asMaxUsedGrantKb;
+    str     asTotalIdealGrantKb;
+    str     asLastIdealGrantKb;
+    str     asMinIdealGrantKb;
+    str     asMaxIdealGrantKb;
+    str     asTotalReservedThreads;
+    str     asLastReservedThreads;
+    str     asMinReservedThreads;
+    str     asMaxReservedThreads;
+    str     asTotalUsedThreads;
+    str     asLastUsedThreads;
+    str     asMinUsedThreads;
+    str     asMaxUsedThreads;
+    str     asTotalColumnstoreSegmentReads;
+    str     asLastColumnstoreSegmentReads;
+    str     asMinColumnstoreSegmentReads;
+    str     asMaxColumnstoreSegmentReads;
+    str     asTotalColumnstoreSegmentSkips;
+    str     asLastColumnstoreSegmentSkips;
+    str     asMinColumnstoreSegmentSkips;
+    str     asMaxColumnstoreSegmentSkips;
+    str     asTotalSpills;
+    str     asLastSpills;
+    str     asMinSpills;
+    str     asMaxSpills;
+    str     asAvgWorkerTime;
+    str     asAvgPhysicalReads;
+    str     asAvgLogicalWrites;
+    str     asAvgLogicalReads;
+    str     asAvgClrTime;
+    str     asAvgRows;
+    str     asAvgDop;
+    str     asAvgGrantKb;
+    str     asAvgUsedGrantKb;
+    str     asAvgIdealGrantKb;
+    str     asAvgReservedThreads;
+    str     asAvgUsedThreads;
+    str     asAvgColumnstoreSegmentReads;
+    str     asAvgColumnstoreSegmentSkips;
+    str     asAvgSpills;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates the view.
+    /// </summary>
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStatsViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns the SQL statement to create the view.
+    /// </summary>
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        DictField DictFieldSQLText = new DictField(tableNum(DBMSQLQueryStats), fieldNum(DBMSQLQueryStats, SQLText));
+        str sqlStmt = 'SELECT ';
+        sqlStmt += '1010' + ' AS ' + asRecId + ', ';
+        sqlStmt += 'qs.total_elapsed_time' + ' AS ' + asTotalElapsedTime + ', ';
+        sqlStmt += 'qs.total_elapsed_time/execution_count' + ' AS ' + asAvgElapsedTime + ', ';
+        sqlStmt += 'execution_count' + ' AS ' + asExecutionCount + ', ';
+        sqlStmt += 'min_elapsed_time' + ' AS ' + asMinElapsedTime + ', ';
+        sqlStmt += 'max_elapsed_time' + ' AS ' + asMaxElapsedTime + ', ';
+        sqlStmt += 'last_elapsed_time' + ' AS ' + asLastElapsedTime + ', ';
+        sqlStmt += 'qs.last_execution_time' + ' AS ' + asLastExecutionTime + ', ';
+        sqlStmt += 'CONVERT([varchar](128), qs.sql_handle, 1)' + ' AS ' + asSQLHandle + ', ';
+        sqlStmt += 'CONVERT([varchar](128), qs.plan_handle, 1)' + ' AS ' + asPlanHandle + ', ';
+        sqlStmt += strFmt('CONVERT([NVARCHAR](%1), st.text)',DictFieldSQLText.stringLen()) + ' AS ' + asSQLText + ', ';
+        sqlStmt += 'qs.statement_start_offset' + ' AS ' + asStatementStartOffset + ', ';
+        sqlStmt += 'qs.statement_end_offset' + ' AS ' + asStatementEndOffset + ', ';
+        sqlStmt += 'qs.plan_generation_num' + ' AS ' + asPlanGenerationNum + ', ';
+        sqlStmt += 'qs.creation_time' + ' AS ' + asCreationTime + ', ';
+        sqlStmt += 'qs.total_worker_time' + ' AS ' + asTotalWorkerTime + ', ';
+        sqlStmt += 'qs.last_worker_time' + ' AS ' + asLastWorkerTime + ', ';
+        sqlStmt += 'qs.min_worker_time' + ' AS ' + asMinWorkerTime + ', ';
+        sqlStmt += 'qs.max_worker_time' + ' AS ' + asMaxWorkerTime + ', ';
+        sqlStmt += 'qs.total_physical_reads' + ' AS ' + asTotalPhysicalReads + ', ';
+        sqlStmt += 'qs.last_physical_reads' + ' AS ' + asLastPhysicalReads + ', ';
+        sqlStmt += 'qs.min_physical_reads' + ' AS ' + asMinPhysicalReads + ', ';
+        sqlStmt += 'qs.max_physical_reads' + ' AS ' + asMaxPhysicalReads + ', ';
+        sqlStmt += 'qs.total_logical_writes' + ' AS ' + asTotalLogicalWrites + ', ';
+        sqlStmt += 'qs.last_logical_writes' + ' AS ' + asLastLogicalWrites + ', ';
+        sqlStmt += 'qs.min_logical_writes' + ' AS ' + asMinLogicalWrites + ', ';
+        sqlStmt += 'qs.max_logical_writes' + ' AS ' + asMaxLogicalWrites + ', ';
+        sqlStmt += 'qs.total_logical_reads' + ' AS ' + asTotalLogicalReads + ', ';
+        sqlStmt += 'qs.last_logical_reads' + ' AS ' + asLastLogicalReads + ', ';
+        sqlStmt += 'qs.min_logical_reads' + ' AS ' + asMinLogicalReads + ', ';
+        sqlStmt += 'qs.max_logical_reads' + ' AS ' + asMaxLogicalReads + ', ';
+        sqlStmt += 'qs.total_clr_time' + ' AS ' + asTotalClrTime + ', ';
+        sqlStmt += 'qs.last_clr_time' + ' AS ' + asLastClrTime + ', ';
+        sqlStmt += 'qs.min_clr_time' + ' AS ' + asMinClrTime + ', ';
+        sqlStmt += 'qs.max_clr_time' + ' AS ' + asMaxClrTime + ', ';
+        sqlStmt += 'CONVERT([varchar](20), qs.query_hash, 1)' + ' AS ' + asQueryHash + ', ';
+        sqlStmt += 'CONVERT([varchar](20), qs.query_plan_hash, 1)' + ' AS ' + asQueryPlanHash + ', ';
+        sqlStmt += 'qs.total_rows' + ' AS ' + asTotalRows + ', ';
+        sqlStmt += 'qs.last_rows' + ' AS ' + asLastRows + ', ';
+        sqlStmt += 'qs.min_rows' + ' AS ' + asMinRows + ', ';
+        sqlStmt += 'qs.max_rows' + ' AS ' + asMaxRows + ', ';
+        sqlStmt += 'CONVERT([varchar](130), qs.statement_sql_handle, 1)' + ' AS ' + asStatementSqlHandle + ', ';
+        sqlStmt += 'qs.statement_context_id' + ' AS ' + asStatementContextId + ', ';
+        sqlStmt += 'qs.total_dop' + ' AS ' + asTotalDop + ', ';
+        sqlStmt += 'qs.last_dop' + ' AS ' + asLastDop + ', ';
+        sqlStmt += 'qs.min_dop' + ' AS ' + asMinDop + ', ';
+        sqlStmt += 'qs.max_dop' + ' AS ' + asMaxDop + ', ';
+        sqlStmt += 'qs.total_grant_kb' + ' AS ' + asTotalGrantKb + ', ';
+        sqlStmt += 'qs.last_grant_kb' + ' AS ' + asLastGrantKb + ', ';
+        sqlStmt += 'qs.min_grant_kb' + ' AS ' + asMinGrantKb + ', ';
+        sqlStmt += 'qs.max_grant_kb' + ' AS ' + asMaxGrantKb + ', ';
+        sqlStmt += 'qs.total_used_grant_kb' + ' AS ' + asTotalUsedGrantKb + ', ';
+        sqlStmt += 'qs.last_used_grant_kb' + ' AS ' + asLastUsedGrantKb + ', ';
+        sqlStmt += 'qs.min_used_grant_kb' + ' AS ' + asMinUsedGrantKb + ', ';
+        sqlStmt += 'qs.max_used_grant_kb' + ' AS ' + asMaxUsedGrantKb + ', ';
+        sqlStmt += 'qs.total_ideal_grant_kb' + ' AS ' + asTotalIdealGrantKb + ', ';
+        sqlStmt += 'qs.last_ideal_grant_kb' + ' AS ' + asLastIdealGrantKb + ', ';
+        sqlStmt += 'qs.min_ideal_grant_kb' + ' AS ' + asMinIdealGrantKb + ', ';
+        sqlStmt += 'qs.max_ideal_grant_kb' + ' AS ' + asMaxIdealGrantKb + ', ';
+        sqlStmt += 'qs.total_reserved_threads' + ' AS ' + asTotalReservedThreads + ', ';
+        sqlStmt += 'qs.last_reserved_threads' + ' AS ' + asLastReservedThreads + ', ';
+        sqlStmt += 'qs.min_reserved_threads' + ' AS ' + asMinReservedThreads + ', ';
+        sqlStmt += 'qs.max_reserved_threads' + ' AS ' + asMaxReservedThreads + ', ';
+        sqlStmt += 'qs.total_used_threads' + ' AS ' + asTotalUsedThreads + ', ';
+        sqlStmt += 'qs.last_used_threads' + ' AS ' + asLastUsedThreads + ', ';
+        sqlStmt += 'qs.min_used_threads' + ' AS ' + asMinUsedThreads + ', ';
+        sqlStmt += 'qs.max_used_threads' + ' AS ' + asMaxUsedThreads + ', ';
+        sqlStmt += 'qs.total_columnstore_segment_reads' + ' AS ' + asTotalColumnstoreSegmentReads + ', ';
+        sqlStmt += 'qs.last_columnstore_segment_reads' + ' AS ' + asLastColumnstoreSegmentReads + ', ';
+        sqlStmt += 'qs.min_columnstore_segment_reads' + ' AS ' + asMinColumnstoreSegmentReads + ', ';
+        sqlStmt += 'qs.max_columnstore_segment_reads' + ' AS ' + asMaxColumnstoreSegmentReads + ', ';
+        sqlStmt += 'qs.total_columnstore_segment_skips' + ' AS ' + asTotalColumnstoreSegmentSkips + ', ';
+        sqlStmt += 'qs.last_columnstore_segment_skips' + ' AS ' + asLastColumnstoreSegmentSkips + ', ';
+        sqlStmt += 'qs.min_columnstore_segment_skips' + ' AS ' + asMinColumnstoreSegmentSkips + ', ';
+        sqlStmt += 'qs.max_columnstore_segment_skips' + ' AS ' + asMaxColumnstoreSegmentSkips + ', ';
+        sqlStmt += 'qs.total_spills' + ' AS ' + asTotalSpills + ', ';
+        sqlStmt += 'qs.last_spills' + ' AS ' + asLastSpills + ', ';
+        sqlStmt += 'qs.min_spills' + ' AS ' + asMinSpills + ', ';
+        sqlStmt += 'qs.max_spills' + ' AS ' + asMaxSpills + ', ';
+        sqlStmt += 'qs.total_worker_time/execution_count' + ' AS ' + asAvgWorkerTime + ', ';
+        sqlStmt += 'qs.total_physical_reads/execution_count' + ' AS ' + asAvgPhysicalReads + ', ';
+        sqlStmt += 'qs.total_logical_writes/execution_count' + ' AS ' + asAvgLogicalWrites + ', ';
+        sqlStmt += 'qs.total_logical_reads/execution_count' + ' AS ' + asAvgLogicalReads + ', ';
+        sqlStmt += 'qs.total_clr_time/execution_count' + ' AS ' + asAvgClrTime + ', ';
+        sqlStmt += 'qs.total_rows/execution_count' + ' AS ' + asAvgRows + ', ';
+        sqlStmt += 'qs.total_dop/execution_count' + ' AS ' + asAvgDop + ', ';
+        sqlStmt += 'qs.total_grant_kb/execution_count' + ' AS ' + asAvgGrantKb + ', ';
+        sqlStmt += 'qs.total_used_grant_kb/execution_count' + ' AS ' + asAvgUsedGrantKb + ', ';
+        sqlStmt += 'qs.total_ideal_grant_kb/execution_count' + ' AS ' + asAvgIdealGrantKb + ', ';
+        sqlStmt += 'qs.total_reserved_threads/execution_count' + ' AS ' + asAvgReservedThreads + ', ';
+        sqlStmt += 'qs.total_used_threads/execution_count' + ' AS ' + asAvgUsedThreads + ', ';
+        sqlStmt += 'qs.total_columnstore_segment_reads/execution_count' + ' AS ' + asAvgColumnstoreSegmentReads + ', ';
+        sqlStmt += 'qs.total_columnstore_segment_skips/execution_count' + ' AS ' + asAvgColumnstoreSegmentSkips + ', ';
+        sqlStmt += 'qs.total_spills/execution_count' + ' AS ' + asAvgSpills + ' ';
+        sqlStmt += 'FROM sys.dm_exec_query_stats AS qs CROSS APPLY' + ' sys.dm_exec_sql_text(qs.sql_handle) AS st' ;
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStats));
+        viewName            = view.name(DbBackend::Sql);
+
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStats, RecId)).name(DbBackend::Sql);
+        asTotalElapsedTime = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalElapsedTime)).name(DbBackend::Sql);
+        asAvgElapsedTime = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgElapsedTime)).name(DbBackend::Sql);
+        asExecutionCount = view.fieldObject(fieldNum(DBMSQLQueryStats, ExecutionCount)).name(DbBackend::Sql);
+        asMinElapsedTime = view.fieldObject(fieldNum(DBMSQLQueryStats, MinElapsedTime)).name(DbBackend::Sql);
+        asMaxElapsedTime = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxElapsedTime)).name(DbBackend::Sql);
+        asLastElapsedTime = view.fieldObject(fieldNum(DBMSQLQueryStats, LastElapsedTime)).name(DbBackend::Sql);
+        asLastExecutionTime = view.fieldObject(fieldNum(DBMSQLQueryStats, LastExecutionTime)).name(DbBackend::Sql);
+        asSQLHandle = view.fieldObject(fieldNum(DBMSQLQueryStats, SQLHandle)).name(DbBackend::Sql);
+        asPlanHandle = view.fieldObject(fieldNum(DBMSQLQueryStats, PlanHandle)).name(DbBackend::Sql);
+        asSQLText = view.fieldObject(fieldNum(DBMSQLQueryStats, SQLText)).name(DbBackend::Sql);
+        asStatementStartOffset = view.fieldObject(fieldNum(DBMSQLQueryStats, StatementStartOffset)).name(DbBackend::Sql);
+        asStatementEndOffset = view.fieldObject(fieldNum(DBMSQLQueryStats, StatementEndOffset)).name(DbBackend::Sql);
+        asPlanGenerationNum = view.fieldObject(fieldNum(DBMSQLQueryStats, PlanGenerationNum)).name(DbBackend::Sql);
+        asCreationTime = view.fieldObject(fieldNum(DBMSQLQueryStats, CreationTime)).name(DbBackend::Sql);
+        asTotalWorkerTime = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalWorkerTime)).name(DbBackend::Sql);
+        asLastWorkerTime = view.fieldObject(fieldNum(DBMSQLQueryStats, LastWorkerTime)).name(DbBackend::Sql);
+        asMinWorkerTime = view.fieldObject(fieldNum(DBMSQLQueryStats, MinWorkerTime)).name(DbBackend::Sql);
+        asMaxWorkerTime = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxWorkerTime)).name(DbBackend::Sql);
+        asTotalPhysicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalPhysicalReads)).name(DbBackend::Sql);
+        asLastPhysicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, LastPhysicalReads)).name(DbBackend::Sql);
+        asMinPhysicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, MinPhysicalReads)).name(DbBackend::Sql);
+        asMaxPhysicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxPhysicalReads)).name(DbBackend::Sql);
+        asTotalLogicalWrites = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalLogicalWrites)).name(DbBackend::Sql);
+        asLastLogicalWrites = view.fieldObject(fieldNum(DBMSQLQueryStats, LastLogicalWrites)).name(DbBackend::Sql);
+        asMinLogicalWrites = view.fieldObject(fieldNum(DBMSQLQueryStats, MinLogicalWrites)).name(DbBackend::Sql);
+        asMaxLogicalWrites = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxLogicalWrites)).name(DbBackend::Sql);
+        asTotalLogicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalLogicalReads)).name(DbBackend::Sql);
+        asLastLogicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, LastLogicalReads)).name(DbBackend::Sql);
+        asMinLogicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, MinLogicalReads)).name(DbBackend::Sql);
+        asMaxLogicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxLogicalReads)).name(DbBackend::Sql);
+        asTotalClrTime = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalClrTime)).name(DbBackend::Sql);
+        asLastClrTime = view.fieldObject(fieldNum(DBMSQLQueryStats, LastClrTime)).name(DbBackend::Sql);
+        asMinClrTime = view.fieldObject(fieldNum(DBMSQLQueryStats, MinClrTime)).name(DbBackend::Sql);
+        asMaxClrTime = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxClrTime)).name(DbBackend::Sql);
+        asQueryHash = view.fieldObject(fieldNum(DBMSQLQueryStats, QueryHash)).name(DbBackend::Sql);
+        asQueryPlanHash = view.fieldObject(fieldNum(DBMSQLQueryStats, QueryPlanHash)).name(DbBackend::Sql);
+        asTotalRows = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalRows)).name(DbBackend::Sql);
+        asLastRows = view.fieldObject(fieldNum(DBMSQLQueryStats, LastRows)).name(DbBackend::Sql);
+        asMinRows = view.fieldObject(fieldNum(DBMSQLQueryStats, MinRows)).name(DbBackend::Sql);
+        asMaxRows = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxRows)).name(DbBackend::Sql);
+        asStatementSqlHandle = view.fieldObject(fieldNum(DBMSQLQueryStats, StatementSqlHandle)).name(DbBackend::Sql);
+        asStatementContextId = view.fieldObject(fieldNum(DBMSQLQueryStats, StatementContextId)).name(DbBackend::Sql);
+        asTotalDop = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalDop)).name(DbBackend::Sql);
+        asLastDop = view.fieldObject(fieldNum(DBMSQLQueryStats, LastDop)).name(DbBackend::Sql);
+        asMinDop = view.fieldObject(fieldNum(DBMSQLQueryStats, MinDop)).name(DbBackend::Sql);
+        asMaxDop = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxDop)).name(DbBackend::Sql);
+        asTotalGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalGrantKb)).name(DbBackend::Sql);
+        asLastGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, LastGrantKb)).name(DbBackend::Sql);
+        asMinGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, MinGrantKb)).name(DbBackend::Sql);
+        asMaxGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxGrantKb)).name(DbBackend::Sql);
+        asTotalUsedGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalUsedGrantKb)).name(DbBackend::Sql);
+        asLastUsedGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, LastUsedGrantKb)).name(DbBackend::Sql);
+        asMinUsedGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, MinUsedGrantKb)).name(DbBackend::Sql);
+        asMaxUsedGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxUsedGrantKb)).name(DbBackend::Sql);
+        asTotalIdealGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalIdealGrantKb)).name(DbBackend::Sql);
+        asLastIdealGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, LastIdealGrantKb)).name(DbBackend::Sql);
+        asMinIdealGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, MinIdealGrantKb)).name(DbBackend::Sql);
+        asMaxIdealGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxIdealGrantKb)).name(DbBackend::Sql);
+        asTotalReservedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalReservedThreads)).name(DbBackend::Sql);
+        asLastReservedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, LastReservedThreads)).name(DbBackend::Sql);
+        asMinReservedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, MinReservedThreads)).name(DbBackend::Sql);
+        asMaxReservedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxReservedThreads)).name(DbBackend::Sql);
+        asTotalUsedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalUsedThreads)).name(DbBackend::Sql);
+        asLastUsedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, LastUsedThreads)).name(DbBackend::Sql);
+        asMinUsedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, MinUsedThreads)).name(DbBackend::Sql);
+        asMaxUsedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxUsedThreads)).name(DbBackend::Sql);
+        asTotalColumnstoreSegmentReads = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalColumnstoreSegmentReads)).name(DbBackend::Sql);
+        asLastColumnstoreSegmentReads = view.fieldObject(fieldNum(DBMSQLQueryStats, LastColumnstoreSegmentReads)).name(DbBackend::Sql);
+        asMinColumnstoreSegmentReads = view.fieldObject(fieldNum(DBMSQLQueryStats, MinColumnstoreSegmentReads)).name(DbBackend::Sql);
+        asMaxColumnstoreSegmentReads = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxColumnstoreSegmentReads)).name(DbBackend::Sql);
+        asTotalColumnstoreSegmentSkips = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalColumnstoreSegmentSkips)).name(DbBackend::Sql);
+        asLastColumnstoreSegmentSkips = view.fieldObject(fieldNum(DBMSQLQueryStats, LastColumnstoreSegmentSkips)).name(DbBackend::Sql);
+        asMinColumnstoreSegmentSkips = view.fieldObject(fieldNum(DBMSQLQueryStats, MinColumnstoreSegmentSkips)).name(DbBackend::Sql);
+        asMaxColumnstoreSegmentSkips = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxColumnstoreSegmentSkips)).name(DbBackend::Sql);
+        asTotalSpills = view.fieldObject(fieldNum(DBMSQLQueryStats, TotalSpills)).name(DbBackend::Sql);
+        asLastSpills = view.fieldObject(fieldNum(DBMSQLQueryStats, LastSpills)).name(DbBackend::Sql);
+        asMinSpills = view.fieldObject(fieldNum(DBMSQLQueryStats, MinSpills)).name(DbBackend::Sql);
+        asMaxSpills = view.fieldObject(fieldNum(DBMSQLQueryStats, MaxSpills)).name(DbBackend::Sql);
+        asAvgWorkerTime = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgWorkerTime)).name(DbBackend::Sql);
+        asAvgPhysicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgPhysicalReads)).name(DbBackend::Sql);
+        asAvgLogicalWrites = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgLogicalWrites)).name(DbBackend::Sql);
+        asAvgLogicalReads = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgLogicalReads)).name(DbBackend::Sql);
+        asAvgClrTime = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgClrTime)).name(DbBackend::Sql);
+        asAvgRows = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgRows)).name(DbBackend::Sql);
+        asAvgDop = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgDop)).name(DbBackend::Sql);
+        asAvgGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgGrantKb)).name(DbBackend::Sql);
+        asAvgUsedGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgUsedGrantKb)).name(DbBackend::Sql);
+        asAvgIdealGrantKb = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgIdealGrantKb)).name(DbBackend::Sql);
+        asAvgReservedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgReservedThreads)).name(DbBackend::Sql);
+        asAvgUsedThreads = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgUsedThreads)).name(DbBackend::Sql);
+        asAvgColumnstoreSegmentReads = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgColumnstoreSegmentReads)).name(DbBackend::Sql);
+        asAvgColumnstoreSegmentSkips = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgColumnstoreSegmentSkips)).name(DbBackend::Sql);
+        asAvgSpills = view.fieldObject(fieldNum(DBMSQLQueryStats, AvgSpills)).name(DbBackend::Sql);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStatsViewBuilder construct()
+    {
+        return new DBMSQLQueryStatsViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

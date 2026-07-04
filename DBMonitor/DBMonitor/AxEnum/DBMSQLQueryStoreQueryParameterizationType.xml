@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryParameterizationType</Name>
+	<HelpText>@DBMonitor:DBMSQLQueryStoreQueryParameterizationTypeHelp</HelpText>
+	<Label>@DBMonitor:DBMSQLQueryStoreQueryParameterizationType</Label>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>None</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreQueryParameterizationType_None</Label>
+			<Value>0</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>User</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreQueryParameterizationType_User</Label>
+			<Value>1</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Simple</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreQueryParameterizationType_Simple</Label>
+			<Value>2</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Forced</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreQueryParameterizationType_Forced</Label>
+			<Value>3</Value>
+		</AxEnumValue>
+	</EnumValues>
+</AxEnum>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMUpdateStatisticsObjType</Name>
+	<Help>@DBMUpdateTableStats:UpdateStatisticsObjectHelp</Help>
+	<Label>@DBMUpdateTableStats:UpdateStatisticsObjectLabel</Label>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Form</Name>
+			<Label>@DBMUpdateTableStats:Form</Label>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Table</Name>
+			<Label>@DBMUpdateTableStats:Table</Label>
+			<Value>1</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>View</Name>
+			<Label>@DBMUpdateTableStats:View</Label>
+			<Value>2</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>DataEntity</Name>
+			<Label>@DBMUpdateTableStats:DataEntity</Label>
+			<Value>3</Value>
+		</AxEnumValue>
+	</EnumValues>
+</AxEnum>

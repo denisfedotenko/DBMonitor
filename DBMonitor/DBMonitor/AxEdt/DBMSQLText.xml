@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
+	<Name>DBMSQLText</Name>
+	<Label>@DBMLockMonitor:SQLText</Label>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+	<StringSize>-1</StringSize>
+</AxEdt>

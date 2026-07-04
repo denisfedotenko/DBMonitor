@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryText</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStoreQueryText extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DateTimeNull</Name>
+				<Source><![CDATA[
+    public static str DateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(utcDateTimeNull());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLQueryStoreQueryText</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups />
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>QueryTextId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryTextId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QuerySqlText</Name>
+			<ExtendedDataType>DBMSQLStatsSQLText</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>StatementSqlHandle</Name>
+			<ExtendedDataType>DBMSQLQueryStoreStatementSqlHandle</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsPartOfEncryptedModule</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryTextIsPartOfEncryptedModule</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>HasRestrictedText</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryTextHasRestrictedText</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

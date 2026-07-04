@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreWaitStatsViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStoreWaitStatsViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asWaitStatsId;
+    str     asPlanId;
+    str     asRuntimeStatsIntervalId;
+    str     asWaitCategory;
+    str     asWaitCategoryDesc;
+    str     asExecutionType;
+    str     asExecutionTypeDesc;
+    str     asTotalQueryWaitTimeMs;
+    str     asAvgQueryWaitTimeMs;
+    str     asLastQueryWaitTimeMs;
+    str     asMinQueryWaitTimeMs;
+    str     asMaxQueryWaitTimeMs;
+    str     asStdevQueryWaitTimeMs;
+    str     asReplicaGroupId;
+    str     asRecId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStoreWaitStatsViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement2019</Name>
+				<Source><![CDATA[
+
+    private str createSQLStatement2019()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.wait_stats_id AS %1,
+            r.plan_id AS %2,
+            r.runtime_stats_interval_id AS %3,
+            r.wait_category AS %4,
+            CONVERT([NVARCHAR](MAX), r.wait_category_desc) AS %5,
+            r.execution_type AS %6,
+            CONVERT([NVARCHAR](MAX), r.execution_type_desc) AS %7,
+            r.total_query_wait_time_ms AS %8,
+            r.avg_query_wait_time_ms AS %9,
+            r.last_query_wait_time_ms AS %10,
+            r.min_query_wait_time_ms AS %11,
+            r.max_query_wait_time_ms AS %12,
+            r.stdev_query_wait_time_ms AS %13,
+            0 AS %14,
+            1010 AS %15
+            FROM sys.query_store_wait_stats r",
+        asWaitStatsId,
+        asPlanId,
+        asRuntimeStatsIntervalId,
+        asWaitCategory,
+        asWaitCategoryDesc,
+        asExecutionType,
+        asExecutionTypeDesc,
+        asTotalQueryWaitTimeMs,
+        asAvgQueryWaitTimeMs,
+        asLastQueryWaitTimeMs,
+        asMinQueryWaitTimeMs,
+        asMaxQueryWaitTimeMs,
+        asStdevQueryWaitTimeMs,
+        asReplicaGroupId,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement2022</Name>
+				<Source><![CDATA[
+
+    private str createSQLStatement2022()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.wait_stats_id AS %1,
+            r.plan_id AS %2,
+            r.runtime_stats_interval_id AS %3,
+            r.wait_category AS %4,
+            CONVERT([NVARCHAR](MAX), r.wait_category_desc) AS %5,
+            r.execution_type AS %6,
+            CONVERT([NVARCHAR](MAX), r.execution_type_desc) AS %7,
+            r.total_query_wait_time_ms AS %8,
+            r.avg_query_wait_time_ms AS %9,
+            r.last_query_wait_time_ms AS %10,
+            r.min_query_wait_time_ms AS %11,
+            r.max_query_wait_time_ms AS %12,
+            r.stdev_query_wait_time_ms AS %13,
+            r.replica_group_id AS %14,
+            1010 AS %15
+            FROM sys.query_store_wait_stats r",
+        asWaitStatsId,
+        asPlanId,
+        asRuntimeStatsIntervalId,
+        asWaitCategory,
+        asWaitCategoryDesc,
+        asExecutionType,
+        asExecutionTypeDesc,
+        asTotalQueryWaitTimeMs,
+        asAvgQueryWaitTimeMs,
+        asLastQueryWaitTimeMs,
+        asMinQueryWaitTimeMs,
+        asMaxQueryWaitTimeMs,
+        asStdevQueryWaitTimeMs,
+        asReplicaGroupId,
+        asRecId);
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        if (DBMSQLUtils::databaseCompatibilityLevel() >= 160)
+        {
+            return this.createSQLStatement2022();
+        }
+        else
+        {
+            return this.createSQLStatement2019();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStoreWaitStats));
+        viewName            = view.name(DbBackend::Sql);
+        asWaitStatsId = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, WaitStatsId)).name(DbBackend::Sql);
+        asPlanId = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, PlanId)).name(DbBackend::Sql);
+        asRuntimeStatsIntervalId = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, RuntimeStatsIntervalId)).name(DbBackend::Sql);
+        asWaitCategory = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, WaitCategory)).name(DbBackend::Sql);
+        asWaitCategoryDesc = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, WaitCategoryDesc)).name(DbBackend::Sql);
+        asExecutionType = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, ExecutionType)).name(DbBackend::Sql);
+        asExecutionTypeDesc = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, ExecutionTypeDesc)).name(DbBackend::Sql);
+        asTotalQueryWaitTimeMs = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, TotalQueryWaitTimeMs)).name(DbBackend::Sql);
+        asAvgQueryWaitTimeMs = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, AvgQueryWaitTimeMs)).name(DbBackend::Sql);
+        asLastQueryWaitTimeMs = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, LastQueryWaitTimeMs)).name(DbBackend::Sql);
+        asMinQueryWaitTimeMs = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, MinQueryWaitTimeMs)).name(DbBackend::Sql);
+        asMaxQueryWaitTimeMs = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, MaxQueryWaitTimeMs)).name(DbBackend::Sql);
+        asStdevQueryWaitTimeMs = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, StdevQueryWaitTimeMs)).name(DbBackend::Sql);
+        asReplicaGroupId = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, ReplicaGroupId)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStoreWaitStats, RecId)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStoreWaitStatsViewBuilder construct()
+    {
+        return new DBMSQLQueryStoreWaitStatsViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

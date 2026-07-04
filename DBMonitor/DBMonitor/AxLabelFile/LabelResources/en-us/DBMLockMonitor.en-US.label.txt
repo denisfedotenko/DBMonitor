@@ -1,0 +1,237 @@
+ActivateDBResourceMon=Activate DB Resource monitor
+ ;DBMLockMonitor
+ActivateLockMonitorLabel=Activate lock monitor
+ ;DBMLockMonitor
+ActivateLockMontorHelp=Activates a job, periodically checking for locks
+ ;DBMLockMonitor
+ArchiveUnit=Archival unit (minutes)
+ ;DBMLockMonitor
+BatchAlreadyExists=Batch job "%1" already exists in the batch queue
+ ;DBMLockMonitor
+BlockingSPIDHelp=The first SPID blocking the current session
+ ;DBMLockMonitor
+BlockingSPIDLabel=Blocking SPID
+ ;DBMLockMonitor
+CalculatedFieldsforLocLog=Calculated fields for Locking log
+ ;DBMLockMonitor
+CleanupDBLockHistory=Clean up DB Locking History
+ ;DBMLockMonitor
+CPULimitHelp=Number of vCores for this database during this interval.
+CPULimitLabel=CPU Limit
+ ;DBMLockMonitor
+CPUPercentAvgLabel=Avg CPU Percent
+ ;DBMLockMonitor
+CPUPercentHelp= Compute utilization in percentage of the limit of the service tier
+ ;DBMLockMonitor
+CPUPercentLabel=CPU Percent
+ ;DBMLockMonitor
+CPUPercentMaxLabel=Max CPU Percent
+ ;DBMLockMonitor
+CPUPercentMinLabel=Min CPU Percent
+ ;DBMLockMonitor
+CurrentSPID=SPID
+ ;DBMLockMonitor
+CurrentSQLHelp=Currently executed SQL
+ ;DBMLockMonitor
+CurrentSQLLabel=Current SQL
+ ;DBMLockMonitor
+CursorSQLHelp=SQ in every open cursor in the current session
+ ;DBMLockMonitor
+CursorSQLLabel=Cursor SQL
+ ;DBMLockMonitor
+DataIoPercentAvgLabel=Avg data IO percent
+ ;DBMLockMonitor
+DataIOPercentHelp=Data I/O utilization in percentage of the limit of the service tier.
+ ;DBMLockMonitor
+DataIoPercentLabel=Data IO percent
+ ;DBMLockMonitor
+DataIoPercentMaxLabel=Max data IO percent
+ ;DBMLockMonitor
+DataIoPercentMinLabel=Min data IO percent
+ ;DBMLockMonitor
+DBResourceUsage=Database resource usage
+ ;DBMLockMonitor
+DBResourceUsageArchive=DB Resource Usage Archive
+ ;DBMLockMonitor
+DBResourceUsageArchiveEntityMaintain=Database resource usage archive entity - Maintain
+ ;DBMLockMonitor
+DBResourceUsageArchiveEntityView=Database resource usage archive entity - View
+ ;DBMLockMonitor
+DBResourceUsageEntityMaintain=Database resource usage entity - Maintain
+ ;DBMLockMonitor
+DBResourceUsageEntityView=Database resource usage entity - View
+ ;DBMLockMonitor
+DBResourceUsageMonitor=DB Resource Usage Monitor
+ ;DBMLockMonitor
+DBResourceUsageMonitorBatch=DBM Database resource usage monitor batch
+ ;DBMLockMonitor
+DBResourceusagemonitoringoptions=DB Resource usage monitoring options
+ ;DBMLockMonitor
+DBSessionInfo=Database sessions
+ ;DBMLockMonitor
+EndTime=End time
+ ;DBMLockMonitor
+HostName=Host name
+ ;DBMLockMonitor
+DBMDBLockHistoryEntityMaintain=DBM DB Lock History Entity - Maintain
+ ;DBMLockMonitor
+DBMDbLockHistoryEntityView=DBM DB Lock History Entity - View
+ ;DBMLockMonitor
+DBMDBLockingHistory=DBM DB Locking History
+ ;DBMLockMonitor
+DBMLockMon=DBM Lock Monitor
+ ;DBMLockMonitor
+IndexNameHelp=Name of the index locked/to be locked
+ ;DBMLockMonitor
+IndexNameLabel=Index name
+ ;DBMLockMonitor
+InstanceCPUPercentAvgLabel=Avg instance CPU percent
+ ;DBMLockMonitor
+InstanceCPUPercentHelp=CPU utilization by the database engine instance hosting the pool, as a percentage of instance limit.
+ ;DBMLockMonitor
+InstanceCPUPercentLabel=Instance CPU percent
+ ;DBMLockMonitor
+InstanceCPUPercentMaxLabel=Max instance CPU percent
+ ;DBMLockMonitor
+InstanceCPUPercentMinLabel=Min instance CPU percent
+ ;DBMLockMonitor
+InstanceMemoryPercentAvgLabel=Avg instance memory percent
+ ;DBMLockMointor
+InstanceMemoryPercentHelp=Memory usage for the SQL Server instance hosting the database
+ ;DBMLockMointor
+InstanceMemoryPercentLabel=Instance memory percent
+ ;DBMLockMointor
+InstanceMemoryPercentMaxLabel=Max instance memory percent
+ ;DBMLockMointor
+InstanceMemoryPercentMinLabel=Min instance memory percent
+ ;DBMLockMointor
+InstanceUsage=Instance usage
+ ;DBMLockMonitor
+LockingHistory=Locking history
+ ;DBMLockMonitor
+LockMonitor=Lock monitor
+ ;DBMLockMontor
+LockMonitoringJobOptions=Lock monitoring job options
+ ;DBMLockMontor
+LockMonitorMaintain=Lock Monitor - Maintain
+ ;DBMLockMonitor
+LockMonitorView=Lock Monitor - View
+ ;DBMLockMonitor
+LockRescanFreqHelp=Frequency of the lock scanning after a waiting lock has been found
+ ;DBMLockMontor
+LockRescanFreqLabel=Lock re-scan frequency (sec)
+ ;DBMLockMonitor
+LoginName=Login name
+ ;DBMLockMonitor
+LoginTimeHelp=Login date and time of the current SPID
+ ;DBMLockMonitor
+LoginTimeLabel=Login date and time
+ ;DBMLockMonitor
+LogWritePercentAvgLabel=Avg log Write percent
+ ;DBMLockMonitor
+LogWritePercentHelp=Transaction log writes (in MB/s) as percentage of the service tier limit.
+ ;DBMLockMonitor
+LogWritePercentLabel=Log Write percent
+ ;DBMLockMonitor
+LogWritePercentMaxLabel=Max log Write percent
+ ;DBMLockMonitor
+LogWritePercentMinLabel=Min log Write percent
+ ;DBMLockMonitor
+MaxSessionPercentAvgLabel=Avg max session percent
+ ;DBMLockMonitor
+MaxSessionPercentHelp=Maximum concurrent sessions in percentage of the limit of the database's service tier.
+ ;DBMLockMonitor
+MaxSessionPercentLabel=Max session percent
+ ;DBMLockMonitor
+MaxSessionPercentMaxLabel=Max max session percent
+ ;DBMLockMonitor
+MaxSessionPercentMinLabel=Min max session percent
+ ;DBMLockMonitor
+MaxWorkerPercentAvgLabel=Avg max worker percent
+ ;DBMLockMonitor
+MaxWorkerPercentHelp=Maximum concurrent workers (requests) in percentage of the limit of the database's service tier.
+ ;DBMLockMonitor
+MaxWorkerPercentLabel=Max worker percent
+ ;DBMLockMonitor
+MaxWorkerPercentMaxLabel=Max max worker percent
+ ;DBMLockMonitor
+MaxWorkerPercentMinLabel=Min max worker percent
+ ;DBMLockMonitor
+MemoryPercentAvgLabel=Avg instance memory percent
+ ;DBMLockMonitor
+MemoryPercentLabel=Instance memory percent
+ ;DBMLockMonitor
+MemoryPercentMaxLabel=Max instance memory percent
+ ;DBMLockMonitor
+MemoryPercentMinLabel=Min instance memory percent
+ ;DBMLockMonitor
+MemoryUsagePercentAvgLabel=Avg memory usage percent
+ ;DBMLockMonitor
+MemoryUsagePercentHelp=Memory utilization in percentage of the limit of the service tier
+ ;DBMLockMonitor
+MemoryUsagePercentLabel=Memory usage percent
+ ;DBMLockMonitor
+MemoryUsagePercentMaxLabel=Max memory usage percent
+ ;DBMLockMonitor
+MemoryUsagePercentMinLabel=Min memory usage percent
+ ;DBMLockMonitor
+MinMonitorFreq=Minimum monitoring frequency cannot be less than %1
+ ;DBMLockMonitor
+MinScanFreq=Minimum lock re-scan frequency cannot be less than %1
+ ;DBMLocMonitor
+MonitoringFreqHelp=Delay between two consequence checks of the locked sessions, when no existing waiting locks have been found
+ ;DBMLockMonitor
+MonitoringFreqLabel=Monitoring frequency (sec)
+ ;DBMLockMonitor
+NewLabel0=Label files created on 09/14/2024 16:59:01 for label file Id DBMLockMonitor and language en-US
+ ;Label file comment - see above label
+Numberdaystokeep=Number of days to keep 
+ ;DBMLockMonitor
+NumberOfDaysToKeep=Number of days to keep in the locking history
+ ;DBMLockMonitor
+NumerDaysInArchive=Number of days to keep in archive
+ ;DBMLockMonitor
+ObjectNameHelp=Name of the object locked/to be locked
+ ;DBMLockMontor
+ObjectNameLabel=Object Name
+ ;DBMLockMontor
+OurDBUsage=Our database usage
+ ;DBMLockMonitor
+ProgramName=Program name
+ ;DBMLockMonitor
+RecentSQLHelp=The most recent SQL text executed in the current session
+ ;DBMLockMonitor
+RecentSQLLabel=Recent SQL
+ ;DBMLockMonitor
+RequestTypeHelp=Lock request type
+ ;DBMLockMonitor
+RequestTypeLabel=Request type
+ ;DBMLockMonitor
+ResourceDescriptionHelp=Description of the resource locked/to be locked
+ ;DBMLockMonitor
+ResourceDescriptionLabel=Resource description
+ ;DBMLockMontor
+ResourceTypeHelp=Type of the resource locked/to be locked
+ ;DBMLockMonitor
+ResourceTypeLabel=Resource type
+ ;DBMLockMonitor
+RootSPIDHelp=Root SPID of the lock tree
+ ;DBMLockMonitor
+RootSPIDLabel=Root SPID
+ ;DBMLockMonitor
+ScanFrequency=Scan frequency
+ ;DBMLockMonitor
+SPID=SPID
+ ;DBMLockMonitor
+SQLText=SQL Text
+ ;DBMLockMonitor
+StartTimeHelp=Execution start time for the current SQL
+ ;DBMLockMonitor
+StartTimeLabel=Start time
+ ;DBMLockMonitor
+Timestamp=Timestamp
+ ;DBMLockMonitor
+userContextHelp=User context passed from D365FO kernel to the SQL Server
+ ;DBMLockMonitor
+userContextLabel=User context
+ ;DBMLockMonitor

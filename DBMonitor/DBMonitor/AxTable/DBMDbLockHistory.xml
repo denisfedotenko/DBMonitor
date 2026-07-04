@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTable xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDbLockHistory</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMDbLockHistory extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromDBSessionInfo</Name>
+				<Source><![CDATA[
+    public void initFromDBSessionInfo(DBMDBSessionInfo _sessionInfo)
+    {
+        this.rootSpid = _sessionInfo.rootSpid;
+        this.nestingLevel = _sessionInfo.nestingLevel;
+        this.spid = _sessionInfo.spid;
+        this.loginTime = _sessionInfo.loginTime;
+        this.programName = _sessionInfo.programName;
+        this.hostName = _sessionInfo.hostName;
+        this.currentSQL = _sessionInfo.currentSQL;
+        this.cursorSQL = _sessionInfo.cursorSQL;
+        this.recentSQL = _sessionInfo.recentSQL;
+        this.blockingSpid = _sessionInfo.blockingSpid;
+        this.startTime = _sessionInfo.startTime;
+        this.userContext = _sessionInfo.userContext;
+        this.resourceDescription = _sessionInfo.resourceDescription;
+        this.resourceType = _sessionInfo.resourceType;
+        this.requestMode = _sessionInfo.requestMode;
+        this.objectName = _sessionInfo.objectName;
+        this.indexName = _sessionInfo.indexName;
+        this.axUserId = _sessionInfo.axUserId;
+        this.axSessionId = _sessionInfo.axSessionId;
+        this.batchJobId = _sessionInfo.batchJobid;
+        this.batchCaption = _sessionInfo.batchCaption;
+        this.className = _sessionInfo.className;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMLockMonitor:LockingHistory</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<TitleField1>rootSpid</TitleField1>
+	<TitleField2>userContext</TitleField2>
+	<AllowRowVersionChangeTracking>Yes</AllowRowVersionChangeTracking>
+	<CreatedDateTime>Yes</CreatedDateTime>
+	<SaveDataPerCompany>No</SaveDataPerCompany>
+	<DeleteActions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>rootSpid</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>nestingLevel</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>spid</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>loginTime</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>programName</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>hostName</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>currentSQL</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>cursorSQL</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>recentSQL</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>blockingSpid</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>startTime</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>userContext</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>requestMode</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>resourceDescription</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>resourceType</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>indexName</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>objectName</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>axUserId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>batchCaption</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>className</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>rootSpid</Name>
+			<ExtendedDataType>DBMSQLSPID</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:RootSPIDHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:RootSPIDLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>nestingLevel</Name>
+			<ExtendedDataType>level</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>spid</Name>
+			<ExtendedDataType>DBMSQLSPID</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:CurrentSPID</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldUtcDateTime">
+			<Name>loginTime</Name>
+			<ExtendedDataType>UTCTimeStamp</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:LoginTimeHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:LoginTimeLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>programName</Name>
+			<ExtendedDataType>DBMSQLProgramName</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>hostName</Name>
+			<ExtendedDataType>DBMSQLHostName</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>currentSQL</Name>
+			<ExtendedDataType>DBMSQLText</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:CurrentSQLHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:CurrentSQLLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>cursorSQL</Name>
+			<ExtendedDataType>DBMSQLText</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:CursorSQLHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:CursorSQLLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>recentSQL</Name>
+			<ExtendedDataType>DBMSQLText</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:RecentSQLHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:RecentSQLLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>blockingSpid</Name>
+			<ExtendedDataType>DBMSQLSPID</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:BlockingSPIDHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:BlockingSPIDLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldUtcDateTime">
+			<Name>startTime</Name>
+			<ExtendedDataType>UTCTimeStamp</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:StartTimeHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:StartTimeLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>userContext</Name>
+			<ExtendedDataType>DBMSQLUserContext</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>resourceDescription</Name>
+			<ExtendedDataType>DBMResourceDescription</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>resourceType</Name>
+			<ExtendedDataType>DBMResourceType</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>requestMode</Name>
+			<ExtendedDataType>DBMRequestMode</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>objectName</Name>
+			<ExtendedDataType>DBMSQLSysName</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:ObjectNameHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>indexName</Name>
+			<ExtendedDataType>DBMSQLSysName</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:IndexNameHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:IndexNameLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>axUserId</Name>
+			<ExtendedDataType>userId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>axSessionId</Name>
+			<ExtendedDataType>sessioNId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt64">
+			<Name>batchJobId</Name>
+			<ExtendedDataType>refRecId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@SYS114515</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>batchCaption</Name>
+			<ExtendedDataType>batchCaption</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@SYS114518</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>className</Name>
+			<ExtendedDataType>className</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes>
+		<AxTableIndex>
+			<Name>createdDateTimeIdx</Name>
+			<AllowDuplicates>Yes</AllowDuplicates>
+			<Fields>
+				<AxTableIndexField>
+					<DataField>CreatedDateTime</DataField>
+				</AxTableIndexField>
+			</Fields>
+		</AxTableIndex>
+	</Indexes>
+	<Mappings />
+	<Relations>
+		<AxTableRelation>
+			<Name>BatchJob</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>batchJob</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>batchJobId</Name>
+					<Field>batchJobId</Field>
+					<RelatedField>RecId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+	</Relations>
+	<StateMachines />
+</AxTable>

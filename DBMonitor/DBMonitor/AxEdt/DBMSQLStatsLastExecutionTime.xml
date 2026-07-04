@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtUtcDateTime">
+	<Name>DBMSQLStatsLastExecutionTime</Name>
+	<Label>@DBMSQLStats:LastExecutionTime</Label>
+	<HelpText>@DBMSQLStats:LastExecutionTimeHelp</HelpText>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

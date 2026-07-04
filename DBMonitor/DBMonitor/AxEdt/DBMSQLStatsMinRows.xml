@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtInt64">
+	<Name>DBMSQLStatsMinRows</Name>
+	<Label>@DBMSQLStats:MinRows</Label>
+	<HelpText>@DBMSQLStats:MinRowsHelp</HelpText>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

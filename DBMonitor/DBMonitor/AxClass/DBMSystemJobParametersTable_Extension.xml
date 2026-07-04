@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSystemJobParametersTable_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Extension class for the standard class SystemJobDefaultParameters
+/// </summary>
+[ExtensionOf(tableStr(SystemJobParameters))]
+public final class DBMSystemJobParametersTable_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initValue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// initializes default values for the record
+    /// </summary>
+    public void initValue()
+    {
+        next initValue();
+        this.DBMLockMonMonitorFreq = 30;
+        this.DBMLockMonReScanFreq = 10;
+        this.DBMDBResArchivalUnit = 15;
+        this.DBMDBResDaysToKeep = 7;
+        this.DBMDBResDaysToKeepinArchive = 183;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>aosValidateUpdate</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// validates the parameter values
+    /// </summary>
+    public boolean aosValidateUpdate()
+    {
+        boolean ret;
+        ret = next aosValidateUpdate();
+
+        if (this.DBMLockMonMonitorFreq < SystemJobDefaultParameters::DBMMinMonitoringFreq)
+        {
+            Message::Add(MessageSeverity::Warning, strFmt("@DBMLockMonitor:MinMonitorFreq", SystemJobDefaultParameters::DBMMinMonitoringFreq));
+            this.DBMLockMonMonitorFreq = SystemJobDefaultParameters::DBMMinMonitoringFreq;
+            return false;
+        }
+        if (this.DBMLockMonRescanFreq < SystemJobDefaultParameters::DBMMinRescanFreq)
+        {
+            Message::Add(MessageSeverity::Warning, strFmt("@DBMLockMonitor:MinScanFreq", SystemJobDefaultParameters::DBMMinRescanFreq));
+            this.DBMLockMonRescanFreq = SystemJobDefaultParameters::DBMMinRescanFreq;
+            return false;
+        }
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

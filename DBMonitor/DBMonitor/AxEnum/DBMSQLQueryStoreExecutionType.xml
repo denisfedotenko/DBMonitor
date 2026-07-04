@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreExecutionType</Name>
+	<HelpText>@DBMonitor:DBMSQLQueryStoreExecutionTypeHelp</HelpText>
+	<Label>@DBMonitor:DBMSQLQueryStoreExecutionType</Label>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Regular</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreExecutionType_Regular</Label>
+			<Value>0</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Client</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreExecutionType_Client</Label>
+			<Value>3</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Exception</Name>
+			<Label>@DBMonitor:DBMSQLQueryStoreExecutionType_Exception</Label>
+			<Value>4</Value>
+		</AxEnumValue>
+	</EnumValues>
+</AxEnum>

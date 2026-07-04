@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDBUsageMonitorBatch</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// The main batch job for monitoring database resource usage
+/// </summary>
+public class DBMDBUsageMonitorBatch extends runBaseBatch
+{
+    #OCCRetryCount
+
+    
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// the main run() method
+    /// </summary>
+    public void run()
+    {
+        if (!DBMSQLUtils::isSqlAzure())
+        {
+            return;
+        }
+        if (!SystemJobParameters::find().DBMActivateDBResourceMonitor)
+        {
+            return;
+        }
+        try
+        {
+            ttsbegin;
+            DBMDBResourceUsage resourceUsageTemp;
+            resourceUsageTemp.setTempDB();
+            delete_from resourceUsageTemp;
+            this.collectFromDMV(resourceUsageTemp);
+            this.insertMainTable(resourceUsageTemp);
+            this.updateArchive();
+            this.cleanupOldData();
+            ttscommit;
+        }
+        catch (Exception::UpdateConflict)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::UpdateConflictNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::UpdateConflict;
+            }
+        }
+        catch(Exception::DuplicateKeyException)
+        {
+            if (appl.ttsLevel() == 0)
+            {
+                if (xSession::currentRetryCount() >= #RetryNum)
+                {
+                    throw Exception::DuplicateKeyExceptionNotRecovered;
+                }
+                else
+                {
+                    retry;
+                }
+            }
+            else
+            {
+                throw Exception::DuplicateKeyException;
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            if (xSession::currentRetryCount() >= #RetryNum)
+            {
+                throw Exception::Deadlock;
+            }
+            sleep(xSession::currentRetryCount() * 500);
+            retry;
+        }
+        catch (Exception::TransientSqlConnectionError)
+        {
+            if (SysTransientSqlConnectionErrorHandler::retryTransientSqlConnectionError())
+            {
+                retry;
+            }
+            else
+            {
+                throw Exception::TransientSqlConnectionError;
+            }
+        }
+        catch (Exception::Error)
+        {
+            exceptionTextFallThrough();
+        }
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>collectFromDMV</Name>
+				<Source><![CDATA[
+    private void collectFromDMV(DBMDBResourceUsage resourceUsageTemp)
+    {
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        str sqlStatementText = @"select end_time,avg_cpu_percent,avg_data_io_percent,avg_log_write_percent,avg_memory_usage_percent,max_worker_percent,max_session_percent,avg_instance_cpu_percent,avg_instance_memory_percent,cpu_limit
+from sys.dm_db_resource_stats";
+
+        if (sqlStatementText)
+        {
+            permission = new SqlStatementExecutePermission(sqlStatementText);
+
+            // Open the code access permission scope.
+            permission.assert();
+
+            statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQueryWithParameters(sqlStatementText,SqlParams::create());
+            RecordInsertList ril = new RecordInsertList(tableNum(DBMDBResourceUsage),true,true,true,true,true,resourceUsageTemp);
+            while (resultSet.next())
+            {
+                resourceUsageTemp.clear();
+                resourceUsageTemp.timeStamp = resultSet.getDateTime(1);
+                resourceUsageTemp.CPUPercent = resultSet.getReal(2);
+                resourceUsageTemp.dataIOPercent = resultSet.getReal(3);
+                resourceUsageTemp.logWritePercent = resultSet.getReal(4);
+                resourceUsageTemp.memoryUsagePercent = resultSet.getReal(5);
+                resourceUsageTemp.maxWorkerPercent = resultSet.getReal(6);
+                resourceUsageTemp.maxSessionPercent = resultSet.getReal(7);
+                resourceUsageTemp.instanceCPUPercent = resultSet.getReal(8);
+                resourceUsageTemp.instanceMemoryPercent = resultSet.getReal(9);
+                resourceUsageTemp.CPULimit = resultSet.getInt(10);
+                ril.add(resourceUsageTemp);
+            }
+            // Close the code access permission scope.
+            CodeAccessPermission::revertAssert();
+            ril.insertDatabase();
+        }
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateArchive</Name>
+				<Source><![CDATA[
+    private void updateArchive()
+    {
+        DBMDBUsageArchiveView archiveView;
+        DBMDBResourceUsageArchive archive;
+        DBMDBResourceUsageArchive archiveCheck;
+        insert_recordset archive(timeStamp,
+                                CPULimitAvg,
+                                CPUPercentAvg,
+                                CPUPercentMax,
+                                CPUPercentMin,
+                                dataIOPercentAvg,
+                                dataIOPercentMax,
+                                dataIOPercentMin,
+                                instanceCpuPercentAvg,
+                                instanceCpuPercentMax,
+                                instanceCpuPercentMin,
+                                instanceMemoryPercentAvg,
+                                instanceMemoryPercentMax,
+                                instanceMemoryPercentMin,
+                                logWritePercentAvg,
+                                logWritePercentMax,
+                                logWritePercentMin,
+                                maxSessionPercentAvg,
+                                maxSessionPercentMax,
+                                maxSessionPercentMin,
+                                maxWorkerPercentAvg,
+                                maxWorkerPercentMax,
+                                maxWorkerPercentMin,
+                                memoryUsagePercentAvg,
+                                memoryUsagePercentMax,
+                                memoryUsagePercentMin)
+        select                  timeStamp,
+                                CPULimitAvg,
+                                CPUPercentAvg,
+                                CPUPercentMax,
+                                CPUPercentMin,
+                                dataIOPercentAvg,
+                                dataIOPercentMax,
+                                dataIOPercentMin,
+                                instanceCpuPercentAvg,
+                                instanceCpuPercentMax,
+                                instanceCpuPercentMin,
+                                instanceMemoryPercentAvg,
+                                instanceMemoryPercentMax,
+                                instanceMemoryPercentMin,
+                                logWritePercentAvg,
+                                logWritePercentMax,
+                                logWritePercentMin,
+                                maxSessionPercentAvg,
+                                maxSessionPercentMax,
+                                maxSessionPercentMin,
+                                maxWorkerPercentAvg,
+                                maxWorkerPercentMax,
+                                maxWorkerPercentMin,
+                                memoryUsagePercentAvg,
+                                memoryUsagePercentMax,
+                                memoryUsagePercentMin
+        from archiveView
+        where archiveView.lineNumber>1 //we skip the first line, because it can contain uncompleted period;
+        notexists join archiveCheck
+            where archiveCheck.timeStamp == archiveView.timestamp;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>cleanupOldData</Name>
+				<Source><![CDATA[
+    private void cleanupOldData()
+    {
+        SystemJobParameters systemJobParameters = SystemJobParameters::find();
+        utcDateTime cleanThreshold = DateTimeUtil::addDays(DateTimeUtil::getSystemDateTime(),-systemJobParameters.DBMDBResDaysToKeep);
+        utcDateTime cleanThresholdArchive = DateTimeUtil::addDays(DateTimeUtil::getSystemDateTime(),-systemJobParameters.DBMDBResDaysToKeepInArchive);
+        DBMDBResourceUsage dbResourceUsage;
+        delete_from dbResourceUsage
+            where dbResourceUsage.timeStamp < cleanThreshold;
+        DBMDBResourceUsageArchive dbResourceUsageArchive;
+        delete_from dbResourceUsageArchive
+            where dbResourceUsageArchive.timeStamp < cleanThresholdArchive;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>insertMainTable</Name>
+				<Source><![CDATA[
+    private void insertMainTable(DBMDBResourceUsage resourceUsageTemp)
+    {
+        DBMDBResourceUsage resourceUsage;
+        DBMDBResourceUsage resourceCheck;
+        insert_recordset resourceUsage(Timestamp,CPUPercent,dataIOPercent,logWritePercent,memoryUsagePercent,maxWorkerPercent,maxSessionPercent,instanceCPUPercent,instanceMemoryPercent,CPULimit)
+            select timestamp,CPUPercent,dataIOPercent,logWritePercent,memoryUsagePercent,maxWorkerPercent,maxSessionPercent,instanceCPUPercent,instanceMemoryPercent,CPULimit
+            from resourceUsageTemp
+            notexists join resourceCheck
+            where resourceCheck.timeStamp == resourceUsageTemp.timeStamp;
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>description</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Provides the description for the batch job.
+    /// </summary>
+    /// <returns>
+    /// The description for the batch job.
+    /// </returns>
+    public static ClassDescription description()
+    {
+        return "@DBMLockMonitor:DBResourceUsageMonitorBatch";
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>mustGoBatch</Name>
+				<Source><![CDATA[
+    boolean mustGoBatch()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>scheduleForBatchExecution</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Schedules a job to run using given recurrence data
+    /// </summary>
+    public void scheduleForBatchExecution()
+    {
+        changecompany('dat')
+        {
+            this.batchInfo();
+            batchInfo.parmBatchExecute(this.mustGoBatch());
+            batchInfo.parmCaption(this.caption());
+            SysRecurrenceData recurrenceData = SysRecurrence::defaultRecurrence();
+            recurrenceData = SysRecurrence::setRecurrenceStartDateTime(recurrenceData, DateTimeUtil::addSeconds(DateTimeUtil::utcNow(), 1));
+            recurrenceData = SysRecurrence::setRecurrenceNoEnd(recurrenceData);
+            recurrenceData = SysRecurrence::setRecurrenceUnit(recurrenceData, SysRecurrenceUnit::Minute, 20);
+            batchInfo.parmRecurrenceData(recurrenceData);
+            batchInfo.parmCritical(NoYes::Yes);
+            batchInfo.parmBatchHeader().parmLogLevel(BatchLogLevel::Never);
+
+            batchInfo.doBatch();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>batchJobExists</Name>
+				<Source><![CDATA[
+    private boolean batchJobExists()
+    {
+        BatchJob batchJob;
+        Batch batch;
+
+        select firstonly RecId from batchJob
+            exists join batch
+            where batchJob.RecId == batch.BatchJobId
+                && batch.ClassNumber == classIdGet(this);
+
+        return batchJob.RecId != 0;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>canRunInNewSession</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Describes whether the class is designed for execution in a new session.
+    /// </summary>
+    /// <returns>
+    /// true if the class is designed for execution the operation in a new session; otherwise, false.
+    /// </returns>
+    protected boolean canRunInNewSession()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    static void main(Args args)
+    {
+        DBMDBUsageMonitorBatch                 dbUsageMonitorBatch = new DBMDBUsageMonitorBatch();
+        ;
+        if (!dbUsageMonitorBatch.batchJobExists())
+        {
+            dbUsageMonitorBatch.scheduleForBatchExecution();
+        }
+        else
+        {
+            warning(strFmt("@DBMLockMonitor:BatchAlreadyExists",DBMDBUsageMonitorBatch::description()));
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

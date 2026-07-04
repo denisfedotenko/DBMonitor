@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLSessionInfoViewSetup</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Recreates SQL select statement for the <c>DBMDBSessionInfo</c> view due the limitation of AX designer.
+/// </summary>
+[
+    SysSetupTableAttribute(viewstr(DBMDBSessionInfo)),
+    SysSetupConfig(false, 300, 0.0)
+]
+public final class DBMSQLSessionInfoViewSetup implements SysSetup
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>loadData</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public void loadData()
+    {
+        DBMSQLSessionInfoViewBuilder::main(new Args());
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtReal">
+	<Name>DBMSQLInstanceMemoryPercent</Name>
+	<Extends>Percent</Extends>
+	<HelpText>@DBMLockMonitor:InstanceMemoryPercentHelp</HelpText>
+	<Label>@DBMLockMonitor:InstanceMemoryPercentLabel</Label>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

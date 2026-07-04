@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryHintsViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStoreQueryHintsViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asQueryHintId;
+    str     asQueryId;
+    str     asReplicaGroupId;
+    str     asQueryHintText;
+    str     asLastQueryHintFailureReason;
+    str     asLastQueryHintFailureReasonDesc;
+    str     asQueryHintFailureCount;
+    str     asSource;
+    str     asSourceDesc;
+    str     asComment;
+    str     asRecId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStoreQueryHintsViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement2019</Name>
+				<Source><![CDATA[
+    private str createSQLStatement2019()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            0 AS %1,
+            0 AS %2,
+            0 AS %3,
+            '' AS %4,
+            0 AS %5,
+            '' AS %6,
+            0 AS %7,
+            0 AS %8,
+            '' AS %9,
+            '' AS %10,
+            1010 AS %11
+            FROM sys.query_store_query WHERE 1=0",
+        asQueryHintId,
+        asQueryId,
+        asReplicaGroupId,
+        asQueryHintText,
+        asLastQueryHintFailureReason,
+        asLastQueryHintFailureReasonDesc,
+        asQueryHintFailureCount,
+        asSource,
+        asSourceDesc,
+        asComment,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement2022</Name>
+				<Source><![CDATA[
+    private str createSQLStatement2022()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.query_hint_id AS %1,
+            r.query_id AS %2,
+            r.replica_group_id AS %3,
+            CONVERT([NVARCHAR](MAX), r.query_hint_text) AS %4,
+            r.last_query_hint_failure_reason AS %5,
+            CONVERT([NVARCHAR](MAX), r.last_query_hint_failure_reason_desc) AS %6,
+            r.query_hint_failure_count AS %7,
+            r.source AS %8,
+            CONVERT([NVARCHAR](MAX), r.source_desc) AS %9,
+            CONVERT([NVARCHAR](MAX), r.comment) AS %10,
+            1010 AS %11
+            FROM sys.query_store_query_hints r",
+        asQueryHintId,
+        asQueryId,
+        asReplicaGroupId,
+        asQueryHintText,
+        asLastQueryHintFailureReason,
+        asLastQueryHintFailureReasonDesc,
+        asQueryHintFailureCount,
+        asSource,
+        asSourceDesc,
+        asComment,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        if (DBMSQLUtils::databaseCompatibilityLevel() >= 160)
+        {
+            return this.createSQLStatement2022();
+        }
+        else
+        {
+            return this.createSQLStatement2019();
+        }
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStoreQueryHints));
+        viewName            = view.name(DbBackend::Sql);
+        asQueryHintId = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, QueryHintId)).name(DbBackend::Sql);
+        asQueryId = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, QueryId)).name(DbBackend::Sql);
+        asReplicaGroupId = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, ReplicaGroupId)).name(DbBackend::Sql);
+        asQueryHintText = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, QueryHintText)).name(DbBackend::Sql);
+        asLastQueryHintFailureReason = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, LastQueryHintFailureReason)).name(DbBackend::Sql);
+        asLastQueryHintFailureReasonDesc = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, LastQueryHintFailureReasonDesc)).name(DbBackend::Sql);
+        asQueryHintFailureCount = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, QueryHintFailureCount)).name(DbBackend::Sql);
+        asSource = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, Source)).name(DbBackend::Sql);
+        asSourceDesc = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, SourceDesc)).name(DbBackend::Sql);
+        asComment = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, Comment)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryHints, RecId)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStoreQueryHintsViewBuilder construct()
+    {
+        return new DBMSQLQueryStoreQueryHintsViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

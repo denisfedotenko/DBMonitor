@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtInt">
+	<Name>DBMSQLActiveQueriesRequestId</Name>
+	<Label>@DBMonitor:DBMSQLActiveQueriesRequestId</Label>
+	<HelpText>@DBMonitor:DBMSQLActiveQueriesRequestIdHelp</HelpText>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

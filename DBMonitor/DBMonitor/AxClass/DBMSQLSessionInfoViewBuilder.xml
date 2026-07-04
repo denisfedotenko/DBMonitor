@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLSessionInfoViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// View builder class for the view with the SQL Sessions
+/// </summary>
+public final class DBMSQLSessionInfoViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates the <c>DBMDBSessionInfo</c> view.
+    /// </summary>
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(), SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLSessionInfoViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns the SQL statement to create the <c>DBMDBSessionInfo</c> view.
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        str sqlStmt=@"
+WITH blockingInfo (
+    session_id
+    ,blocking_session_id
+    ,sql_handle
+    ,start_time
+    )
+AS (
+    SELECT r.session_id
+        ,r.blocking_session_id
+        ,r.sql_handle
+        ,r.start_time
+    FROM sys.dm_exec_requests r
+    )
+    ,sessioninfoRaw (
+    session_id
+    ,login_time
+    ,program_name
+    ,host_name
+    ,login_name
+    ,current_sql_handle
+    ,cursor_sql_handle
+    ,most_recent_sql_handle
+    ,blocking_session_id
+    ,start_time
+    ,usercontext
+    ,usercontextadjusted
+    )
+AS (
+    SELECT s.session_id
+        ,s.Login_time
+        ,s.program_name
+        ,s.host_name
+        ,s.login_name
+        ,b.sql_handle AS current_sql_handle
+        ,cur.sql_handle AS cursor_sql_handle
+        ,con.most_recent_sql_handle AS most_recent_sql_handle
+        ,b.blocking_session_id
+        ,b.start_time
+        ,usercontext = cast(s.context_info AS VARCHAR(256))
+        ,usercontextadjusted = iif(charindex('++',cast(s.context_info AS VARCHAR(256)))!=0,
+        substring(cast(s.context_info AS VARCHAR(256)),charindex('++',cast(s.context_info AS VARCHAR(256)))+2, len(cast(s.context_info AS VARCHAR(256)))),
+        cast(s.context_info AS VARCHAR(256)))    FROM sys.dm_exec_sessions s
+    LEFT OUTER JOIN blockinginfo b ON b.session_id = s.session_id
+    LEFT OUTER JOIN sys.dm_exec_cursors(0) cur ON cur.session_id = s.session_id
+        AND cur.fetch_status != 0
+    JOIN sys.dm_exec_connections con ON con.session_id = s.session_id
+    )
+    ,sessioninfo (
+    session_id
+    ,login_time
+    ,program_name
+    ,host_name
+    ,login_name
+    ,current_sql_handle
+    ,cursor_sql_handle
+    ,most_recent_sql_handle
+    ,blocking_session_id
+    ,start_time
+    ,usercontext
+    ,axUserId
+    ,axSessionId
+    )
+AS (select 	session_id
+    ,login_time
+    ,program_name
+    ,host_name
+    ,login_name
+    ,current_sql_handle
+    ,cursor_sql_handle
+    ,most_recent_sql_handle
+    ,blocking_session_id
+    ,start_time
+    ,usercontext
+    ,case"
+    +" when isJSON('[\"' + REPLACE(userContextAdjusted,' ','\",\"') + '\"]')>0\n"
+    +"then JSON_VALUE('[\"' + REPLACE(userContextAdjusted,' ','\",\"') + '\"]',CONCAT('$[',1,']'))\n"
+    +"else ''\n"
+    +"end as axUserId\n"
+    +",coalesce(try_convert(int, case\n"
+    +"when isJSON('[\"' + REPLACE(userContextAdjusted,' ','\",\"') + '\"]')>0\n"
+    +"then JSON_VALUE('[\"' + REPLACE(userContextAdjusted,' ','\",\"') + '\"]',CONCAT('$[',2,']'))\n"
+    +
+    @"else NULL
+    end ),0) as axSessionId
+    from sessionInfoRaw
+    )
+    ,blockingTree (
+    rootSPID
+    ,LEVEL
+    ,sorting
+    ,session_id
+    ,login_time
+    ,program_name
+    ,host_name
+    ,login_name
+    ,current_sql_handle
+    ,cursor_sql_handle
+    ,most_recent_sql_handle
+    ,blocking_session_id
+    ,start_time
+    ,usercontext
+    ,axUserId
+    ,axSessionId
+    )
+            AS (
+    SELECT s1.session_id
+        ,0
+        ,CAST(REPLICATE('0', 4 - LEN(CAST(s1.session_id AS VARCHAR))) + CAST(s1.session_id AS VARCHAR) AS VARCHAR(1000)) as sorting
+        ,s1.session_id
+        ,s1.login_time
+        ,s1.program_name
+        ,s1.host_name
+        ,s1.login_name
+        ,s1.current_sql_handle
+        ,s1.cursor_sql_handle
+        ,s1.most_recent_sql_handle
+        ,s1.blocking_session_id
+        ,s1.start_time
+        ,s1.usercontext
+        ,s1.axUserId
+        ,s1.axSessionId
+    FROM sessionInfo s1
+    WHERE isnull(s1.blocking_session_id, 0) = 0
+ 
+    UNION ALL
+ 
+    SELECT bt.rootSPID
+        ,bt.LEVEL + 1
+        ,CAST(bt.sorting + RIGHT(CAST((1000 + s2.session_id) AS VARCHAR(100)), 4) AS VARCHAR(1000))
+        ,s2.session_id
+        ,s2.login_time
+        ,s2.program_name
+        ,s2.host_name
+        ,s2.login_name
+        ,s2.current_sql_handle
+        ,s2.cursor_sql_handle
+        ,s2.most_recent_sql_handle
+        ,s2.blocking_session_id
+        ,s2.start_time
+        ,s2.usercontext
+        ,s2.axUserId
+        ,s2.axSessionId
+    FROM sessionInfo s2
+    INNER JOIN blockingTree bt ON s2.blocking_session_id = bt.session_id
+    WHERE s2.blocking_session_id > 0
+        AND s2.blocking_session_id <> s2.session_id
+        AND bt.LEVEL < 29
+    )
+    ,lockInfo (
+    request_session_id
+    ,lockNumber
+    ,ObjectName
+    ,index_name
+    ,resource_type
+    ,resource_description
+    ,request_mode
+    )
+            AS (
+    SELECT dm_tran_locks.request_session_id
+            ,ROW_NUMBER() over (partition by request_session_id order by request_request_id) as lockNumber
+            ,CASE
+            WHEN resource_type = 'OBJECT'
+                THEN OBJECT_NAME(dm_tran_locks.resource_associated_entity_id)
+            ELSE OBJECT_NAME(partitions.OBJECT_ID)
+            END AS ObjectName
+        ,indexes.name AS index_name
+        ,dm_tran_locks.resource_type
+        ,dm_tran_locks.resource_description
+        ,dm_tran_locks.request_mode
+    FROM sys.dm_tran_locks
+    LEFT JOIN sys.partitions ON partitions.hobt_id = dm_tran_locks.resource_associated_entity_id
+    LEFT JOIN sys.indexes ON indexes.OBJECT_ID = partitions.OBJECT_ID
+        AND indexes.index_id = partitions.index_id
+    WHERE resource_associated_entity_id > 0
+        AND resource_database_id = DB_ID()
+        AND dm_tran_locks.request_status = 'WAIT'
+    )
+            SELECT 1010 AS RECID
+    ,rootSPID
+    ,btr.LEVEL as nestingLevel
+    ,btr.session_id AS SPID
+    ,btr.login_time AS loginTime
+    ,btr.program_name AS programName
+    ,btr.host_name AS hostName
+    ,btr.login_name
+    ,sqlcurrent.TEXT AS currentSql
+    ,sqlcursor.TEXT AS cursorSql
+    ,sqlrecent.TEXT AS recentSql
+    ,btr.blocking_session_id AS blockingSpid
+    ,btr.start_time AS startTime
+    ,btr.usercontext AS userContext
+    ,btr.sorting as sorting
+    ,lockInfo.resource_description as resourceDescription
+    ,lockInfo.resource_type as resourceType
+    ,lockiNfo.request_mode as requestMode
+    ,lockInfo.ObjectName
+    ,lockInfo.index_name as IndexName
+    ,btr.axUserId as axUserId
+    ,btr.axSessionId as axSessionId
+    ,batch.BATCHJOBID
+    ,batchJob.CAPTION as batchCaption
+    ,CLASSIDTABLE.name as className
+            FROM blockingTree btr
+            OUTER APPLY sys.dm_exec_sql_text(btr.current_sql_handle) AS sqlcurrent
+            OUTER APPLY sys.dm_exec_sql_text(btr.cursor_sql_handle) AS sqlcursor
+            OUTER APPLY sys.dm_exec_sql_text(btr.most_recent_sql_handle) AS sqlrecent
+            LEFT OUTER JOIN lockinfo ON lockinfo.request_session_id = btr.session_id
+            AND lockinfo.lockNumber = 1
+            left outer join batch
+            on batch.SESSIONIDX = btr.axSessionId
+            and batch.[STATUS] = 2
+            left outer join batchJob
+            on batchJob.RECID = batch.BATCHJOBID
+            left outer join CLASSIDTABLE
+            on CLASSIDTABLE.ID = batch.CLASSNUMBER";
+    return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>as</Name>
+				<Source><![CDATA[
+    private str as(str _fieldName, str _alias)
+    {
+        return _fieldName + ' AS ' + _alias;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMDBSessionInfo));
+        viewName            = view.name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>sqlTableName</Name>
+				<Source><![CDATA[
+    private str sqlTableName(TableId _tableId)
+    {
+        return new SysDictTable(_tableId).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns a new instance of the <c>DBMSQLSessionInfoViewBuilder</c> class.
+    /// </summary>
+    /// <returns>The new instance of the <c>DBMSQLSessionInfoViewBuilder</c> class.</returns>
+    public static DBMSQLSessionInfoViewBuilder construct()
+    {
+        return new DBMSQLSessionInfoViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

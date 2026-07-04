@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreRuntimeStatsViewSetup</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[
+    SysSetupTable(tableStr(SqlDictionary)),
+    SysSetupConfig(false, 300, 0.0)
+]
+internal final class DBMSQLQueryStoreRuntimeStatsViewSetup extends SysSetupAsync implements SysSetup
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>loadData</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public void loadData()
+    {
+        DBMSQLQueryStoreRuntimeStatsViewBuilder::main(new Args());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
+	<Name>DBMSQLQueryStoreQueryPlanHash</Name>
+	<HelpText>@DBMonitor:DBMSQLQueryStoreQueryPlanHashHelp</HelpText>
+	<Label>@DBMonitor:DBMSQLQueryStoreQueryPlanHash</Label>
+	<StringSize>8</StringSize>
+</AxEdt>

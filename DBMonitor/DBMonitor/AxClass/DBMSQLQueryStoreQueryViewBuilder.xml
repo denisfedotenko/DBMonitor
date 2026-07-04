@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStoreQueryViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asQueryId;
+    str     asQueryTextId;
+    str     asContextSettingsId;
+    str     asObjectId;
+    str     asBatchSqlHandle;
+    str     asQueryHash;
+    str     asIsInternalQuery;
+    str     asQueryParameterizationType;
+    str     asQueryParameterizationTypeDesc;
+    str     asInitialCompileStartTime;
+    str     asLastCompileStartTime;
+    str     asLastExecutionTime;
+    str     asLastCompileBatchSqlHandle;
+    str     asLastCompileBatchOffsetStart;
+    str     asLastCompileBatchOffsetEnd;
+    str     asCountCompiles;
+    str     asAvgCompileDuration;
+    str     asLastCompileDuration;
+    str     asAvgBindDuration;
+    str     asLastBindDuration;
+    str     asAvgBindCpuTime;
+    str     asLastBindCpuTime;
+    str     asAvgOptimizeDuration;
+    str     asLastOptimizeDuration;
+    str     asAvgOptimizeCpuTime;
+    str     asLastOptimizeCpuTime;
+    str     asAvgCompileMemoryKb;
+    str     asLastCompileMemoryKb;
+    str     asMaxCompileMemoryKb;
+    str     asIsClouddbInternalQuery;
+    str     asRecId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStoreQueryViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.query_id AS %1,
+            r.query_text_id AS %2,
+            r.context_settings_id AS %3,
+            r.object_id AS %4,
+            r.batch_sql_handle AS %5,
+            r.query_hash AS %6,
+            r.is_internal_query AS %7,
+            r.query_parameterization_type AS %8,
+            CONVERT([NVARCHAR](MAX), r.query_parameterization_type_desc) AS %9,
+            r.initial_compile_start_time AS %10,
+            r.last_compile_start_time AS %11,
+            r.last_execution_time AS %12,
+            r.last_compile_batch_sql_handle AS %13,
+            r.last_compile_batch_offset_start AS %14,
+            r.last_compile_batch_offset_end AS %15,
+            r.count_compiles AS %16,
+            r.avg_compile_duration AS %17,
+            r.last_compile_duration AS %18,
+            r.avg_bind_duration AS %19,
+            r.last_bind_duration AS %20,
+            r.avg_bind_cpu_time AS %21,
+            r.last_bind_cpu_time AS %22,
+            r.avg_optimize_duration AS %23,
+            r.last_optimize_duration AS %24,
+            r.avg_optimize_cpu_time AS %25,
+            r.last_optimize_cpu_time AS %26,
+            r.avg_compile_memory_kb AS %27,
+            r.last_compile_memory_kb AS %28,
+            r.max_compile_memory_kb AS %29,
+            r.is_clouddb_internal_query AS %30,
+            1010 AS %31
+            FROM sys.query_store_query r",
+        asQueryId,
+        asQueryTextId,
+        asContextSettingsId,
+        asObjectId,
+        asBatchSqlHandle,
+        asQueryHash,
+        asIsInternalQuery,
+        asQueryParameterizationType,
+        asQueryParameterizationTypeDesc,
+        asInitialCompileStartTime,
+        asLastCompileStartTime,
+        asLastExecutionTime,
+        asLastCompileBatchSqlHandle,
+        asLastCompileBatchOffsetStart,
+        asLastCompileBatchOffsetEnd,
+        asCountCompiles,
+        asAvgCompileDuration,
+        asLastCompileDuration,
+        asAvgBindDuration,
+        asLastBindDuration,
+        asAvgBindCpuTime,
+        asLastBindCpuTime,
+        asAvgOptimizeDuration,
+        asLastOptimizeDuration,
+        asAvgOptimizeCpuTime,
+        asLastOptimizeCpuTime,
+        asAvgCompileMemoryKb,
+        asLastCompileMemoryKb,
+        asMaxCompileMemoryKb,
+        asIsClouddbInternalQuery,
+            asRecId);
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStoreQuery));
+        viewName            = view.name(DbBackend::Sql);
+        asQueryId = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, QueryId)).name(DbBackend::Sql);
+        asQueryTextId = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, QueryTextId)).name(DbBackend::Sql);
+        asContextSettingsId = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, ContextSettingsId)).name(DbBackend::Sql);
+        asObjectId = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, ObjectId)).name(DbBackend::Sql);
+        asBatchSqlHandle = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, BatchSqlHandle)).name(DbBackend::Sql);
+        asQueryHash = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, QueryHash)).name(DbBackend::Sql);
+        asIsInternalQuery = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, IsInternalQuery)).name(DbBackend::Sql);
+        asQueryParameterizationType = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, ParameterizationType)).name(DbBackend::Sql);
+        asQueryParameterizationTypeDesc = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, QueryParameterizationTypeDesc)).name(DbBackend::Sql);
+        asInitialCompileStartTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, InitialCompileStartTime)).name(DbBackend::Sql);
+        asLastCompileStartTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastCompileStartTime)).name(DbBackend::Sql);
+        asLastExecutionTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastExecutionTime)).name(DbBackend::Sql);
+        asLastCompileBatchSqlHandle = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastCompileBatchSqlHandle)).name(DbBackend::Sql);
+        asLastCompileBatchOffsetStart = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastCompileBatchOffsetStart)).name(DbBackend::Sql);
+        asLastCompileBatchOffsetEnd = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastCompileBatchOffsetEnd)).name(DbBackend::Sql);
+        asCountCompiles = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, CountCompiles)).name(DbBackend::Sql);
+        asAvgCompileDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, AvgCompileDuration)).name(DbBackend::Sql);
+        asLastCompileDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastCompileDuration)).name(DbBackend::Sql);
+        asAvgBindDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, AvgBindDuration)).name(DbBackend::Sql);
+        asLastBindDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastBindDuration)).name(DbBackend::Sql);
+        asAvgBindCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, AvgBindCpuTime)).name(DbBackend::Sql);
+        asLastBindCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastBindCpuTime)).name(DbBackend::Sql);
+        asAvgOptimizeDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, AvgOptimizeDuration)).name(DbBackend::Sql);
+        asLastOptimizeDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastOptimizeDuration)).name(DbBackend::Sql);
+        asAvgOptimizeCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, AvgOptimizeCpuTime)).name(DbBackend::Sql);
+        asLastOptimizeCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastOptimizeCpuTime)).name(DbBackend::Sql);
+        asAvgCompileMemoryKb = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, AvgCompileMemoryKb)).name(DbBackend::Sql);
+        asLastCompileMemoryKb = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, LastCompileMemoryKb)).name(DbBackend::Sql);
+        asMaxCompileMemoryKb = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, MaxCompileMemoryKb)).name(DbBackend::Sql);
+        asIsClouddbInternalQuery = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, IsClouddbInternalQuery)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStoreQuery, RecId)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStoreQueryViewBuilder construct()
+    {
+        return new DBMSQLQueryStoreQueryViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

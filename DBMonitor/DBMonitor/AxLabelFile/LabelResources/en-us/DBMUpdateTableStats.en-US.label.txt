@@ -1,0 +1,38 @@
+NewLabel0=Label files created on 02/27/2025 23:36:42 for label file Id DBMUpdateTableStats and language en-US
+;Label file comment - see above label
+availableTables=Available tables
+;DBMUpdateTableStats
+ChooseTables=Choose tables for statistics update
+;DBMUpdateTableStats
+DataEntity=Data Entity
+;DBMUpdateTableStats
+DeterminingObject=Object
+;DBMUpdateTableStats
+fetchingTheTableList=Fetching the table list...
+;DBMUpdateTableStats
+Form=Form
+;DBMUpdateTableStats
+ListOfTablesHelp=List of tables for statistics update
+;DBMUpdateTableStats
+ListOfTablesLabel=List of tables
+;DBMUpdateTableStats
+selectedTables=Selected tables
+;DBMUpdateTableStats
+SelectFromTables=Select from the available tables
+;DBMUpdateTableStats
+StatisticsWereUpdated=Statistics were updated for the table %1, consumed time %2
+;DBMUpdateTableStats
+Table=Table
+;DBMUpdateTableStats
+TableListIsEmpty=List of the tables is empty
+;DBMUpdateTableStats
+UpdateStatistics=Update table statistics
+;DBMUpdateTableStats
+UpdateStatisticsObjectHelp=Choose the type of the object to update statistics
+;DBMUpdateTableStats
+UpdateStatisticsObjectLabel=Object type
+;DBMUpdateTableStats
+UpdateTableStatisticsMaintain=Update table statistics - Maintain
+;DBMUpdateTableStats
+View=View
+;DBMUpdateTableStats

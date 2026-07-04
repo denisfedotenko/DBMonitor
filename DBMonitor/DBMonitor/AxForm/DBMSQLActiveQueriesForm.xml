@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMSQLActiveQueriesForm</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMSQLActiveQueriesForm extends FormRun
+{
+
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getSQLHandle</Name>
+				<Source><![CDATA[
+    public DBMSQLHandle getSQLHandle()
+    {
+        return DBMSQLActiveQueries.SqlHandle;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getPlanHandle</Name>
+				<Source><![CDATA[
+    public DBMSQLHandle getPlanHandle()
+    {
+        return DBMSQLActiveQueries.PlanHandle;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="">
+			<DataSource>
+				<Name>DBMSQLActiveQueries</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        public void init()
+        {
+            super();
+            this.queryBuildDataSource().addSortField(fieldNum(DBMDBSessionInfo,Sorting),SortOrder::Ascending);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+		</DataSources>
+		<DataControls xmlns="">
+			<Control>
+				<Name>DropPlan</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            DBMSQLUtils::dropPlanFromCache(DBMSQLActiveQueries.PlanHandle);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>QueryPlan</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            Filename fileName = strFmt('QPL%1.sqlplan', DBMSQLActiveQueries.QueryPlanHash);
+            XML LivePlan = DBMSQLUtils::getLiveQueryPlan(DBMSQLActiveQueries.SessionId);
+            if (strLen(LivePlan) != 0)
+            {
+                File::SendStringAsFileToUser(LivePlan, fileName);
+            }
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>LivePlan</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            Filename fileName = strFmt('QP%1.sqlplan', DBMSQLActiveQueries.QueryPlanHash);
+            File::SendStringAsFileToUser(DBMSQLUtils::getQueryPlan(DBMSQLActiveQueries.PlanHandle),fileName);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLActiveQueries</Name>
+			<Table>DBMSQLActiveQueries</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>BlockingSessionId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>clientRowCount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Command</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>contextInfo</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CPUTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DBName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>dop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>elapsedTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>grantedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>lastWaitType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>logicalReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>percentComplete</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlanHandle</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>reads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>SessionId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>SQLHandle</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>SQLText</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Status</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WaitTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WaitType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>workerCount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>writes</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Design>
+		<Caption xmlns="">@DBMSQLMon:ActiveQueries</Caption>
+		<DataSource xmlns="">DBMSQLActiveQueries</DataSource>
+		<Pattern xmlns="">SimpleList</Pattern>
+		<PatternVersion xmlns="">1.1</PatternVersion>
+		<ShowDeleteButton xmlns="">No</ShowDeleteButton>
+		<ShowNewButton xmlns="">No</ShowNewButton>
+		<Style xmlns="">SimpleList</Style>
+		<TitleDataSource xmlns="">DBMSQLActiveQueries</TitleDataSource>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPane</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormActionPaneTabControl">
+						<Name>QueryData</Name>
+						<Type>ActionPaneTab</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonGroupControl">
+								<Name>QueryText</Name>
+								<Type>ButtonGroup</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormMenuFunctionButtonControl">
+										<Name>DBMSQLText</Name>
+										<Type>MenuFunctionButton</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<MenuItemName>DBMSQLText</MenuItemName>
+										<NeedsRecord>Yes</NeedsRecord>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonControl">
+										<Name>DropPlan</Name>
+										<HelpText>@DBMonitor:DropPlanHelp</HelpText>
+										<Type>Button</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<NeedsRecord>Yes</NeedsRecord>
+										<Text>@DBMonitor:DropPlanLabel</Text>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonControl">
+										<Name>QueryPlan</Name>
+										<HelpText>@DBMonitor:DownloadPlanHelp</HelpText>
+										<Type>Button</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<NeedsRecord>Yes</NeedsRecord>
+										<Text>@DBMonitor:DownloadPlanLabel</Text>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonControl">
+										<Name>LivePlan</Name>
+										<HelpText>@DBMonitor:LivePlanHelp</HelpText>
+										<Type>Button</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<Text>@DBMonitor:LivePlanLabel</Text>
+									</AxFormControl>
+								</Controls>
+							</AxFormControl>
+						</Controls>
+						<Caption>@DBMonitor:QueryData</Caption>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>FilterGroup</Name>
+				<Pattern>CustomAndQuickFilters</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl>
+						<Name>QuickFilterControl</Name>
+						<FormControlExtension>
+							<Name>QuickFilterControl</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>targetControlName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>placeholderText</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>defaultColumnName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+				<FrameType>None</FrameType>
+				<Style>CustomFilter</Style>
+				<ViewEditMode>Edit</ViewEditMode>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGridControl">
+				<Name>DBSessionGrid</Name>
+				<Type>Grid</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_SessionId</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>SessionId</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLActiveQueries_StartTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>StartTime</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_Status</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Status</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_Command</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Command</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_BlockingSessionId</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>BlockingSessionId</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_SQLText</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>SQLText</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_contextInfo</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>contextInfo</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_DBName</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>DBName</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_elapsedTime</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>elapsedTime</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_CPUTime</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CPUTime</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLActiveQueries_logicalReads</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>logicalReads</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLActiveQueries_reads</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>reads</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLActiveQueries_writes</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>writes</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_WaitType</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>WaitType</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_WaitTime</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>WaitTime</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLActiveQueries_clientRowCount</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>clientRowCount</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_dop</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>dop</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLActiveQueries_grantedMemory</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>grantedMemory</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_lastWaitType</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>lastWaitType</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>DBMSQLActiveQueries_percentComplete</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>percentComplete</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_PlanHandle</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>PlanHandle</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataSource>DBMSQLActiveQueries</DataSource>
+				<Style>Tabular</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

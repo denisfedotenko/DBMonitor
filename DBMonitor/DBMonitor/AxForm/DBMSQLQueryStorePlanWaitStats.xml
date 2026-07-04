@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMSQLQueryStorePlanWaitStats</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMSQLQueryStorePlanWaitStats extends FormRun
+{
+    boolean queryGrouping;
+    DBMQueryStoreStatGrouping currentGrouping = DBMQueryStoreStatGrouping::None;
+    Map    waitStatsFields;
+    Map    statsIntervalFields;
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        super();
+        Grouping.selection(queryGrouping);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="">
+			<DataSource>
+				<Name>DBMSQLQueryStoreWaitStats</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            qbdsThis.fields().dynamic(NoYes::No);
+            SysDictTable dictTable = new SysDictTable(tableNum(DBMSQLQueryStoreWaitStats));
+            SetEnumerator se = dictTable.fields(false,false,false,false).getEnumerator();
+            waitStatsFields = new Map(Types::Integer, Types::Class);
+            while (se.moveNext())
+            {
+                SysDictField dictField = se.current() as SysDictField;
+                if (this.object(dictField.id()))
+                {
+                    waitStatsFields.insert(dictField.id(), this.object(dictField.id()));
+                }
+            }
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>linkToParent</Name>
+						<Source><![CDATA[
+        private void linkToParent()
+        {
+            QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            if (element.args().dataSet() == tableNum(DBMSQLQueryStorePlanExt))
+            {
+                DBMSQLQueryStorePlanExt planExt = element.args().record() as DBMSQLQueryStorePlanExt;
+                QueryBuildRange qbrPlanId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreWaitStats, PlanId));
+                qbrPlanId.value(queryValue(planExt.PlanId));
+        
+            }
+            else 
+            {
+                if (element.args().dataSet() == tableNum(DBMSQLQueryStorePlan))
+                {
+                    DBMSQLQueryStorePlan plan = element.args().record() as DBMSQLQueryStorePlan;
+                    QueryBuildRange qbrPlanId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreWaitStats, PlanId));
+                    qbrPlanId.value(queryValue(plan.PlanId));
+                }
+            }
+        
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>executeQuery</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void executeQuery()
+        {
+            this.clearAll();
+            this.setAggregateFields();
+            this.setTimeGrouping();
+            this.linkToParent();
+            this.showAllAvailableFields();
+        
+            super();
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>showAllAvailableFields</Name>
+						<Source><![CDATA[
+        private void showAllAvailableFields()
+        {
+            MapEnumerator me;
+            me = waitStatsFields.getEnumerator();
+            while (me.moveNext())
+            {
+                FormDataObject fdo = me.currentValue() as FormDataObject;
+                fdo.visible(false);
+            }
+            me = statsIntervalFields.getEnumerator();
+            while (me.moveNext())
+            {
+                FormDataObject fdo = me.currentValue() as FormDataObject;
+                fdo.visible(false);
+            }
+            QueryBuildDataSource qbdsWaitStats = DBMSQLQueryStoreWaitStats_ds.query().dataSourceTable(tableNum(DBMSQLQueryStoreWaitStats));
+            for (int i = 1; i <= qbdsWaitStats.fields().fieldCount(); i++)
+            {
+                FieldId fieldId = qbdsWaitStats.fields().field(i);
+                if (waitStatsFields.exists(fieldId))
+                {
+                    FormDataObject fdo = waitStatsFields.lookup(qbdsWaitStats.fields().field(i)) as FormDataObject;
+                    if (fdo)
+                    {
+                        fdo.visible(true);
+                    }
+                }
+
+            }
+
+            boolean groupByFieldAdded = false;
+            for (int i = 1; i <= DBMSQLQueryStoreWaitStats_ds.query().groupByFieldCount(); i++)
+            {
+                QueryGroupByField  groupByField= DBMSQLQueryStoreWaitStats_ds.query().groupByField(i);
+                
+                QueryBuildDataSource qbdsGroupBy = groupByField.dataSource();
+                if (qbdsGroupBy.table() == tableNum(DBMSQLQueryStoreRuntimeStatsInterval))
+                {
+                    FormDataObject fdo = DBMSQLQueryStoreRuntimeStatsInterval_ds.object(groupByField.fieldId());
+                    if (fdo)
+                    {
+                        fdo.visible(true);
+                        groupByFieldAdded = true;
+                    }
+                }
+                if (qbdsGroupBy.table() == tableNum(DBMSQLQueryStoreWaitStats))
+                {
+                    FormDataObject fdo = DBMSQLQueryStoreWaitStats_ds.object(groupByField.fieldId());
+                    if (fdo)
+                    {
+                        fdo.visible(true);
+                        groupByFieldAdded = true;
+                    }
+                }
+
+            }
+            if (!groupByFieldAdded)
+            {
+                FormDataObject fdoStartTime = DBMSQLQueryStoreRuntimeStatsInterval_ds.object(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, startTime));
+                fdoStartTime.visible(true);
+                FormDataObject fdoEndTime = DBMSQLQueryStoreRuntimeStatsInterval_ds.object(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, endTime));
+                fdoEndTime.visible(true);
+            }
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>clearAll</Name>
+						<Source><![CDATA[
+        private void clearAll()
+        {
+            this.query().clearAllFields();
+            this.query().clearGroupBy();
+            this.query().clearOrderBy();
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>setTimeGrouping</Name>
+						<Source><![CDATA[
+        private void setTimeGrouping()
+        {
+            QueryBuildDataSource qbdsInterval= this.query().dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval));
+            FormDataSource formDataSource = DBMSQLQueryStoreWaitStats_ds;
+            switch (currentGrouping)
+            {
+                case DBMQueryStoreStatGrouping::None:
+                    break;
+                case DBMQueryStoreStatGrouping::Hour:
+                    qbdsInterval.addGroupByField(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Hour));
+                    break;
+                case DBMQueryStoreStatGrouping::Day:
+                    qbdsInterval.addGroupByField(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Day));
+                    break;
+                case DBMQueryStoreStatGrouping::Week:
+                    qbdsInterval.addGroupByField(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Week));
+                    break;
+                case DBMQueryStoreStatGrouping::Month:
+                    qbdsInterval.addGroupByField(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Month));
+                    break;
+            }   
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>setAggregateFields</Name>
+						<Source><![CDATA[
+        private void setAggregateFields()
+        {
+            boolean doGrouping = (currentGrouping!= DBMQueryStoreStatGrouping::None);
+            QueryBuildDataSource qbdsWaitStats = this.query().dataSourceTable(tableNum(DBMSQLQueryStoreWaitStats));
+            QueryBuildDataSource qbdsRuntimeStatsInterval = this.query().dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval));
+            if (doGrouping)
+            {
+                qbdsWaitStats.addSelectionField(fieldNum(DBMSQLQueryStoreWaitStats, AvgQueryWaitTimeMs), SelectionField::Avg);
+                qbdsWaitStats.addSelectionField(fieldNum(DBMSQLQueryStoreWaitStats, TotalQueryWaitTimeMs), SelectionField::Sum);
+                qbdsWaitStats.addSelectionField(fieldNum(DBMSQLQueryStoreWaitStats, MinQueryWaitTimeMs), SelectionField::Min);
+                qbdsWaitStats.addSelectionField(fieldNum(DBMSQLQueryStoreWaitStats, MaxQueryWaitTimeMs), SelectionField::Max);
+                qbdsWaitStats.addGroupByField(fieldNum(DBMSQLQueryStoreWaitStats, WaitCategory));
+                qbdsWaitStats.addGroupByField(fieldNum(DBMSQLQueryStoreWaitStats, WaitCategoryDesc));
+                qbdsWaitStats.addGroupByField(fieldNum(DBMSQLQueryStoreWaitStats, ExecutionType));
+                qbdsWaitStats.addGroupByField(fieldNum(DBMSQLQueryStoreWaitStats, ExecutionTypeDesc));
+                qbdsWaitStats.addGroupByField(fieldNum(DBMSQLQueryStoreWaitStats, replicaGroupId));
+            }
+            else
+            {
+                qbdsWaitStats.addAllFields(viewStr(DBMSQLQueryStoreWaitStats));
+                qbdsRuntimeStatsInterval.addAllFields(viewStr(DBMSQLQueryStoreRuntimeStatsInterval));
+            }
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+			<DataSource>
+				<Name>DBMSQLQueryStoreRuntimeStatsInterval</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            qbdsThis.fields().dynamic(NoYes::No);
+            qbdsThis.addLink(fieldNum(DBMSQLQueryStoreWaitStats, runtimeStatsIntervalId), fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, runtimeStatsIntervalId));
+            SysDictTable dictTable = new SysDictTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval));
+            SetEnumerator se = dictTable.fields(false,false,false,false).getEnumerator();
+            statsIntervalFields = new Map(Types::Integer, Types::Class);
+            while (se.moveNext())
+            {
+                SysDictField dictField = se.current() as SysDictField;
+                if (this.object(dictField.id()))
+                {
+                    statsIntervalFields.insert(dictField.id(), this.object(dictField.id()));
+                }
+            }
+
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+		</DataSources>
+		<DataControls xmlns="">
+			<Control>
+				<Name>Grouping</Name>
+				<Type>ComboBox</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        public boolean modified()
+        {
+            boolean ret;
+    
+            ret = super();
+            currentGrouping = this.selection();
+            DBMSQLQueryStoreWaitStats_ds.executeQuery();
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreWaitStats</Name>
+			<Table>DBMSQLQueryStoreWaitStats</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>AvgQueryWaitTimeMs</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ExecutionType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ExecutionTypeDesc</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastQueryWaitTimeMs</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxQueryWaitTimeMs</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinQueryWaitTimeMs</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlanId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ReplicaGroupId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RuntimeStatsIntervalId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StdevQueryWaitTimeMs</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalQueryWaitTimeMs</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WaitCategory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WaitCategoryDesc</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WaitStatsId</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<LinkType>InnerJoin</LinkType>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreRuntimeStatsInterval</Name>
+			<Table>DBMSQLQueryStoreRuntimeStatsInterval</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>Comment</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Day</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>EndTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Hour</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Month</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RuntimeStatsIntervalId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Time</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Week</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<JoinSource>DBMSQLQueryStoreWaitStats</JoinSource>
+			<LinkType>InnerJoin</LinkType>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Design>
+		<Caption xmlns="">@DBMonitor:PlanWaitStats</Caption>
+		<Pattern xmlns="">SimpleList</Pattern>
+		<PatternVersion xmlns="">1.1</PatternVersion>
+		<Style xmlns="">SimpleList</Style>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPane</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls />
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>CustomFilter</Name>
+				<Pattern>CustomAndQuickFilters</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl>
+						<Name>QuickFilter</Name>
+						<FormControlExtension>
+							<Name>QuickFilterControl</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>targetControlName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>placeholderText</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>defaultColumnName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormComboBoxControl">
+						<Name>Grouping</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>ComboBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<EnumType>DBMQueryStoreStatGrouping</EnumType>
+						<Items />
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+				<FrameType>None</FrameType>
+				<Style>CustomFilter</Style>
+				<ViewEditMode>Edit</ViewEditMode>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGridControl">
+				<Name>StatsGrid</Name>
+				<Type>Grid</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreRuntimeStatsInterval_Day</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Day</DataField>
+						<DataSource>DBMSQLQueryStoreRuntimeStatsInterval</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreRuntimeStatsInterval_Hour</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Hour</DataField>
+						<DataSource>DBMSQLQueryStoreRuntimeStatsInterval</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreRuntimeStatsInterval_Month</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Month</DataField>
+						<DataSource>DBMSQLQueryStoreRuntimeStatsInterval</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreRuntimeStatsInterval_Week</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Week</DataField>
+						<DataSource>DBMSQLQueryStoreRuntimeStatsInterval</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreRuntimeStatsInterval_StartTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>StartTime</DataField>
+						<DataSource>DBMSQLQueryStoreRuntimeStatsInterval</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreRuntimeStatsInterval_EndTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>EndTime</DataField>
+						<DataSource>DBMSQLQueryStoreRuntimeStatsInterval</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>DBMSQLQueryStoreWaitStats_AvgQueryWaitTimeMs</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>AvgQueryWaitTimeMs</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_TotalQueryWaitTimeMs</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>TotalQueryWaitTimeMs</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_MinQueryWaitTimeMs</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>MinQueryWaitTimeMs</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_MaxQueryWaitTimeMs</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>MaxQueryWaitTimeMs</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>DBMSQLQueryStoreWaitStats_StdevQueryWaitTimeMs</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>StdevQueryWaitTimeMs</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_LastQueryWaitTimeMs</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>LastQueryWaitTimeMs</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormComboBoxControl">
+						<Name>DBMSQLQueryStoreWaitStats_ExecutionType</Name>
+						<Type>ComboBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>ExecutionType</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+						<Items />
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreWaitStats_ExecutionTypeDesc</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>ExecutionTypeDesc</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_PlanId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>PlanId</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_ReplicaGroupId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>ReplicaGroupId</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMSQLQueryStoreWaitStats_WaitCategory</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>WaitCategory</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreWaitStats_WaitCategoryDesc</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>WaitCategoryDesc</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreWaitStats_WaitStatsId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>WaitStatsId</DataField>
+						<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataSource>DBMSQLQueryStoreWaitStats</DataSource>
+				<Style>Tabular</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

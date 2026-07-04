@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
+	<Name>DBMSQLStatsQueryPlanHash</Name>
+	<Label>@DBMSQLStats:QueryPlanHash</Label>
+	<HelpText>@DBMSQLStats:QueryPlanHashHelp</HelpText>
+	<StringSize>20</StringSize>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

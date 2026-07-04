@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQuery</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStoreQuery extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DateTimeNull</Name>
+				<Source><![CDATA[
+    public static str DateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(utcDateTimeNull());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLQueryStoreQuery</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups />
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>QueryId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>QueryTextId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryTextId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>ContextSettingsId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreContextSettingsId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>ObjectId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreObjectId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>BatchSqlHandle</Name>
+			<ExtendedDataType>DBMSQLQueryStoreBatchSqlHandle</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QueryHash</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryHash</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsInternalQuery</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryIsInternalQuery</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QueryParameterizationTypeDesc</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryParameterizationTypeDesc</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>InitialCompileStartTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreInitialCompileStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>LastCompileStartTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>LastExecutionTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastExecutionTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>LastCompileBatchSqlHandle</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileBatchSqlHandle</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastCompileBatchOffsetStart</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileBatchOffsetStart</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastCompileBatchOffsetEnd</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileBatchOffsetEnd</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>CountCompiles</Name>
+			<ExtendedDataType>DBMSQLQueryStoreCountCompiles</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgCompileDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgCompileDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastCompileDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgBindDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgBindDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastBindDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastBindDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgBindCpuTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgBindCpuTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastBindCpuTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastBindCpuTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgOptimizeDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgOptimizeDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastOptimizeDuration</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastOptimizeDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgOptimizeCpuTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgOptimizeCpuTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastOptimizeCpuTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastOptimizeCpuTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgCompileMemoryKb</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgCompileMemoryKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastCompileMemoryKb</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastCompileMemoryKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxCompileMemoryKb</Name>
+			<ExtendedDataType>DBMSQLQueryStoreMaxCompileMemoryKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsClouddbInternalQuery</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryIsClouddbInternalQuery</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>parameterizationType</Name>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>DBMSQLQueryStoreQueryParameterizationType</EnumType>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

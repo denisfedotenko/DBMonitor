@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStorePlanExt</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStorePlanExt extends common
+{
+}
+]]></Declaration>
+		<Methods />
+	</SourceCode>
+	<Label>@DBMonitor:QueryStorePlanExt</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryId</Name>
+			<DataField>QueryId</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>EngineVersion</Name>
+			<DataField>EngineVersion</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsForcedPlan</Name>
+			<DataField>IsForcedPlan</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsNativelyCompiled</Name>
+			<DataField>IsNativelyCompiled</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsOnlineIndexPlan</Name>
+			<DataField>IsOnlineIndexPlan</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsParallelPlan</Name>
+			<DataField>IsParallelPlan</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsTrivialPlan</Name>
+			<DataField>IsTrivialPlan</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgClrTime</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgClrTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgCpuTime</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgDop</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgDop</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgDuration</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgDuration</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgLogBytesUsed</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgLogBytesUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgLogicalIoReads</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgLogicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgLogicalIoWrites</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgLogicalIoWrites</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgNumPhysicalIoReads</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgNumPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgPhysicalIoReads</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgQueryMaxUsedMemory</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgQueryMaxUsedMemory</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgRowcount</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgRowcount</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgTempdbSpaceUsed</Name>
+			<Aggregation>Avg</Aggregation>
+			<DataField>AvgTempdbSpaceUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CountExecutions</Name>
+			<Aggregation>Count</Aggregation>
+			<DataField>CountExecutions</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxClrTime</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxClrTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxCpuTime</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxDop</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxDop</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxDuration</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxDuration</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxLogBytesUsed</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxLogBytesUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxLogicalIoReads</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxLogicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxLogicalIoWrites</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxLogicalIoWrites</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxNumPhysicalIoReads</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxNumPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxPhysicalIoReads</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxQueryMaxUsedMemory</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxQueryMaxUsedMemory</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxRowcount</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxRowcount</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxTempdbSpaceUsed</Name>
+			<Aggregation>Max</Aggregation>
+			<DataField>MaxTempdbSpaceUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinClrTime</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinClrTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinCpuTime</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinDuration</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinDuration</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinDop</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinDop</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinLogicalIoReads</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinLogicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinLogBytesUsed</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinLogBytesUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinLogicalIoWrites</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinLogicalIoWrites</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinNumPhysicalIoReads</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinNumPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinPhysicalIoReads</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinQueryMaxUsedMemory</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinQueryMaxUsedMemory</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinRowcount</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinRowcount</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MinTempdbSpaceUsed</Name>
+			<Aggregation>Min</Aggregation>
+			<DataField>MinTempdbSpaceUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalClrTime</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalClrTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalCpuTime</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalDop</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalDop</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalDuration</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalDuration</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalLogBytesUsed</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalLogBytesUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalLogicalIoReads</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalLogicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalLogicalIoWrites</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalLogicalIoWrites</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalNumPhysicalIoReads</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalNumPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalPhysicalIoReads</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalPhysicalIoReads</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalQueryMaxUsedMemory</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalQueryMaxUsedMemory</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalRowcount</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalRowcount</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>TotalTempdbSpaceUsed</Name>
+			<Aggregation>Sum</Aggregation>
+			<DataField>TotalTempdbSpaceUsed</DataField>
+			<DataSource>DBMSQLQueryStoreRuntimeStats</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>PlanId</Name>
+			<DataField>PlanId</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CountCompiles</Name>
+			<DataField>CountCompiles</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CompatibilityLevel</Name>
+			<DataField>CompatibilityLevel</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgCompileDuration</Name>
+			<DataField>AvgCompileDuration</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>PlanForcingType</Name>
+			<DataField>PlanForcingType</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryPlanHash</Name>
+			<DataField>QueryPlanHash</DataField>
+			<DataSource>DBMSQLQueryStorePlan</DataSource>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>DBMSQLQueryStorePlan</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>DBMSQLQueryStorePlan</Table>
+				<DataSources>
+					<AxQuerySimpleEmbeddedDataSource>
+						<Name>DBMSQLQueryStoreRuntimeStats</Name>
+						<DynamicFields>Yes</DynamicFields>
+						<Table>DBMSQLQueryStoreRuntimeStats</Table>
+						<DataSources />
+						<DerivedDataSources />
+						<Fields />
+						<Ranges />
+						<Relations>
+							<AxQuerySimpleDataSourceRelation>
+								<Name>QueryDataSourceRelation1</Name>
+								<Field>PlanId</Field>
+								<JoinDataSource>DBMSQLQueryStorePlan</JoinDataSource>
+								<RelatedField>PlanId</RelatedField>
+							</AxQuerySimpleDataSourceRelation>
+						</Relations>
+					</AxQuerySimpleEmbeddedDataSource>
+				</DataSources>
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

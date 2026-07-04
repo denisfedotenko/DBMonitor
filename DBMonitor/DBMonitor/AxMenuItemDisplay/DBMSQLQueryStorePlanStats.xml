@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuItemDisplay xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStorePlanStats</Name>
+	<Label>@DBMonitor:TimeExecutionStatistic</Label>
+	<Object>DBMSQLQueryStorePlanStats</Object>
+	<ObjectType>Form</ObjectType>
+</AxMenuItemDisplay>

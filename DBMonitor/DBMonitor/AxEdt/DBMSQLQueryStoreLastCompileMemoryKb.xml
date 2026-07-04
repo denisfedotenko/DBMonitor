@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtInt64">
+	<Name>DBMSQLQueryStoreLastCompileMemoryKb</Name>
+	<HelpText>@DBMonitor:DBMSQLQueryStoreLastCompileMemoryKbHelp</HelpText>
+	<Label>@DBMonitor:DBMSQLQueryStoreLastCompileMemoryKb</Label>
+</AxEdt>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMUpdateTableStatisticsContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// A contract class for <c>DBMUpdateTableStatisticsService.process()</c> operation.
+/// </summary>
+///<remarks>
+///</remarks>
+[DataContractAttribute]
+[SysOperationAlwaysInitialize]
+public class DBMUpdateTableStatisticsContract implements SysOperationInitializable,SysOperationValidatable
+{
+    private Set tables;    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmTables</Name>
+				<Source><![CDATA[
+    [DataMember,  SysOperationLabel("@DBMUpdateTableStats:ListOfTablesLabel"),
+        SysOperationHelpText("@DBMUpdateTableStats:ListOfTablesHelp"),
+        AifCollectionTypeAttribute("_tables", Types::String),
+        AifCollectionTypeAttribute("return", Types::String)]
+    public Set parmTables(Set _tables = tables)
+    {
+        tables = _tables;
+        return tables;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    public void initialize()
+  {
+      tables = new Set(Types::String);
+  }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public boolean validate()
+    {
+        boolean ret=true;
+        if (ret && (tables.elements() == 0))
+        {
+            ret = checkFailed("@DBMUpdateTableStats:TableListIsEmpty");
+        }
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

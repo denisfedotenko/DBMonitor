@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLDBTuningRecommendations</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLDBTuningRecommendations extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DateTimeNull</Name>
+				<Source><![CDATA[
+    public static str DateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(DateTimeUtil::minValue());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLDBTuningRecommendations</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups />
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Name</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationName</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Type</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationType</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Reason</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationReason</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>ValidSince</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationValidSince</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>LastRefresh</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationLastRefresh</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>State</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationState</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsExecutableAction</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationIsExecutableAction</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>IsRevertableAction</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationIsRevertableAction</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>ExecuteActionStartTime</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationExecuteActionStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>ExecuteActionDuration</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationExecuteActionDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>ExecuteActionInitiatedBy</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationExecuteActionInitiatedBy</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>ExecuteActionInitiatedTime</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationExecuteActionInitiatedTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>RevertActionStartTime</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationRevertActionStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>RevertActionDuration</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationRevertActionDuration</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>RevertActionInitiatedBy</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationRevertActionInitiatedBy</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>RevertActionInitiatedTime</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationRevertActionInitiatedTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>Score</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationScore</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Details</Name>
+			<ExtendedDataType>DBMSQLDBTuningRecommendationDetails</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDIctionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDIctionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

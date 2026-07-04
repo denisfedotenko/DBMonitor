@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSystemJobDefaultParametersClass_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Extension class for the standard class SystemJobDefaultParameters
+/// </summary>
+
+[ExtensionOf(classStr(SystemJobDefaultParameters))]
+public final class DBMSystemJobDefaultParametersClass_Extension
+{
+    public static const int DBMMinMonitoringFreq = 15;
+    public static const int DBMMinReScanFreq = 5;
+}
+
+]]></Declaration>
+		<Methods />
+	</SourceCode>
+</AxClass>

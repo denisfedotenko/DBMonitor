@@ -1,0 +1,1572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMSQLQueryStoreQuery</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMSQLQueryStoreQuery extends FormRun
+{
+
+    QueryBuildRange qbrQueryStart;
+    QueryBuildRange qbrQueryEnd;
+    QueryBuildRange qbrPlanStart;
+    QueryBuildRange qbrPlanEnd;
+    
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryTextId</Name>
+				<Source><![CDATA[
+    public DBMSQLQueryStoreQueryTextId getQueryTextId()
+    {
+        return  DBMSQLQueryStoreExt.queryTextId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryPlanId</Name>
+				<Source><![CDATA[
+    public DBMSQLQueryStorePlanId getQueryPlanId()
+    {
+        return DBMSQLQueryStorePlanExt.PlanId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="">
+			<DataSource>
+				<Name>DBMSQLQueryStoreExt</Name>
+				<Methods>
+					<Method>
+						<Name>executeQuery</Name>
+						<Source><![CDATA[
+        public void executeQuery()
+        {
+            Query query = this.query();
+
+            // Reset limits first
+            query.firstOnly10(false);
+            query.firstOnly100(false);
+            query.firstOnly1000(false);
+
+            switch (TopSelectionComboBox.selection())
+            {
+                case DBMSQLQueryStatsTopEnum::Top10:
+                    query.firstOnly10(true);
+                    break;
+                case DBMSQLQueryStatsTopEnum::Top100:
+                    query.firstOnly100(true);
+                    break;
+                case DBMSQLQueryStatsTopEnum::Top1000:
+                    query.firstOnly1000(true);
+                    break;
+            }
+            if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
+            {
+                utcdatetime fromDateTime = filterFrom.dateTimeValue();
+                utcdatetime toDateTime = filterTo.dateTimeValue();
+                query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(true);
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(true);
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(true);
+                switch(true)
+                {
+                    case FromDateTime && toDateTime:
+                        qbrQueryStart.value(SysQuery::range(FromDateTime, ToDateTime));
+                        qbrQueryEnd.value(SysQuery::range(FromDateTime, ToDateTime));
+                        break;
+                    case FromDateTime && !ToDateTime:
+                        qbrQueryStart.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                        qbrQueryEnd.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                        break;
+                    case !FromDateTime && ToDateTime:
+                        qbrQueryStart.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                        qbrQueryEnd.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                        break;
+                }
+            }
+            else
+            {
+                query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(false);
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
+            }
+
+            super();
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbds = this.queryBuildDataSource();
+            qbds.addSortField(fieldNum(DBMSQLQueryStoreExt, totalDuration), SortOrder::Descending);
+            QueryBuildDataSource qbdsPlan = qbds.addDataSource(tableNum(DBMSQLQueryStorePlan));
+            qbdsPlan.joinMode(JoinMode::ExistsJoin);
+            qbdsPlan.fetchMode(QueryFetchMode::One2One);
+            qbdsPlan.addLink(fieldNum(DBMSQLQueryStoreExt, queryId), fieldNum(DBMSQLQueryStorePlan, queryId));
+            QueryBuildDataSource qbdsRuntimeStats = qbdsPlan.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStats));
+            qbdsRuntimeStats.joinMode(JoinMode::InnerJoin);
+            qbdsRuntimeStats.fetchMode(QueryFetchMode::One2One);
+            qbdsRuntimeStats.addLink(fieldNum(DBMSQLQueryStorePlan, planId), fieldNum(DBMSQLQueryStoreRuntimeStats, planId));
+            QueryBuildDataSource qbdsRuntimeStatsInterval = qbdsRuntimeStats.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStatsInterval));
+            qbdsRuntimeStatsInterval.joinMode(JoinMode::InnerJoin);
+            qbdsRuntimeStatsInterval.fetchMode(QueryFetchMode::One2One);
+            qbdsRuntimeStatsInterval.addLink(fieldNum(DBMSQLQueryStoreRuntimeStats, RuntimeStatsIntervalId), fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, RuntimeStatsIntervalId));
+            qbrQueryStart =  qbdsRuntimeStatsInterval.addRange(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, startTime));
+            qbrQueryEnd =  qbdsRuntimeStatsInterval.addRange(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, endTime));
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+			<DataSource>
+				<Name>DBMSQLQueryStorePlanExt</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbds = this.queryBuildDataSource();
+            qbds.addDynalink(fieldNum(DBMSQLQueryStorePlanExt,queryId),DBMSQLQueryStoreExt,fieldNum(DBMSQLQueryStoreExt,queryId));
+            QueryBuildDataSource qbdsRuntimeStats = qbds.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStats));
+            qbdsRuntimeStats.joinMode(JoinMode::ExistsJoin);
+            qbdsRuntimeStats.fetchMode(QueryFetchMode::One2One);
+            qbdsRuntimeStats.addLink(fieldNum(DBMSQLQueryStorePlanExt, planId), fieldNum(DBMSQLQueryStoreRuntimeStats, planId));
+            QueryBuildDataSource qbdsRuntimeStatsInterval = qbdsRuntimeStats.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStatsInterval));
+            qbdsRuntimeStatsInterval.joinMode(JoinMode::InnerJoin);
+            qbdsRuntimeStatsInterval.fetchMode(QueryFetchMode::One2One);
+            qbdsRuntimeStatsInterval.addLink(fieldNum(DBMSQLQueryStoreRuntimeStats, RuntimeStatsIntervalId), fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, RuntimeStatsIntervalId));
+            qbrPlanStart =  qbdsRuntimeStatsInterval.addRange(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, startTime));
+            qbrPlanEnd =  qbdsRuntimeStatsInterval.addRange(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, endTime));
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>executeQuery</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void executeQuery()
+        {
+            super();
+            Query query  = this.query();
+            if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
+            {
+                utcdatetime fromDateTime = filterFrom.dateTimeValue();
+                utcdatetime toDateTime = filterTo.dateTimeValue();
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(true);
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(true);
+                switch(true)
+                {
+                    case FromDateTime && toDateTime:
+                        qbrPlanStart.value(SysQuery::range(FromDateTime, ToDateTime));
+                        qbrPlanEnd.value(SysQuery::range(FromDateTime, ToDateTime));
+                        break;
+                    case FromDateTime && !ToDateTime:
+                        qbrPlanStart.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                        qbrPlanEnd.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                        break;
+                    case !FromDateTime && ToDateTime:
+                        qbrPlanStart.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                        qbrPlanEnd.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                        break;
+                }
+            }
+            else
+            {
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
+                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
+            }
+
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+		</DataSources>
+		<DataControls xmlns="">
+			<Control>
+				<Name>TopSelectionComboBox</Name>
+				<Type>ComboBox</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        public boolean modified()
+        {
+            boolean ret;
+
+            ret = super();
+
+            DBMSQLQueryStoreExt_ds.executeQuery();
+
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>FilterFrom</Name>
+				<Type>DateTime</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public boolean modified()
+        {
+            boolean ret;
+    
+            ret = super();
+            DBMSQLQueryStoreExt_ds.executeQuery();
+    
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>FilterTo</Name>
+				<Type>DateTime</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public boolean modified()
+        {
+            boolean ret;
+    
+            ret = super();
+            DBMSQLQueryStoreExt_ds.executeQuery();
+
+    
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>QueryPlan</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            Filename fileName = strFmt('QP%1.sqlplan', DBMSQLQueryStorePlanExt.queryPlanHash);
+            File::SendStringAsFileToUser(DBMSQLUtils::getQueryStorePlan(DBMSQLQueryStorePlanExt.PlanId),fileName);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreExt</Name>
+			<Table>DBMSQLQueryStoreExt</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>AvgBindCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgBindDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileMemoryKb</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgOptimizeCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgOptimizeDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CountCompiles</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CountExecutions</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InitialCompileStartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxCompileMemoryKb</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>parameterizationType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QuerySqlText</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStorePlanExt</Name>
+			<Table>DBMSQLQueryStorePlanExt</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>AvgClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CountCompiles</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CountExecutions</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>EngineVersion</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InitialCompileStartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsForcedPlan</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsNativelyCompiled</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsOnlineIndexPlan</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsParallelPlan</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsTrivialPlan</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastExecutionTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastForceFailureReason</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastForceFailureReasonDesc</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MinTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlanForcingType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlanGroupId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlanId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalClrTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalDop</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalLogBytesUsed</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalLogicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalLogicalIoWrites</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalNumPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalPhysicalIoReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalQueryMaxUsedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalRowcount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalTempdbSpaceUsed</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<JoinSource>DBMSQLQueryStoreExt</JoinSource>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Design>
+		<Caption xmlns="">@DBMonitor:QueryStore</Caption>
+		<DataSource xmlns="">DBMSQLQueryStoreExt</DataSource>
+		<Pattern xmlns="">TaskParentChild</Pattern>
+		<PatternVersion xmlns="">1.2</PatternVersion>
+		<TitleDataSource xmlns="">DBMSQLQueryStoreExt</TitleDataSource>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPaneControl</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>QueryInfo</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLQueryStoreQueryHints</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>DBMSQLQueryStoreQueryHints</MenuItemName>
+							</AxFormControl>
+						</Controls>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>FilterGroup</Name>
+				<Pattern>CustomFilters</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl>
+						<Name>QuickFilterControl</Name>
+						<FormControlExtension>
+							<Name>QuickFilterControl</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>targetControlName</Name>
+									<Type>String</Type>
+									<Value>QueryStoreGrid</Value>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>placeholderText</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>defaultColumnName</Name>
+									<Type>String</Type>
+									<Value>DBMSQLQueryStoreExt_QuerySqlText</Value>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormComboBoxControl">
+						<Name>TopSelectionComboBox</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>ComboBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<EnumType>DBMSQLQueryStatsTopEnum</EnumType>
+						<Items />
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>FilterFrom</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>@DBMonitor:FilterFrom</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>FilterTo</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>@DBMonitor:FilterTo</Label>
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+				<FrameType>None</FrameType>
+				<Style>CustomFilter</Style>
+				<ViewEditMode>Edit</ViewEditMode>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormTabControl">
+				<Name>QueriesTab</Name>
+				<Type>Tab</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormTabPageControl">
+						<Name>queriesTabPage</Name>
+						<Pattern>ToolbarList</Pattern>
+						<PatternVersion>1.2</PatternVersion>
+						<Type>TabPage</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormGridControl">
+								<Name>QueryStoreGrid</Name>
+								<Type>Grid</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormInt64Control">
+										<Name>DBMSQLQueryStoreExt_QueryId</Name>
+										<Type>Int64</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>QueryId</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormStringControl">
+										<Name>DBMSQLQueryStoreExt_QuerySqlText</Name>
+										<Type>String</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>QuerySqlText</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormInt64Control">
+										<Name>DBMSQLQueryStoreExt_CountExecutions</Name>
+										<Type>Int64</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>CountExecutions</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalDuration</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalCpuTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalCpuTime</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalLogicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalLogicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalLogicalIoWrites</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalLogicalIoWrites</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalRowcount</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalRowcount</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalNumPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalNumPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalClrTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalClrTime</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalDop</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalDop</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalLogBytesUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalLogBytesUsed</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalQueryMaxUsedMemory</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalQueryMaxUsedMemory</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_TotalTempdbSpaceUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalTempdbSpaceUsed</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgBindCpuTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgBindCpuTime</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgBindDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgBindDuration</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgClrTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgClrTime</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgCompileDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgCompileDuration</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgCompileMemoryKb</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgCompileMemoryKb</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgCpuTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgCpuTime</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgDop</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgDop</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgDuration</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgLogBytesUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgLogBytesUsed</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgLogicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgLogicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgLogicalIoWrites</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgLogicalIoWrites</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgNumPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgNumPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgOptimizeCpuTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgOptimizeCpuTime</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgOptimizeDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgOptimizeDuration</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgQueryMaxUsedMemory</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgQueryMaxUsedMemory</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgRowcount</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgRowcount</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStoreExt_AvgTempdbSpaceUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgTempdbSpaceUsed</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+								</Controls>
+								<DataSource>DBMSQLQueryStoreExt</DataSource>
+								<Style>Tabular</Style>
+							</AxFormControl>
+						</Controls>
+						<Caption>@DBMonitor:Queries</Caption>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>horizSplitter</Name>
+				<HeightMode>Auto</HeightMode>
+				<Type>Group</Type>
+				<WidthMode>Auto</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls />
+				<HideIfEmpty>No</HideIfEmpty>
+				<Style>SplitterHorizontalContainer</Style>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>queryPlanActionPane</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>planActions</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLText</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>DBMSQLText</MenuItemName>
+								<NeedsRecord>Yes</NeedsRecord>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>QueryPlan</Name>
+								<HelpText>@DBMonitor:DownloadPlanHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:DownloadPlanLabel</Text>
+							</AxFormControl>
+						</Controls>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>planStatistics</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLQueryStorePlanStats</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+								<MenuItemName>DBMSQLQueryStorePlanStats</MenuItemName>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLQueryStorePlanWaitStats</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+								<MenuItemName>DBMSQLQueryStorePlanWaitStats</MenuItemName>
+							</AxFormControl>
+						</Controls>
+					</AxFormControl>
+				</Controls>
+				<Style>Strip</Style>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormTabControl">
+				<Name>PlansTab</Name>
+				<Type>Tab</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormTabPageControl">
+						<Name>plansTabPage</Name>
+						<Pattern>ToolbarList</Pattern>
+						<PatternVersion>1.2</PatternVersion>
+						<Type>TabPage</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormGridControl">
+								<Name>queryPlansGrid</Name>
+								<Type>Grid</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormInt64Control">
+										<Name>DBMSQLQueryStorePlanExt_PlanId</Name>
+										<Type>Int64</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>PlanId</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormCheckBoxControl">
+										<Name>DBMSQLQueryStorePlanExt_IsForcedPlan</Name>
+										<Type>CheckBox</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>IsForcedPlan</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormCheckBoxControl">
+										<Name>DBMSQLQueryStorePlanExt_IsParallelPlan</Name>
+										<Type>CheckBox</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>IsParallelPlan</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormCheckBoxControl">
+										<Name>DBMSQLQueryStorePlanExt_IsTrivialPlan</Name>
+										<Type>CheckBox</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>IsTrivialPlan</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormComboBoxControl">
+										<Name>DBMSQLQueryStorePlanExt_PlanForcingType</Name>
+										<Type>ComboBox</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>PlanForcingType</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+										<Items />
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalDuration</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormInt64Control">
+										<Name>DBMSQLQueryStorePlanExt_CountExecutions</Name>
+										<Type>Int64</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>CountExecutions</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalDop</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalDop</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalCpuTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalCpuTime</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalClrTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalClrTime</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalLogBytesUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalLogBytesUsed</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalLogicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalLogicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalLogicalIoWrites</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalLogicalIoWrites</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalNumPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalNumPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalQueryMaxUsedMemory</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalQueryMaxUsedMemory</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalRowcount</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalRowcount</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_TotalTempdbSpaceUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>TotalTempdbSpaceUsed</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgClrTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgClrTime</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgCompileDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgCompileDuration</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgCpuTime</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgCpuTime</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgDop</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgDop</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgDuration</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgDuration</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgLogBytesUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgLogBytesUsed</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgLogicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgLogicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgLogicalIoWrites</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgLogicalIoWrites</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgNumPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgNumPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgPhysicalIoReads</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgPhysicalIoReads</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgQueryMaxUsedMemory</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgQueryMaxUsedMemory</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgRowcount</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgRowcount</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormRealControl">
+										<Name>DBMSQLQueryStorePlanExt_AvgTempdbSpaceUsed</Name>
+										<Type>Real</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>AvgTempdbSpaceUsed</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormInt64Control">
+										<Name>DBMSQLQueryStorePlanExt_CountCompiles</Name>
+										<Type>Int64</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>CountCompiles</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormInt64Control">
+										<Name>DBMSQLQueryStorePlanExt_CountExecutions1</Name>
+										<Type>Int64</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>CountExecutions</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormStringControl">
+										<Name>DBMSQLQueryStorePlanExt_EngineVersion</Name>
+										<Type>String</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>EngineVersion</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+								</Controls>
+								<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+							</AxFormControl>
+						</Controls>
+						<Caption>@DBMonitor:QueryPlans</Caption>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreRuntimeStatsInterval</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStoreRuntimeStatsInterval extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DateTimeNull</Name>
+				<Source><![CDATA[
+    public static str DateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(utcDateTimeNull());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLQueryStoreRuntimeStatsInterval</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>RuntimeStatsIntervalId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreRuntimeStatsIntervalId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>StartTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreStartTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>EndTime</Name>
+			<ExtendedDataType>DBMSQLQueryStoreEndTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Comment</Name>
+			<ExtendedDataType>DBMSQLQueryStoreComment</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>Time</Name>
+			<ExtendedDataType>DBMSQLQueryStoreTime</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>Hour</Name>
+			<ExtendedDataType>DBMSQLQueryStoreHour</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>Day</Name>
+			<ExtendedDataType>DBMSQLQueryStoreDay</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>Week</Name>
+			<ExtendedDataType>DBMSQLQueryStoreWeek</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>Month</Name>
+			<ExtendedDataType>DBMSQLQueryStoreMonth</ExtendedDataType>
+			<ViewMethod>DateTimeNull</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

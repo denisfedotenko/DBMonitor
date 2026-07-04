@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDBResourceUsageArchiveViewInternal</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMDBResourceUsageArchiveViewInternal extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>timestamp</Name>
+				<Source><![CDATA[
+    private static str timestamp()
+    {
+        return SysComputedColumn::DBMDBDateBucket(
+            SysComputedColumn::returnField(viewstr(DBMDBResourceUsageArchiveViewInternal),
+                                           identifierStr(DBMDBResourceUsage),
+                                           fieldStr(DBMDBResourceUsage,timeStamp)),
+            SysComputedColumn::returnField(viewstr(DBMDBResourceUsageArchiveViewInternal),
+                                           identifierStr(SystemJobParameters),
+                                           fieldStr(SystemJobParameters,DBMDBResArchivalUnit)),
+            'minute');
+
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CPULimit</Name>
+			<DataField>CPULimit</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CPUPercent</Name>
+			<DataField>CPUPercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>dataIOPercent</Name>
+			<DataField>dataIOPercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceCpuPercent</Name>
+			<DataField>instanceCpuPercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceMemoryPercent</Name>
+			<DataField>instanceMemoryPercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>logWritePercent</Name>
+			<DataField>logWritePercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxSessionPercent</Name>
+			<DataField>maxSessionPercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxWorkerPercent</Name>
+			<DataField>maxWorkerPercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>memoryUsagePercent</Name>
+			<DataField>memoryUsagePercent</DataField>
+			<DataSource>DBMDBResourceUsage</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>timeStamp</Name>
+			<ViewMethod>timestamp</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>DBMDBResourceUsage</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>DBMDBResourceUsage</Table>
+				<DataSources>
+					<AxQuerySimpleEmbeddedDataSource>
+						<Name>SystemJobParameters</Name>
+						<DynamicFields>Yes</DynamicFields>
+						<Table>SystemJobParameters</Table>
+						<DataSources />
+						<DerivedDataSources />
+						<Fields />
+						<Ranges />
+						<Relations>
+							<AxQuerySimpleDataSourceRelation>
+								<Name>QueryDataSourceRelation1</Name>
+								<Field>partition</Field>
+								<JoinDataSource>DBMDBResourceUsage</JoinDataSource>
+								<RelatedField>partition</RelatedField>
+							</AxQuerySimpleDataSourceRelation>
+						</Relations>
+					</AxQuerySimpleEmbeddedDataSource>
+				</DataSources>
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

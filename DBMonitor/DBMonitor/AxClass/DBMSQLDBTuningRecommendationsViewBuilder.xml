@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLDBTuningRecommendationsViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLDBTuningRecommendationsViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asRecId;
+    str     asName;
+    str     asType;
+    str     asReason;
+    str     asValidSince;
+    str     asLastRefresh;
+    str     asState;
+    str     asIsExecutableAction;
+    str     asIsRevertableAction;
+    str     asExecuteActionStartTime;
+    str     asExecuteActionDuration;
+    str     asExecuteActionInitiatedBy;
+    str     asExecuteActionInitiatedTime;
+    str     asRevertActionStartTime;
+    str     asRevertActionDuration;
+    str     asRevertActionInitiatedBy;
+    str     asRevertActionInitiatedTime;
+    str     asScore;
+    str     asDetails;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLDBTuningRecommendationsViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement140</Name>
+				<Source><![CDATA[
+    private str createSQLStatement140()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            CONVERT([NVARCHAR](128), r.name) AS %1,
+            CONVERT([NVARCHAR](255), r.type) AS %2,
+            CONVERT([NVARCHAR](255), r.reason) AS %3,
+            r.valid_since AS %4,
+            r.last_refresh AS %5,
+            CONVERT([NVARCHAR](128), r.state) AS %6,
+            r.is_executable_action AS %7,
+            r.is_revertable_action AS %8,
+            r.execute_action_start_time AS %9,
+            DATEDIFF(second, '00:00:00', r.execute_action_duration) AS %10,
+            CONVERT([NVARCHAR](128), r.execute_action_initiated_by) AS %11,
+            r.execute_action_initiated_time AS %12,
+            r.revert_action_start_time AS %13,
+            DATEDIFF(second, '00:00:00', r.revert_action_duration) AS %14,
+            CONVERT([NVARCHAR](128), r.revert_action_initiated_by) AS %15,
+            r.revert_action_initiated_time AS %16,
+            r.score AS %17,
+            CONVERT([NVARCHAR](MAX), r.details) AS %18,
+            1010 AS %19
+            FROM sys.dm_db_tuning_recommendations r",
+        asName,
+        asType,
+        asReason,
+        asValidSince,
+        asLastRefresh,
+        asState,
+        asIsExecutableAction,
+        asIsRevertableAction,
+        asExecuteActionStartTime,
+        asExecuteActionDuration,
+        asExecuteActionInitiatedBy,
+        asExecuteActionInitiatedTime,
+        asRevertActionStartTime,
+        asRevertActionDuration,
+        asRevertActionInitiatedBy,
+        asRevertActionInitiatedTime,
+        asScore,
+        asDetails,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatementFallback</Name>
+				<Source><![CDATA[
+    private str createSQLStatementFallback()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            '' AS %1,
+            '' AS %2,
+            '' AS %3,
+            GETUTCDATE() AS %4,
+            GETUTCDATE() AS %5,
+            '' AS %6,
+            0 AS %7,
+            0 AS %8,
+            GETUTCDATE() AS %9,
+            0 AS %10,
+            '' AS %11,
+            GETUTCDATE() AS %12,
+            GETUTCDATE() AS %13,
+            0 AS %14,
+            '' AS %15,
+            GETUTCDATE() AS %16,
+            0 AS %17,
+            '' AS %18,
+            1010 AS %19
+            FROM sys.databases r WHERE 1=0",
+        asName,
+        asType,
+        asReason,
+        asValidSince,
+        asLastRefresh,
+        asState,
+        asIsExecutableAction,
+        asIsRevertableAction,
+        asExecuteActionStartTime,
+        asExecuteActionDuration,
+        asExecuteActionInitiatedBy,
+        asExecuteActionInitiatedTime,
+        asRevertActionStartTime,
+        asRevertActionDuration,
+        asRevertActionInitiatedBy,
+        asRevertActionInitiatedTime,
+        asScore,
+        asDetails,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        if (DBMSQLUtils::databaseCompatibilityLevel() >= 140)
+        {
+            return this.createSQLStatement140();
+        }
+        else
+        {
+            return this.createSQLStatementFallback();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLDBTuningRecommendations));
+        viewName            = view.name(DbBackend::Sql);
+        asName = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, Name)).name(DbBackend::Sql);
+        asType = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, Type)).name(DbBackend::Sql);
+        asReason = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, Reason)).name(DbBackend::Sql);
+        asValidSince = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, ValidSince)).name(DbBackend::Sql);
+        asLastRefresh = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, LastRefresh)).name(DbBackend::Sql);
+        asState = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, State)).name(DbBackend::Sql);
+        asIsExecutableAction = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, IsExecutableAction)).name(DbBackend::Sql);
+        asIsRevertableAction = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, IsRevertableAction)).name(DbBackend::Sql);
+        asExecuteActionStartTime = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, ExecuteActionStartTime)).name(DbBackend::Sql);
+        asExecuteActionDuration = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, ExecuteActionDuration)).name(DbBackend::Sql);
+        asExecuteActionInitiatedBy = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, ExecuteActionInitiatedBy)).name(DbBackend::Sql);
+        asExecuteActionInitiatedTime = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, ExecuteActionInitiatedTime)).name(DbBackend::Sql);
+        asRevertActionStartTime = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, RevertActionStartTime)).name(DbBackend::Sql);
+        asRevertActionDuration = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, RevertActionDuration)).name(DbBackend::Sql);
+        asRevertActionInitiatedBy = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, RevertActionInitiatedBy)).name(DbBackend::Sql);
+        asRevertActionInitiatedTime = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, RevertActionInitiatedTime)).name(DbBackend::Sql);
+        asScore = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, Score)).name(DbBackend::Sql);
+        asDetails = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, Details)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLDBTuningRecommendations, RecId)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLDBTuningRecommendationsViewBuilder construct()
+    {
+        return new DBMSQLDBTuningRecommendationsViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

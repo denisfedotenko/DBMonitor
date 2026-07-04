@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMUpdateTableStatisticsDialog</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMUpdateTableStatisticsDialog extends FormRun
+{
+    Set tablesToUpdateStats;
+    Set objectOrigTables;
+    DBMUpdateTableStatisticsController controller;
+    DBMUpdateTableStatisticsContract contract;
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>fillDeterminantComboBox</Name>
+				<Source><![CDATA[
+    private void fillDeterminantComboBox()
+    {
+        DBMUpdateStatisticsObjType objType = ObjectType.selection();
+        System.Collections.Specialized.StringEnumerator objectEnumerator;
+        Set nameSet = new Set(Types::String);
+        switch(objType)
+        {
+            case DBMUpdateStatisticsObjType::Table:
+                objectEnumerator = 
+                    Microsoft.Dynamics.Ax.Xpp.MetadataSupport::GetDataModelElements(true,false,false,false,false).GetEnumerator();
+                break;
+            case DBMUpdateStatisticsObjType::View:
+                objectEnumerator =
+                    Microsoft.Dynamics.Ax.Xpp.MetadataSupport::GetDataModelElements(false,true,false,false,false).GetEnumerator();
+                break;
+            case DBMUpdateStatisticsObjType::DataEntity:
+                objectEnumerator =
+                    Microsoft.Dynamics.Ax.Xpp.MetadataSupport::GetDataModelElements(false,false,true,false,false).GetEnumerator();
+                break;
+            case DBMUpdateStatisticsObjType::Form:
+                objectEnumerator =
+                    Microsoft.Dynamics.Ax.Xpp.MetadataSupport::FormNames();
+                break;
+        }
+        while (objectEnumerator.MoveNext())
+        {
+            nameSet.add(objectEnumerator.Current);
+        }
+        SetEnumerator se = nameSet.getEnumerator();
+        determinant.clear();
+        while (se.moveNext())
+        {
+            Determinant.add(se.current());
+        }
+        element.fillAvailableTables();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>fillAvailableTables</Name>
+				<Source><![CDATA[
+    private void fillAvailableTables()
+    {
+        DBMUpdateStatisticsObjType objType = ObjectType.selection();
+        str objName = determinant.valueStr();
+        Set tables = DBMObjectToTableSearcher::construct(objType,objName).search();
+        SetEnumerator se = tables.getEnumerator();
+        availableTables.clear();
+        while (se.moveNext())
+        {
+            availableTables.add(se.current());
+        }
+        objectOrigTables = tables;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addTable</Name>
+				<Source><![CDATA[
+    private void addTable()
+    {
+        str selectedTable = availableTables.getText(availableTables.selection());
+        if (selectedTable && !tablesToUpdateStats.in(selectedTable))
+        {
+            selectedTables.add(selectedTable);
+            tablesToUpdateStats.add(selectedTable);
+            availableTables.delete(selectedTable);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>removeTable</Name>
+				<Source><![CDATA[
+    private void removeTable()
+    {
+        str tableToRemove = selectedTables.getText(selectedTables.selection());
+        if (tableToRemove && tablesToUpdateStats.in(tableToRemove))
+        {
+            if (objectOrigTables.in(tableToRemove))
+            {
+                availableTables.add(tableToRemove);
+            }
+            tablesToUpdateStats.remove(tableToRemove);
+            selectedTables.delete(tableToRemove);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addAllTables</Name>
+				<Source><![CDATA[
+    private void addAllTables()
+    {
+        SetEnumerator se = objectOrigTables.getEnumerator();
+        while (se.moveNext())
+        {
+            if (!tablesToUpdateStats.in(se.current()))
+            {
+                tablesToUpdateStats.add(se.current());
+                selectedTables.add(se.current());
+            }
+        }
+        availableTables.clear();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>removeAllTables</Name>
+				<Source><![CDATA[
+    private void removeAllTables()
+    {
+        SetEnumerator se = tablesToUpdateStats.getEnumerator();
+        while (se.moveNext())
+        {
+            if (objectOrigTables.in(se.current()))
+            {
+                availableTables.add(se.current());
+            }
+
+        }
+        selectedTables.clear();
+        tablesToUpdateStats = new Set(Types::String);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        if (!element.args().caller())
+        {
+            throw error("@SYS22539");
+        }
+
+        if (!(element.args().caller() is SysOperationDialog))
+        {
+            throw error(strFmt("@SYS86720", this.form().name(), classStr(SysOperationDialog)));
+        }
+
+        SysOperationDialog sysOperationDialog = element.args().caller() as SysOperationDialog;
+
+        if (sysOperationDialog.controller() == null || !(sysOperationDialog.controller() is DBMUpdateTableStatisticsController))
+        {
+            throw error(strFmt("@CashManagement:IncorrectControllerType", classStr(DBMUpdateTableStatisticsController)));
+        }
+
+        controller = sysOperationDialog.controller() as DBMUpdateTableStatisticsController;
+
+        contract = controller.getDataContractObject(identifierStr(_contract)) as DBMUpdateTableStatisticsContract;
+
+        if (contract == null)
+        {
+            throw error(strFmt("@CashManagement:IncorrectDataContractType", classStr(DBMUpdateTableStatisticsContract)));
+        }
+        objectOrigTables = new Set(Types::String);
+        super();
+        element.fillDeterminantComboBox();
+        Determinant.selection(0);
+        this.initControlValuesFromContract();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initControlValuesFromContract</Name>
+				<Source><![CDATA[
+    private void initControlValuesFromContract()
+    {
+        tablesToUpdateStats = contract.parmTables();
+        SetEnumerator se = tablesToUpdateStats.getEnumerator();
+        selectedTables.clear();
+        while (se.moveNext())
+        {
+            selectedTables.add(se.current());
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>formRun</Name>
+				<Source><![CDATA[
+    public FormRun formRun()
+    {
+        //Required by SysOperation framework.
+        return this;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>canClose</Name>
+				<Source><![CDATA[
+    public boolean canClose()
+    {
+        boolean canClose = super();
+
+        if (canClose && element.closedOk())
+        {
+            canClose = controller.checkCloseDialog();
+        }
+
+        return canClose;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>applyValuesFromDialogToContract</Name>
+				<Source><![CDATA[
+    internal void applyValuesFromDialogToContract()
+    {
+        contract.parmTables(tablesToUpdateStats);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>closeOk</Name>
+				<Source><![CDATA[
+    public void closeOk()
+    {
+        this.applyValuesFromDialogToContract();
+
+        super();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="" />
+		<DataControls xmlns="">
+			<Control>
+				<Name>ObjectType</Name>
+				<Type>ComboBox</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        public boolean modified()
+        {
+            boolean ret;
+    
+            ret = super();
+            element.fillDeterminantComboBox();
+    
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>Determinant</Name>
+				<Type>ComboBox</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        public boolean modified()
+        {
+            boolean ret;
+    
+            ret = super();
+            element.fillAvailableTables();
+    
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>TableAdd</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            element.addTable();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>TableRemove</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            element.removeTable();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>TableAddAll</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            element.addAllTables();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>TableRemoveAll</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            element.removeAllTables();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources />
+	<Design>
+		<Caption xmlns="">@DBMUpdateTableStats:ChooseTables</Caption>
+		<DialogSize xmlns="">Medium</DialogSize>
+		<HideIfEmpty xmlns="">No</HideIfEmpty>
+		<Pattern xmlns="">DialogFastTabs</Pattern>
+		<PatternVersion xmlns="">1.0</PatternVersion>
+		<ShowDeleteButton xmlns="">No</ShowDeleteButton>
+		<ShowNewButton xmlns="">No</ShowNewButton>
+		<Style xmlns="">Dialog</Style>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormTabControl">
+				<Name>Tab</Name>
+				<Type>Tab</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormTabPageControl">
+						<Name>Parameters</Name>
+						<Pattern>Custom</Pattern>
+						<Type>TabPage</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormGroupControl">
+								<Name>AvailableGroup</Name>
+								<ElementPosition>858993458</ElementPosition>
+								<ExtendedStyle>listPanel_availPanel</ExtendedStyle>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>SizeToAvailable</HeightMode>
+								<Type>Group</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormGroupControl">
+										<Name>Group_Group</Name>
+										<ElementPosition>1288490187</ElementPosition>
+										<FilterExpression>%1</FilterExpression>
+										<Pattern>CustomAndQuickFilters</Pattern>
+										<PatternVersion>1.1</PatternVersion>
+										<Type>Group</Type>
+										<VerticalSpacing>-1</VerticalSpacing>
+										<WidthMode>SizeToAvailable</WidthMode>
+										<FormControlExtension
+											i:nil="true" />
+										<Controls>
+											<AxFormControl>
+												<Name>QuickFilter</Name>
+												<Visible>No</Visible>
+												<FormControlExtension>
+													<Name>QuickFilterControl</Name>
+													<ExtensionComponents />
+													<ExtensionProperties>
+														<AxFormControlExtensionProperty>
+															<Name>targetControlName</Name>
+															<Type>String</Type>
+															<Value>AvailableCommodityCodesGrid</Value>
+														</AxFormControlExtensionProperty>
+														<AxFormControlExtensionProperty>
+															<Name>defaultColumnName</Name>
+															<Type>String</Type>
+														</AxFormControlExtensionProperty>
+														<AxFormControlExtensionProperty>
+															<Name>placeholderText</Name>
+															<Type>String</Type>
+														</AxFormControlExtensionProperty>
+													</ExtensionProperties>
+												</FormControlExtension>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormComboBoxControl">
+												<Name>ObjectType</Name>
+												<AutoDeclaration>Yes</AutoDeclaration>
+												<Type>ComboBox</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<EnumType>DBMUpdateStatisticsObjType</EnumType>
+												<Items />
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormComboBoxControl">
+												<Name>Determinant</Name>
+												<AutoDeclaration>Yes</AutoDeclaration>
+												<Type>ComboBox</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<Label>@DBMUpdateTableStats:DeterminingObject</Label>
+												<Items />
+											</AxFormControl>
+										</Controls>
+										<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+										<FrameType>None</FrameType>
+										<Style>CustomFilter</Style>
+										<ViewEditMode>Edit</ViewEditMode>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormListBoxControl">
+										<Name>availableTables</Name>
+										<AutoDeclaration>Yes</AutoDeclaration>
+										<Height>200</Height>
+										<HeightMode>Manual</HeightMode>
+										<Type>ListBox</Type>
+										<WidthMode>SizeToAvailable</WidthMode>
+										<FormControlExtension
+											i:nil="true" />
+										<Label>@DBMUpdateTableStats:availableTables</Label>
+										<Items />
+									</AxFormControl>
+								</Controls>
+								<HideIfEmpty>No</HideIfEmpty>
+								<FrameType>None</FrameType>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormGroupControl">
+								<Name>DialogContent</Name>
+								<ElementPosition>715827882</ElementPosition>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>SizeToAvailable</HeightMode>
+								<Type>Group</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls />
+								<ArrangeMethod>Auto</ArrangeMethod>
+								<Style>DialogContent</Style>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormGroupControl">
+								<Name>SelectedGroup</Name>
+								<ElementPosition>1717986916</ElementPosition>
+								<ExtendedStyle>listPanel_selPanel</ExtendedStyle>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>SizeToAvailable</HeightMode>
+								<Type>Group</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonGroupControl">
+										<Name>AddRemoveButtonGroup</Name>
+										<ElementPosition>1431655764</ElementPosition>
+										<FilterExpression>%1</FilterExpression>
+										<LeftMode>AutoLeft</LeftMode>
+										<Type>ButtonGroup</Type>
+										<VerticalSpacing>-1</VerticalSpacing>
+										<FormControlExtension
+											i:nil="true" />
+										<Controls>
+											<AxFormControl xmlns=""
+												i:type="AxFormButtonControl">
+												<Name>TableAdd</Name>
+												<Type>Button</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<ButtonDisplay>ImageOnly</ButtonDisplay>
+												<NormalImage>MoveRight</NormalImage>
+												<Text>@SYS2318</Text>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormButtonControl">
+												<Name>TableRemove</Name>
+												<Type>Button</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<ButtonDisplay>ImageOnly</ButtonDisplay>
+												<NormalImage>MoveLeft</NormalImage>
+												<Text>@SYS311855</Text>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormButtonControl">
+												<Name>TableAddAll</Name>
+												<Type>Button</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<ButtonDisplay>ImageOnly</ButtonDisplay>
+												<NormalImage>MoveAllRight</NormalImage>
+												<Text>@SYS105245</Text>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormButtonControl">
+												<Name>TableRemoveAll</Name>
+												<Type>Button</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<ButtonDisplay>ImageOnly</ButtonDisplay>
+												<NormalImage>MoveAllLeft</NormalImage>
+												<Text>@SYS70471</Text>
+											</AxFormControl>
+										</Controls>
+										<ArrangeMethod>Vertical</ArrangeMethod>
+										<HideIfEmpty>No</HideIfEmpty>
+										<TopMargin>70</TopMargin>
+										<TopMarginMode>Fixed</TopMarginMode>
+										<FrameType>None</FrameType>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormListBoxControl">
+										<Name>selectedTables</Name>
+										<AutoDeclaration>Yes</AutoDeclaration>
+										<HeightMode>SizeToAvailable</HeightMode>
+										<Type>ListBox</Type>
+										<WidthMode>SizeToAvailable</WidthMode>
+										<FormControlExtension
+											i:nil="true" />
+										<Label>@DBMUpdateTableStats:selectedTables</Label>
+										<Items />
+									</AxFormControl>
+								</Controls>
+								<Columns>2</Columns>
+								<HideIfEmpty>No</HideIfEmpty>
+								<FrameType>None</FrameType>
+							</AxFormControl>
+						</Controls>
+						<Caption>@CashManagement:BankCurrencyRevalDialogParameters</Caption>
+					</AxFormControl>
+				</Controls>
+				<Style>FastTabs</Style>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormButtonGroupControl">
+				<Name>ButtonGroup</Name>
+				<ElementPosition>1431655764</ElementPosition>
+				<FilterExpression>%1</FilterExpression>
+				<LeftMode>AutoLeft</LeftMode>
+				<Type>ButtonGroup</Type>
+				<VerticalSpacing>-1</VerticalSpacing>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormCommandButtonControl">
+						<Name>OK</Name>
+						<ElementPosition>1073741822</ElementPosition>
+						<FilterExpression>%1</FilterExpression>
+						<HeightMode>Auto</HeightMode>
+						<Type>CommandButton</Type>
+						<VerticalSpacing>-1</VerticalSpacing>
+						<WidthMode>Auto</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<ButtonDisplay>TextOnly</ButtonDisplay>
+						<Command>OK</Command>
+						<DefaultButton>Yes</DefaultButton>
+						<MultiSelect>Yes</MultiSelect>
+						<Text>@SYS300539</Text>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormCommandButtonControl">
+						<Name>Cancel</Name>
+						<ElementPosition>1610612733</ElementPosition>
+						<FilterExpression>%1</FilterExpression>
+						<HeightMode>Auto</HeightMode>
+						<LeftMode>AutoRight</LeftMode>
+						<Type>CommandButton</Type>
+						<VerticalSpacing>-1</VerticalSpacing>
+						<WidthMode>Auto</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<ButtonDisplay>TextOnly</ButtonDisplay>
+						<Command>Cancel</Command>
+						<MultiSelect>Yes</MultiSelect>
+						<SaveRecord>No</SaveRecord>
+						<Text>@SYS300439</Text>
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalRight</ArrangeMethod>
+				<Style>DialogCommitContainer</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

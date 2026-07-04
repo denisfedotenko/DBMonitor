@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SystemJobParameters.DBMDatabaseTools</Name>
+	<FieldGroupExtensions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>DBMLockMontor</Name>
+			<Label>@DBMLockMonitor:LockMonitor</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>DBMActivateLockMonitor</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DBMLockMonMonitorFreq</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DBMLockMonReScanFreq</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>DBMDBResMonitor</Name>
+			<Label>@DBMLockMonitor:DBResourceUsageMonitor</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>DBMActivateDBResourceMonitor</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DBMDBResArchivalUnit</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DBMDBResDaysToKeep</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DBMDBResDaysToKeepInArchive</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>DBMActivateLockMonitor</Name>
+			<HelpText>@DBMLockMonitor:ActivateLockMontorHelp</HelpText>
+			<Label>@DBMLockMonitor:ActivateLockMonitorLabel</Label>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>DBMLockMonMonitorFreq</Name>
+			<ExtendedDataType>DBMScanFrequency</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:MonitoringFreqHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:MonitoringFreqLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>DBMLockMonReScanFreq</Name>
+			<ExtendedDataType>DBMScanFrequency</ExtendedDataType>
+			<HelpText>@DBMLockMonitor:LockRescanFreqHelp</HelpText>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:LockRescanFreqLabel</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>DBMActivateDBResourceMonitor</Name>
+			<Label>@DBMLockMonitor:ActivateDBResourceMon</Label>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>DBMDBResDaysToKeep</Name>
+			<ExtendedDataType>Days</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:Numberdaystokeep</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>DBMDBResDaysToKeepInArchive</Name>
+			<ExtendedDataType>Days</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:NumerDaysInArchive</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>DBMDBResArchivalUnit</Name>
+			<ExtendedDataType>Minutes</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@DBMLockMonitor:ArchiveUnit</Label>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

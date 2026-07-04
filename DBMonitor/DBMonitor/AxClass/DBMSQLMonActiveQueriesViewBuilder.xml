@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLMonActiveQueriesViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLMonActiveQueriesViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asSessionId;
+    str     asStartTime;
+    str     asStatus;
+    str     asCommand;
+    str     asSQLHandle;
+    str     asPlanHandle;
+    str     asDBName;
+    str     asBlockingSessionId;
+    str     asWaitType;
+    str     asWaitTime;
+    str     asLastWaitType;
+    str     asPercentComplete;
+    str     asContextInfo;
+    str     asCPUTime;
+    str     asElapsedTime;
+    str     asReads;
+    str     asWrites;
+    str     asLogicalReads;
+    str     asClientRowCount;
+    str     asGrantedMemory;
+    str     asDop;
+    str     asWorkerCount;
+    str     asSQLText;
+    str     asStatementStartOffset;
+    str     asStatementEndOffset;
+    str     asQueryPlanHash;
+    str     asRequestId;
+    str     asUserId;
+    str     asConnectionId;
+    str     asWaitResource;
+    str     asOpenTransactionCount;
+    str     asOpenResultsetCount;
+    str     asTransactionId;
+    str     asEstimatedCompletionTime;
+    str     asSchedulerId;
+    str     asTaskAddress;
+    str     asTextSize;
+    str     asLanguage;
+    str     asDateFormat;
+    str     asDateFirst;
+    str     asQuotedIdentifier;
+    str     asArithabort;
+    str     asAnsiNullDfltOn;
+    str     asAnsiDefaults;
+    str     asAnsiWarnings;
+    str     asAnsiPadding;
+    str     asAnsiNulls;
+    str     asConcatNullYieldsNull;
+    str     asTransactionIsolationLevel;
+    str     asLockTimeout;
+    str     asDeadlockPriority;
+    str     asPrevError;
+    str     asNestLevel;
+    str     asExecutingManagedCode;
+    str     asGroupId;
+    str     asQueryHash;
+    str     asStatementSqlHandle;
+    str     asStatementContextId;
+    str     asExternalScriptRequestId;
+    str     asIsResumable;
+    str     asPageResource;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates the <c>BOSSalesLineForPicking</c> view.
+    /// </summary>
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLMonActiveQueriesViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns the SQL statement to create the <c>BOSSalesLineForPicking</c> view.
+    /// </summary>
+    /// <remarks>
+    /*
+    CREATE VIEW [dbo].[BOSSALESLINEFORPICKING]
+SELECT
+  r.session_Id AS SessionId,
+  r.start_Time AS startTime,
+  r.Status AS Status,
+  r.Command AS command,
+  CONVERT([varchar](128), r.SQL_Handle, 1) AS SQLHandle,
+  CONVERT([varchar](128), r.Plan_Handle, 1) AS PlanHandle,
+  DB_NAME(r.database_id) AS DBName,
+  r.Blocking_Session_Id AS BlockingSessionId,
+  ISNULL(r.Wait_Type, '') AS WaitType,
+  r.Wait_Time AS WaitTime,
+  ISNULL(r.Last_Wait_Type, '') AS LastWaitType,
+  r.Percent_Complete AS PercentComplete,
+  CAST(r.Context_Info AS varchar(128)) AS ContextInfo,
+  r.CPU_Time AS CPUTime,
+  r.Total_Elapsed_Time AS ElapsedTime,
+  r.Reads AS Reads,
+  r.Writes AS Writes,
+  r.Logical_Reads AS LogicalReads,
+  r.Row_Count AS ClientRowCount,
+  r.Granted_query_Memory AS GrantedMemory,
+  r.Dop AS DOP,
+  ISNULL(r.parallel_Worker_Count, 0) AS WorkerCount,
+  st.text AS SQLText,
+  1010 AS recId
+FROM sys.dm_exec_requests r
+CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) AS st
+WHERE r.sql_handle IS NOT NULL
+
+    */
+    /// </remarks>
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.session_Id AS %1,
+            r.start_Time AS %2,
+            r.Status AS %3,
+            r.Command AS %4,
+            CONVERT([varchar](128), r.SQL_Handle, 1) AS %5,
+            CONVERT([varchar](128), r.Plan_Handle, 1) AS %6,
+            DB_NAME(r.database_id) AS %7,
+            r.Blocking_Session_Id AS %8,
+            ISNULL(r.Wait_Type, '') AS %9,
+                r.Wait_Time AS %10,
+            ISNULL(r.Last_Wait_Type, '') AS %11,
+            r.Percent_Complete AS %12,
+            CAST(r.Context_Info AS varchar(128)) AS %13,
+            r.CPU_Time AS %14,
+            r.Total_Elapsed_Time AS %15,
+            r.Reads AS %16,
+            r.Writes AS %17,
+            r.Logical_Reads AS %18,
+            r.Row_Count AS %19,
+            r.Granted_query_Memory AS %20,
+            r.Dop AS %21,
+            ISNULL(r.parallel_Worker_Count, 0) AS %22,
+            st.text AS %23,
+            r.statement_start_offset  AS %24,
+            r.statement_end_offset  AS %25,
+            r.query_plan_hash AS %26,
+            r.request_id AS %27,
+            r.user_id AS %28,
+            CONVERT([varchar](64), r.connection_id, 1) AS %29,
+            r.wait_resource AS %30,
+            r.open_transaction_count AS %31,
+            r.open_resultset_count AS %32,
+            r.transaction_id AS %33,
+            r.estimated_completion_time AS %34,
+            r.scheduler_id AS %35,
+            CONVERT([varchar](64), r.task_address, 1) AS %36,
+            r.text_size AS %37,
+            r.language AS %38,
+            r.date_format AS %39,
+            r.date_first AS %40,
+            r.quoted_identifier AS %41,
+            r.arithabort AS %42,
+            r.ansi_null_dflt_on AS %43,
+            r.ansi_defaults AS %44,
+            r.ansi_warnings AS %45,
+            r.ansi_padding AS %46,
+            r.ansi_nulls AS %47,
+            r.concat_null_yields_null AS %48,
+            r.transaction_isolation_level AS %49,
+            r.lock_timeout AS %50,
+            r.deadlock_priority AS %51,
+            r.prev_error AS %52,
+            r.nest_level AS %53,
+            r.executing_managed_code AS %54,
+            r.group_id AS %55,
+            CONVERT([varchar](64), r.query_hash, 1) AS %56,
+            CONVERT([varchar](130), r.statement_sql_handle, 1) AS %57,
+            r.statement_context_id AS %58,
+            CONVERT([varchar](64), r.external_script_request_id, 1) AS %59,
+            r.is_resumable AS %60,
+            CONVERT([varchar](64), r.page_resource, 1) AS %61,
+            1010 AS recId
+            FROM sys.dm_exec_requests r
+            CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) AS st
+            WHERE r.sql_handle IS NOT NULL",
+        asSessionId,
+        asStartTime,
+        asStatus,
+        asCommand,
+        asSQLHandle,
+        asPlanHandle,
+        asDBName,
+        asBlockingSessionId,
+        asWaitType,
+        asWaitTime,
+        asLastWaitType,
+        asPercentComplete,
+        asContextInfo,
+        asCPUTime,
+        asElapsedTime,
+        asReads,
+        asWrites,
+        asLogicalReads,
+        asClientRowCount,
+        asGrantedMemory,
+        asDop,
+        asWorkerCount,
+        asSQLText,
+        asStatementStartOffset,
+        asStatementEndOffset,
+            asQueryPlanHash,
+            asRequestId,
+            asUserId,
+            asConnectionId,
+            asWaitResource,
+            asOpenTransactionCount,
+            asOpenResultsetCount,
+            asTransactionId,
+            asEstimatedCompletionTime,
+            asSchedulerId,
+            asTaskAddress,
+            asTextSize,
+            asLanguage,
+            asDateFormat,
+            asDateFirst,
+            asQuotedIdentifier,
+            asArithabort,
+            asAnsiNullDfltOn,
+            asAnsiDefaults,
+            asAnsiWarnings,
+            asAnsiPadding,
+            asAnsiNulls,
+            asConcatNullYieldsNull,
+            asTransactionIsolationLevel,
+            asLockTimeout,
+            asDeadlockPriority,
+            asPrevError,
+            asNestLevel,
+            asExecutingManagedCode,
+            asGroupId,
+            asQueryHash,
+            asStatementSqlHandle,
+            asStatementContextId,
+            asExternalScriptRequestId,
+            asIsResumable,
+            asPageResource);
+
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>as</Name>
+				<Source><![CDATA[
+    private str as(str _fieldName, str _alias)
+    {
+        return _fieldName + ' AS ' + _alias;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLActiveQueries));
+        viewName            = view.name(DbBackend::Sql);
+        asSessionId = view.fieldObject(fieldNum(DBMSQLActiveQueries, SessionId)).name(DbBackend::Sql);
+        asStartTime = view.fieldObject(fieldNum(DBMSQLActiveQueries, StartTime)).name(DbBackend::Sql);
+        asStatus    = view.fieldObject(fieldNum(DBMSQLActiveQueries, status)).name(DbBackend::Sql);
+        asCommand   = view.fieldObject(fieldNum(DBMSQLActiveQueries, command)).name(DbBackend::Sql);
+        asSQLHandle = view.fieldObject(fieldNum(DBMSQLActiveQueries, SQLHandle)).name(DbBackend::Sql);
+        asPlanHandle    = view.fieldObject(fieldNum(DBMSQLActiveQueries, planHandle)).name(DbBackend::Sql);
+        asDBName    = view.fieldObject(fieldNum(DBMSQLActiveQueries, DBName)).name(DbBackend::Sql);
+        asBlockingSessionId = view.fieldObject(fieldNum(DBMSQLActiveQueries, blockingSessionId)).name(DbBackend::Sql);
+        asWaitType = view.fieldObject(fieldNum(DBMSQLActiveQueries, waitType)).name(DbBackend::Sql);
+        asWaitTime = view.fieldObject(fieldNum(DBMSQLActiveQueries, waitTime)).name(DbBackend::Sql);
+        asLastWaitType = view.fieldObject(fieldNum(DBMSQLActiveQueries, lastWaitType)).name(DbBackend::Sql);
+        asPercentComplete = view.fieldObject(fieldNum(DBMSQLActiveQueries, percentComplete)).name(DbBackend::Sql);
+        asContextInfo = view.fieldObject(fieldNum(DBMSQLActiveQueries, contextInfo)).name(DbBackend::Sql);
+        asCPUTime = view.fieldObject(fieldNum(DBMSQLActiveQueries, CPUTime)).name(DbBackend::Sql);
+        asElapsedTime = view.fieldObject(fieldNum(DBMSQLActiveQueries, elapsedTime)).name(DbBackend::Sql);
+        asReads = view.fieldObject(fieldNum(DBMSQLActiveQueries, reads)).name(DbBackend::Sql);
+        asWrites = view.fieldObject(fieldNum(DBMSQLActiveQueries, writes)).name(DbBackend::Sql);
+        asLogicalReads = view.fieldObject(fieldNum(DBMSQLActiveQueries, logicalReads)).name(DbBackend::Sql);
+        asClientRowCount = view.fieldObject(fieldNum(DBMSQLActiveQueries, clientRowCount)).name(DbBackend::Sql);
+        asGrantedMemory = view.fieldObject(fieldNum(DBMSQLActiveQueries, grantedMemory)).name(DbBackend::Sql);
+        asDop = view.fieldObject(fieldNum(DBMSQLActiveQueries, DOP)).name(DbBackend::Sql);
+        asWorkerCount  = view.fieldObject(fieldNum(DBMSQLActiveQueries, WorkerCount)).name(DbBackend::Sql);
+        asSQLText = view.fieldObject(fieldNum(DBMSQLActiveQueries, SQLText)).name(DbBackend::Sql);
+        asStatementStartOffset = view.fieldObject(fieldNum(DBMSQLActiveQueries, StatementStartOffset)).name(DbBackend::Sql);
+        asStatementEndOffset = view.fieldObject(fieldNum(DBMSQLActiveQueries, StatementEndOffset)).name(DbBackend::Sql);
+        asQueryPlanHash = view.fieldObject(fieldNum(DBMSQLActiveQueries, QueryPlanHash)).name(DbBackend::Sql);
+        asRequestId = view.fieldObject(fieldNum(DBMSQLActiveQueries, RequestId)).name(DbBackend::Sql);
+        asUserId = view.fieldObject(fieldNum(DBMSQLActiveQueries, UserId)).name(DbBackend::Sql);
+        asConnectionId = view.fieldObject(fieldNum(DBMSQLActiveQueries, ConnectionId)).name(DbBackend::Sql);
+        asWaitResource = view.fieldObject(fieldNum(DBMSQLActiveQueries, WaitResource)).name(DbBackend::Sql);
+        asOpenTransactionCount = view.fieldObject(fieldNum(DBMSQLActiveQueries, OpenTransactionCount)).name(DbBackend::Sql);
+        asOpenResultsetCount = view.fieldObject(fieldNum(DBMSQLActiveQueries, OpenResultsetCount)).name(DbBackend::Sql);
+        asTransactionId = view.fieldObject(fieldNum(DBMSQLActiveQueries, TransactionId)).name(DbBackend::Sql);
+        asEstimatedCompletionTime = view.fieldObject(fieldNum(DBMSQLActiveQueries, EstimatedCompletionTime)).name(DbBackend::Sql);
+        asSchedulerId = view.fieldObject(fieldNum(DBMSQLActiveQueries, SchedulerId)).name(DbBackend::Sql);
+        asTaskAddress = view.fieldObject(fieldNum(DBMSQLActiveQueries, TaskAddress)).name(DbBackend::Sql);
+        asTextSize = view.fieldObject(fieldNum(DBMSQLActiveQueries, TextSize)).name(DbBackend::Sql);
+        asLanguage = view.fieldObject(fieldNum(DBMSQLActiveQueries, Language)).name(DbBackend::Sql);
+        asDateFormat = view.fieldObject(fieldNum(DBMSQLActiveQueries, DateFormat)).name(DbBackend::Sql);
+        asDateFirst = view.fieldObject(fieldNum(DBMSQLActiveQueries, DateFirst)).name(DbBackend::Sql);
+        asQuotedIdentifier = view.fieldObject(fieldNum(DBMSQLActiveQueries, QuotedIdentifier)).name(DbBackend::Sql);
+        asArithabort = view.fieldObject(fieldNum(DBMSQLActiveQueries, Arithabort)).name(DbBackend::Sql);
+        asAnsiNullDfltOn = view.fieldObject(fieldNum(DBMSQLActiveQueries, AnsiNullDfltOn)).name(DbBackend::Sql);
+        asAnsiDefaults = view.fieldObject(fieldNum(DBMSQLActiveQueries, AnsiDefaults)).name(DbBackend::Sql);
+        asAnsiWarnings = view.fieldObject(fieldNum(DBMSQLActiveQueries, AnsiWarnings)).name(DbBackend::Sql);
+        asAnsiPadding = view.fieldObject(fieldNum(DBMSQLActiveQueries, AnsiPadding)).name(DbBackend::Sql);
+        asAnsiNulls = view.fieldObject(fieldNum(DBMSQLActiveQueries, AnsiNulls)).name(DbBackend::Sql);
+        asConcatNullYieldsNull = view.fieldObject(fieldNum(DBMSQLActiveQueries, ConcatNullYieldsNull)).name(DbBackend::Sql);
+        asTransactionIsolationLevel = view.fieldObject(fieldNum(DBMSQLActiveQueries, TransactionIsolationLevel)).name(DbBackend::Sql);
+        asLockTimeout = view.fieldObject(fieldNum(DBMSQLActiveQueries, LockTimeout)).name(DbBackend::Sql);
+        asDeadlockPriority = view.fieldObject(fieldNum(DBMSQLActiveQueries, DeadlockPriority)).name(DbBackend::Sql);
+        asPrevError = view.fieldObject(fieldNum(DBMSQLActiveQueries, PrevError)).name(DbBackend::Sql);
+        asNestLevel = view.fieldObject(fieldNum(DBMSQLActiveQueries, NestLevel)).name(DbBackend::Sql);
+        asExecutingManagedCode = view.fieldObject(fieldNum(DBMSQLActiveQueries, ExecutingManagedCode)).name(DbBackend::Sql);
+        asGroupId = view.fieldObject(fieldNum(DBMSQLActiveQueries, GroupId)).name(DbBackend::Sql);
+        asQueryHash = view.fieldObject(fieldNum(DBMSQLActiveQueries, QueryHash)).name(DbBackend::Sql);
+        asStatementSqlHandle = view.fieldObject(fieldNum(DBMSQLActiveQueries, StatementSqlHandle)).name(DbBackend::Sql);
+        asStatementContextId = view.fieldObject(fieldNum(DBMSQLActiveQueries, StatementContextId)).name(DbBackend::Sql);
+        asExternalScriptRequestId = view.fieldObject(fieldNum(DBMSQLActiveQueries, ExternalScriptRequestId)).name(DbBackend::Sql);
+        asIsResumable = view.fieldObject(fieldNum(DBMSQLActiveQueries, IsResumable)).name(DbBackend::Sql);
+        asPageResource = view.fieldObject(fieldNum(DBMSQLActiveQueries, PageResource)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLMonActiveQueriesViewBuilder construct()
+    {
+        return new DBMSQLMonActiveQueriesViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

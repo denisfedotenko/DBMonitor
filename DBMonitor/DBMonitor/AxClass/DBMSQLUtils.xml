@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLUtils</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLUtils
+{
+
+
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>isSqlAzure</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Determines if the AX DB is running in SQL Azure or SQL Server.
+    /// </summary>
+    /// <returns>
+    /// True if SQL Azure, false otherwise.
+    /// </returns>
+    public static boolean isSqlAzure()
+    {
+        return DBMSQLUtils::getSqlEdition() == 'SQL Azure';
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getSqlEdition</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Returns the Server property 'Edition' from SQL. (i.e. 'SQL Azure', 'Enterprise Evaluation Edition (64-bit)', etc).
+    /// </summary>
+    /// <returns>
+    /// String representing the Edition of the SQL Server.
+    /// </returns>
+    public static str getSqlEdition()
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str edition;
+
+        sqlStatementText = 'SELECT SERVERPROPERTY(\'Edition\')';
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+
+        // Open the code access permission scope.
+        permission.assert();
+
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+      
+        edition = '';
+        if (sqlResult.next())
+        {
+            edition = sqlResult.getString(1);
+        }
+      
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+      
+        return edition;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>databaseCompatibilityLevel</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Return compatibatibility level of the current database
+    /// </summary>
+    /// <returns>
+    /// Integer number with the compatibility_level 
+    /// (see https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql-compatibility-level?view=sql-server-ver16#compatibility_level--160--150--140--130--120--110--100--90--80- )
+    /// </returns>
+    public static int databaseCompatibilityLevel()
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        int compatibilityLevel;
+
+        sqlStatementText = @"SELECT compatibility_level
+FROM sys.databases
+where database_id=DB_ID()";
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+
+        // Open the code access permission scope.
+        permission.assert();
+
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+      
+        compatibilityLevel =0;
+        if (sqlResult.next())
+        {
+            compatibilityLevel = sqlResult.getInt(1);
+        }
+      
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+      
+        return compatibilityLevel;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getSqlTextSample</Name>
+				<Source><![CDATA[
+    public static DBMSqlText getSqlTextSample(DBMSQLHandle _sqlHandle, DBMSQLHandle _planHandle)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        DBMSqlText QuerySqlText;
+        sqlStatementText = strFmt(@'SELECT TOP 1 SUBSTRING(st.text, (qs.statement_start_offset/2)+1,
+        ((CASE qs.statement_end_offset
+          WHEN -1 THEN DATALENGTH(st.text)
+         ELSE qs.statement_end_offset
+         END - qs.statement_start_offset)/2) + 1) AS statement_text
+FROM sys.dm_exec_query_stats AS qs
+CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) AS st
+WHERE qs.sql_handle = %1
+',_sqlHandle);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+      
+        if (sqlResult.next())
+        {
+            querySqlText = sqlResult.getString(1);
+        }
+      
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+
+        str sqlQuery = strFmt(@"
+    select STRING_AGG('DECLARE ' + parmTable.parmName + ' ' + parmTable.parmDataType + ' = ' + parmTable.parmValue, '; ')
+    from (
+        select parmtable.parms.value('@Column', 'NVARCHAR(128)') as parmName,
+               parmtable.parms.value('@ParameterDataType', 'NVARCHAR(128)') as parmDataType,
+               parmtable.parms.value('@ParameterCompiledValue', 'nvarchar(128)') as parmValue
+        from (
+            select TRY_CONVERT(XML, SUBSTRING(
+                convert(NVARCHAR(MAX), query_plan),
+                CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)),
+                CHARINDEX('</ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)) + LEN('</ParameterList>') - CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan))
+            )) AS Parameters
+            from sys.dm_exec_query_plan(%1)
+        ) as parameterList
+        outer apply parameterList.Parameters.nodes('//ParameterList/ColumnReference') as parmtable(parms)
+    ) as parmTable", _planHandle);        
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+      
+        if (sqlResult.next())
+        {
+            querySqlText = sqlResult.getString(1)+'\n' + querySQLText;
+        }
+        sqlResult.close();
+        statement.close();
+
+        CodeAccessPermission::revertAssert();
+        
+      
+        return querySqlText;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dropPlanFromCache</Name>
+				<Source><![CDATA[
+    public static void dropPlanFromCache(DBMSQLHandle _planHandle = '')
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        sqlStatementText = strFmt(@'ALTER DATABASE SCOPED CONFIGURATION CLEAR PROCEDURE_CACHE %1',_planHandle);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        statement.executeUpdateWithParameters(sqlStatementText, SqlParams::create());
+      
+        statement.close();
+        CodeAccessPermission::revertAssert();
+        
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryPlan</Name>
+				<Source><![CDATA[
+    public static XML getQueryPlan(DBMSQLHandle _planHandle)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        XML QueryPlan;
+        sqlStatementText = strFmt(@'
+    DECLARE @SQLPlan NVARCHAR(MAX);
+SELECT TOP 1 @SQLPlan = CONVERT(NVARCHAR(MAX), query_plan)
+FROM sys.dm_exec_query_plan(%1)
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@SQLPlan, 1, @Size) AS NVARCHAR(512)) AS PlanFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@SQLPlan, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@SQLPlan)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)',_planHandle);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+        while (sqlResult.next())
+        {
+            sb.append(sqlResult.getString(1));
+        }
+        QueryPlan = sb.toString();
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+        return QueryPlan;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getActualQueryPlan</Name>
+				<Source><![CDATA[
+    public static XML getActualQueryPlan(DBMSQLHandle _planHandle)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        XML QueryPlan;
+        sqlStatementText = strFmt(@'
+    DECLARE @SQLPlan NVARCHAR(MAX);
+SELECT TOP 1 @SQLPlan = CONVERT(NVARCHAR(MAX), query_plan)
+FROM sys.dm_exec_query_plan(%1)
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@SQLPlan, 1, @Size) AS NVARCHAR(512)) AS PlanFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@SQLPlan, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@SQLPLan)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)',_planHandle);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+        while (sqlResult.next())
+        {
+            sb.append(sqlResult.getString(1));
+        }
+        QueryPlan = sb.toString();
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+        return QueryPlan;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getLiveQueryPlan</Name>
+				<Source><![CDATA[
+    public static XML getLiveQueryPlan(DBMSQLSPID _spid)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        XML QueryPlan;
+        sqlStatementText = strFmt(@'
+    DECLARE @SQLPlan NVARCHAR(MAX);
+SELECT TOP 1 @SQLPlan = CONVERT(NVARCHAR(MAX), query_plan)
+FROM sys.dm_exec_query_statistics_xml(%1)
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@SQLPlan, 1, @Size) AS NVARCHAR(512)) AS PlanFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@SQLPlan, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@SQLPLan)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)',_spid);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+        while (sqlResult.next())
+        {
+            sb.append(sqlResult.getString(1));
+        }
+        QueryPlan = sb.toString();
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+        return QueryPlan;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getSqlTextSampleQueryStore</Name>
+				<Source><![CDATA[
+    public static DBMSqlText getSqlTextSampleQueryStore(DBMSQLQueryStoreQueryTextId _queryTextId, DBMSQLQueryStorePlanId _queryPlanId)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        DBMSqlText QuerySqlText;
+        sqlStatementText = strFmt(@'select query_sql_text from sys.query_store_query_text where query_text_id = %1',_queryTextId);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+      
+        if (sqlResult.next())
+        {
+            querySqlText = sqlResult.getString(1);
+        }
+        sqlResult.close();
+        statement.close();
+        System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex('(?s)^\([^)]+\)\s*(.*)');
+        System.Text.RegularExpressions.Match match = regex.Match(querySqlText);
+        if (match.Success)
+        {
+                QuerySqlText = match.get_Groups().get_Item(2).get_Value();
+        }
+        CodeAccessPermission::revertAssert();
+
+        str sqlQuery = strFmt(@"
+    select STRING_AGG('DECLARE ' + parmTable.parmName + ' ' + parmTable.parmDataType + ' = ' + parmTable.parmValue, '; ')
+    from (
+        select parmtable.parms.value('@Column', 'NVARCHAR(128)') as parmName,
+               parmtable.parms.value('@ParameterDataType', 'NVARCHAR(128)') as parmDataType,
+               parmtable.parms.value('@ParameterCompiledValue', 'nvarchar(128)') as parmValue
+        from (
+            select TRY_CONVERT(XML, SUBSTRING(
+                convert(NVARCHAR(MAX), query_plan),
+                CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)),
+                CHARINDEX('</ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)) + LEN('</ParameterList>') - CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan))
+            )) AS Parameters
+            from sys.query_store_plan
+            where plan_id = %1
+        ) as parameterList
+        outer apply parameterList.Parameters.nodes('//ParameterList/ColumnReference') as parmtable(parms)
+    ) as parmTable", _queryPlanId);
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+      
+        if (sqlResult.next())
+        {
+            querySqlText = sqlResult.getString(1)+'\n' + querySQLText;
+        }
+        sqlResult.close();
+        statement.close();
+      
+        CodeAccessPermission::revertAssert();
+        
+      
+        return querySqlText;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryStorePlan</Name>
+				<Source><![CDATA[
+    public static XML getQueryStorePlan(DBMSQLQueryStorePlanId _queryPlanId)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        XML QueryPlan;
+        sqlStatementText = strFmt(@'
+    DECLARE @SQLPlan NVARCHAR(MAX);
+SELECT TOP 1 @SQLPlan = CONVERT(NVARCHAR(MAX), query_plan)
+FROM sys.query_store_plan
+where plan_id = %1
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@SQLPlan, 1, @Size) AS NVARCHAR(512)) AS PlanFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@SQLPlan, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@SQLPlan)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)',_queryPlanId);
+        permission = new SqlStatementExecutePermission(sqlStatementText);
+        // Open the code access permission scope.
+        permission.assert();
+        Map parms  = SqlParams::create();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+        while (sqlResult.next())
+        {
+            sb.append(sqlResult.getString(1));
+        }
+        QueryPlan = sb.toString();
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+        return QueryPlan;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

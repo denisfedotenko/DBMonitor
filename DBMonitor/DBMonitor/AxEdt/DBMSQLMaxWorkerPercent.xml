@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtReal">
+	<Name>DBMSQLMaxWorkerPercent</Name>
+	<Extends>Percent</Extends>
+	<HelpText>@DBMLockMonitor:MaxWorkerPercentHelp</HelpText>
+	<Label>@DBMLockMonitor:MaxWorkerPercentLabel</Label>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMQueryStoreStatGrouping</Name>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>None</Name>
+			<Label>@DBMonitor:GroupingNone</Label>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Hour</Name>
+			<Label>@DBMonitor:GroupingHour</Label>
+			<Value>1</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Day</Name>
+			<Label>@DBMonitor:GroupingDay</Label>
+			<Value>2</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Week</Name>
+			<Label>@DBMonitor:GroupingWeek</Label>
+			<Value>3</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Month</Name>
+			<Label>@DBMonitor:GroupingMonth</Label>
+			<Value>4</Value>
+		</AxEnumValue>
+	</EnumValues>
+</AxEnum>

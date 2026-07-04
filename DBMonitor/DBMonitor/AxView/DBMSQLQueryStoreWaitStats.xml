@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreWaitStats</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStoreWaitStats extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DateTimeNull</Name>
+				<Source><![CDATA[
+    public static str DateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(utcDateTimeNull());
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLQueryStoreWaitStats</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups />
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>WaitStatsId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreWaitStatsId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>PlanId</Name>
+			<ExtendedDataType>DBMSQLQueryStorePlanId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>RuntimeStatsIntervalId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreRuntimeStatsIntervalId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>WaitCategory</Name>
+			<ExtendedDataType>DBMSQLQueryStoreWaitCategory</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>WaitCategoryDesc</Name>
+			<ExtendedDataType>DBMSQLQueryStoreWaitCategoryDesc</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>ExecutionType</Name>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>DBMSQLQueryStoreExecutionType</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>ExecutionTypeDesc</Name>
+			<ExtendedDataType>DBMSQLQueryStoreExecutionTypeDesc</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalQueryWaitTimeMs</Name>
+			<ExtendedDataType>DBMSQLQueryStoreTotalQueryWaitTimeMs</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>AvgQueryWaitTimeMs</Name>
+			<ExtendedDataType>DBMSQLQueryStoreAvgQueryWaitTimeMs</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastQueryWaitTimeMs</Name>
+			<ExtendedDataType>DBMSQLQueryStoreLastQueryWaitTimeMs</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinQueryWaitTimeMs</Name>
+			<ExtendedDataType>DBMSQLQueryStoreMinQueryWaitTimeMs</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxQueryWaitTimeMs</Name>
+			<ExtendedDataType>DBMSQLQueryStoreMaxQueryWaitTimeMs</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedReal">
+			<Name>StdevQueryWaitTimeMs</Name>
+			<ExtendedDataType>DBMSQLQueryStoreStdevQueryWaitTimeMs</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>ReplicaGroupId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreReplicaGroupId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

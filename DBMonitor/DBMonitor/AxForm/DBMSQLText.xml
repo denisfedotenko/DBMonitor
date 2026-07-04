@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMSQLText</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMSQLText extends FormRun
+{
+ 
+    Object callerFormRun;
+    DBMSQLHandle statementHandle;
+    DBMSQLHandle planHandle;
+    DBMSQLQueryStoreQueryTextId querytextId;
+    DBMSQLQueryStorePlanId queryPlanId;
+    boolean isPlanCacheBased;
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        if (element.args().caller()
+            && element.args().caller() is FormRun)
+        {
+            FormRun callerForm = element.args().caller() as FormRun;
+            if (formHasMethod(callerForm, identifierStr(getSQLHandle))
+                && formHasMethod(callerForm, identifierStr(getPlanHandle)))
+            {
+                callerFormRun = callerForm;
+                isPlanCacheBased = true;
+            }
+            else  if (formHasMethod(callerForm, identifierStr(getQueryTextId))
+            && formHasMethod(callerForm, identifierStr(getQueryPlanId)))
+            {
+                callerFormRun = callerForm;
+                isPlanCacheBased = false;
+            }
+            else
+            {
+                throw error(Error::wrongUseOfFunction(funcName()));
+            }
+        }
+        super();
+        str SQLWarning =  "@DBMonitor:SQLTextWarning";
+        str SQLTextSample;
+        if (isPlanCacheBased)
+        {
+            statementHandle = callerFormRun.getSQLHandle();
+            planHandle = callerFormRun.getPlanHandle();
+            SQLTextSample = DBMSQLUtils::getSqlTextSample(statementHandle, planHandle);
+        }
+        else
+        {
+            querytextId = callerFormRun.getQueryTextId();
+            queryPlanId = callerFormRun.getQueryPlanId();
+            SQLTextSample = DBMSQLUtils::getSqlTextSampleQueryStore(querytextId, queryPlanId);
+        }
+        SQLText.text(SQLWarning+'\n'+SQLTextSample);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="" />
+		<DataControls xmlns="" />
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources />
+	<Design>
+		<Caption xmlns="">@DBMonitor:SQLText</Caption>
+		<DialogSize xmlns="">Full</DialogSize>
+		<Pattern xmlns="">SimpleDetails-FastTabsContainer</Pattern>
+		<PatternVersion xmlns="">1.4</PatternVersion>
+		<ShowDeleteButton xmlns="">No</ShowDeleteButton>
+		<ShowNewButton xmlns="">No</ShowNewButton>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPane</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls />
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormTabControl">
+				<Name>mainTab</Name>
+				<Type>Tab</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormTabPageControl">
+						<Name>SQLTextTabPage</Name>
+						<Pattern>FillText</Pattern>
+						<PatternVersion>UX7 1.0</PatternVersion>
+						<Type>TabPage</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>SQLText</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<HeightMode>SizeToAvailable</HeightMode>
+								<Type>String</Type>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<MultiLine>Yes</MultiLine>
+							</AxFormControl>
+						</Controls>
+						<FastTabExpanded>Always</FastTabExpanded>
+						<Style>DetailsFormGrid</Style>
+					</AxFormControl>
+				</Controls>
+				<ShowTabs>No</ShowTabs>
+				<Style>FastTabs</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMUpdateTableStatisticsService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// </summary>
+///<remarks>
+///</remarks>
+public class DBMUpdateTableStatisticsService extends SysOperationServiceBase
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// An entry point of the service operation.
+    /// </summary>
+    /// <param name = "_contract">
+    /// Contract instance for service operation.
+    /// </param>
+    public void process(DBMUpdateTableStatisticsContract _contract)
+    {
+        SetEnumerator se = _contract.parmTables().getEnumerator();
+        while (se.moveNext())
+        {
+            this.updateStats(se.current());
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateStats</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// updates database statistics for a single table
+    /// </summary>
+    /// <param name = "_contract">
+    /// Contract instance for service operation.
+    /// </param>
+    protected void updateStats(TableName _tableName)
+    {
+        utcdatetime startTime = DateTimeUtil::getSystemDateTime();
+        Connection connection = new Connection();
+        str statementText = strFmt('UPDATE STATISTICS dbo.%1 WITH FULLSCAN',_tableName);
+        Statement statement = connection.createStatement();
+        SqlStatementExecutePermission perm;
+        perm = new SqlStatementExecutePermission(statementText);
+        perm.assert();
+        statement.executeUpdateWithParameters(statementText,SqlParams::create());
+        CodeAccessPermission::revertAssert();
+        Info(strFmt("@DBMUpdateTableStats:StatisticsWereUpdated",
+                    _tableName,
+            time2Str(DateTimeUtil::getDifference(DateTimeUtil::getSystemDateTime(),startTime),TimeSeparator::Colon,TimeFormat::Hour24)));
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

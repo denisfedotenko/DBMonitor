@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStats</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStats extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates a literal expression returning an empty string.
+    /// </summary>
+    /// <returns>
+    /// An empty string.
+    /// </returns>
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates a literal expression returning zero.
+    /// </summary>
+    /// <returns>
+    /// A string containing '0'.
+    /// </returns>
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dateTimeNull</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates a literal expression returning the null date/time value.
+    /// </summary>
+    /// <returns>
+    /// A string containing the null date/time value.
+    /// </returns>
+    public static str dateTimeNull()
+    {
+        return SysComputedColumnBase::returnLiteral(utcDateTimeNull());
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMSQLMon:QueryStats</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<TitleField1>TotalElapsedTime</TitleField1>
+	<TitleField2>ExecutionCount</TitleField2>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalElapsedTime</Name>
+			<ExtendedDataType>DBMSQLStatsTotalElapsedTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgElapsedTime</Name>
+			<ExtendedDataType>DBMSQLStatsAvgElapsedTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>ExecutionCount</Name>
+			<ExtendedDataType>DBMSQLStatsExecutionCount</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinElapsedTime</Name>
+			<ExtendedDataType>DBMSQLStatsMinElapsedTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxElapsedTime</Name>
+			<ExtendedDataType>DBMSQLStatsMaxElapsedTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastElapsedTime</Name>
+			<ExtendedDataType>DBMSQLStatsLastElapsedTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>LastExecutionTime</Name>
+			<ExtendedDataType>DBMSQLStatsLastExecutionTime</ExtendedDataType>
+			<ViewMethod>dateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>SQLHandle</Name>
+			<ExtendedDataType>DBMStmtHandle</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+			<StringSize>130</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>PlanHandle</Name>
+			<ExtendedDataType>DBMStmtHandle</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+			<StringSize>130</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>SQLText</Name>
+			<ExtendedDataType>DBMSQLStatsSQLText</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>StatementStartOffset</Name>
+			<ExtendedDataType>DBMSQLStatsStatementStartOffset</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>StatementEndOffset</Name>
+			<ExtendedDataType>DBMSQLStatsStatementEndOffset</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>PlanGenerationNum</Name>
+			<ExtendedDataType>DBMSQLStatsPlanGenerationNum</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>CreationTime</Name>
+			<ExtendedDataType>DBMSQLStatsCreationTime</ExtendedDataType>
+			<ViewMethod>dateTimeNull</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalWorkerTime</Name>
+			<ExtendedDataType>DBMSQLStatsTotalWorkerTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastWorkerTime</Name>
+			<ExtendedDataType>DBMSQLStatsLastWorkerTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinWorkerTime</Name>
+			<ExtendedDataType>DBMSQLStatsMinWorkerTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxWorkerTime</Name>
+			<ExtendedDataType>DBMSQLStatsMaxWorkerTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalPhysicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsTotalPhysicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastPhysicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsLastPhysicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinPhysicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsMinPhysicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxPhysicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsMaxPhysicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalLogicalWrites</Name>
+			<ExtendedDataType>DBMSQLStatsTotalLogicalWrites</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastLogicalWrites</Name>
+			<ExtendedDataType>DBMSQLStatsLastLogicalWrites</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinLogicalWrites</Name>
+			<ExtendedDataType>DBMSQLStatsMinLogicalWrites</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxLogicalWrites</Name>
+			<ExtendedDataType>DBMSQLStatsMaxLogicalWrites</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalLogicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsTotalLogicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastLogicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsLastLogicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinLogicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsMinLogicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxLogicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsMaxLogicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalClrTime</Name>
+			<ExtendedDataType>DBMSQLStatsTotalClrTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastClrTime</Name>
+			<ExtendedDataType>DBMSQLStatsLastClrTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinClrTime</Name>
+			<ExtendedDataType>DBMSQLStatsMinClrTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxClrTime</Name>
+			<ExtendedDataType>DBMSQLStatsMaxClrTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QueryHash</Name>
+			<ExtendedDataType>DBMSQLStatsQueryHash</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+			<StringSize>20</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>QueryPlanHash</Name>
+			<ExtendedDataType>DBMSQLStatsQueryPlanHash</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+			<StringSize>20</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalRows</Name>
+			<ExtendedDataType>DBMSQLStatsTotalRows</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastRows</Name>
+			<ExtendedDataType>DBMSQLStatsLastRows</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinRows</Name>
+			<ExtendedDataType>DBMSQLStatsMinRows</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxRows</Name>
+			<ExtendedDataType>DBMSQLStatsMaxRows</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>StatementSqlHandle</Name>
+			<ExtendedDataType>DBMSQLStatsStatementSqlHandle</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+			<StringSize>130</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>StatementContextId</Name>
+			<ExtendedDataType>DBMSQLStatsStatementContextId</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalDop</Name>
+			<ExtendedDataType>DBMSQLStatsTotalDop</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastDop</Name>
+			<ExtendedDataType>DBMSQLStatsLastDop</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinDop</Name>
+			<ExtendedDataType>DBMSQLStatsMinDop</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxDop</Name>
+			<ExtendedDataType>DBMSQLStatsMaxDop</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsTotalGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsLastGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsMinGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsMaxGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalUsedGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsTotalUsedGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastUsedGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsLastUsedGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinUsedGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsMinUsedGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxUsedGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsMaxUsedGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalIdealGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsTotalIdealGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastIdealGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsLastIdealGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinIdealGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsMinIdealGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxIdealGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsMaxIdealGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalReservedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsTotalReservedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastReservedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsLastReservedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinReservedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsMinReservedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxReservedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsMaxReservedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalUsedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsTotalUsedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastUsedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsLastUsedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinUsedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsMinUsedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxUsedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsMaxUsedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalColumnstoreSegmentReads</Name>
+			<ExtendedDataType>DBMSQLStatsTotalColumnstoreSegmentReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastColumnstoreSegmentReads</Name>
+			<ExtendedDataType>DBMSQLStatsLastColumnstoreSegmentReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinColumnstoreSegmentReads</Name>
+			<ExtendedDataType>DBMSQLStatsMinColumnstoreSegmentReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxColumnstoreSegmentReads</Name>
+			<ExtendedDataType>DBMSQLStatsMaxColumnstoreSegmentReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalColumnstoreSegmentSkips</Name>
+			<ExtendedDataType>DBMSQLStatsTotalColumnstoreSegmentSkips</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastColumnstoreSegmentSkips</Name>
+			<ExtendedDataType>DBMSQLStatsLastColumnstoreSegmentSkips</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinColumnstoreSegmentSkips</Name>
+			<ExtendedDataType>DBMSQLStatsMinColumnstoreSegmentSkips</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxColumnstoreSegmentSkips</Name>
+			<ExtendedDataType>DBMSQLStatsMaxColumnstoreSegmentSkips</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>TotalSpills</Name>
+			<ExtendedDataType>DBMSQLStatsTotalSpills</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>LastSpills</Name>
+			<ExtendedDataType>DBMSQLStatsLastSpills</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MinSpills</Name>
+			<ExtendedDataType>DBMSQLStatsMinSpills</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>MaxSpills</Name>
+			<ExtendedDataType>DBMSQLStatsMaxSpills</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgWorkerTime</Name>
+			<ExtendedDataType>DBMSQLStatsAvgWorkerTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgPhysicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsAvgPhysicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgLogicalWrites</Name>
+			<ExtendedDataType>DBMSQLStatsAvgLogicalWrites</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgLogicalReads</Name>
+			<ExtendedDataType>DBMSQLStatsAvgLogicalReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgClrTime</Name>
+			<ExtendedDataType>DBMSQLStatsAvgClrTime</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgRows</Name>
+			<ExtendedDataType>DBMSQLStatsAvgRows</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgDop</Name>
+			<ExtendedDataType>DBMSQLStatsAvgDop</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsAvgGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgUsedGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsAvgUsedGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgIdealGrantKb</Name>
+			<ExtendedDataType>DBMSQLStatsAvgIdealGrantKb</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgReservedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsAvgReservedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgUsedThreads</Name>
+			<ExtendedDataType>DBMSQLStatsAvgUsedThreads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgColumnstoreSegmentReads</Name>
+			<ExtendedDataType>DBMSQLStatsAvgColumnstoreSegmentReads</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgColumnstoreSegmentSkips</Name>
+			<ExtendedDataType>DBMSQLStatsAvgColumnstoreSegmentSkips</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>AvgSpills</Name>
+			<ExtendedDataType>DBMSQLStatsAvgSpills</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

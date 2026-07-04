@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
+	<Name>DBMSQLStatsPlanHandle</Name>
+	<Label>@DBMSQLStats:PlanHandle</Label>
+	<HelpText>@DBMSQLStats:PlanHandleHelp</HelpText>
+    <StringSize>130</StringSize>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

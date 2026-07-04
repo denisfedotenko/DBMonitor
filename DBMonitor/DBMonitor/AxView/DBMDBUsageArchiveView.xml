@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDBUsageArchiveView</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMDBUsageArchiveView extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>lineNumber</Name>
+				<Source><![CDATA[
+    private static str lineNumber()
+    {
+        List partitionBy = new List(Types::String);
+        List orderBy = new List(Types::Container);
+        partitionBy.addEnd(SysComputedColumn::returnField(viewstr(DBMDBUsageArchiveView),
+        identifierStr(DBMDBResourceUsageArchiveRaw),
+        fieldStr(DBMDBResourceUsageArchiveRaw,partition)));
+        orderBy = new List(Types::Container);
+        orderBy.addEnd([SysComputedColumn::returnField(viewstr(DBMDBUsageArchiveView),
+        identifierStr(DBMDBResourceUsageArchiveRaw),
+        fieldStr(DBMDBResourceUsageArchiveRaw,timeStamp)),SortOrder::Ascending]);
+        return SysComputedColumn::DBMDBRowNumOverOrderBy(partitionBy, orderBy);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>timeStamp</Name>
+			<DataField>timeStamp</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CPULimitAvg</Name>
+			<DataField>CPULimitAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CPUPercentAvg</Name>
+			<DataField>CPUPercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CPUPercentMax</Name>
+			<DataField>CPUPercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CPUPercentMin</Name>
+			<DataField>CPUPercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>dataIOPercentAvg</Name>
+			<DataField>dataIOPercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>dataIOPercentMax</Name>
+			<DataField>dataIOPercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>dataIOPercentMin</Name>
+			<DataField>dataIOPercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceCpuPercentAvg</Name>
+			<DataField>instanceCpuPercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceCpuPercentMax</Name>
+			<DataField>instanceCpuPercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceCpuPercentMin</Name>
+			<DataField>instanceCpuPercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceMemoryPercentAvg</Name>
+			<DataField>instanceMemoryPercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceMemoryPercentMax</Name>
+			<DataField>instanceMemoryPercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>instanceMemoryPercentMin</Name>
+			<DataField>instanceMemoryPercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>logWritePercentAvg</Name>
+			<DataField>logWritePercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>logWritePercentMax</Name>
+			<DataField>logWritePercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>logWritePercentMin</Name>
+			<DataField>logWritePercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxSessionPercentAvg</Name>
+			<DataField>maxSessionPercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxSessionPercentMax</Name>
+			<DataField>maxSessionPercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxSessionPercentMin</Name>
+			<DataField>maxSessionPercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxWorkerPercentAvg</Name>
+			<DataField>maxWorkerPercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxWorkerPercentMax</Name>
+			<DataField>maxWorkerPercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>maxWorkerPercentMin</Name>
+			<DataField>maxWorkerPercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>memoryUsagePercentAvg</Name>
+			<DataField>memoryUsagePercentAvg</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>memoryUsagePercentMax</Name>
+			<DataField>memoryUsagePercentMax</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>memoryUsagePercentMin</Name>
+			<DataField>memoryUsagePercentMin</DataField>
+			<DataSource>DBMDBResourceUsageArchiveRaw</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>lineNumber</Name>
+			<ViewMethod>lineNumber</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>DBMDBResourceUsageArchiveRaw</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>DBMDBResourceUsageArchiveRaw</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

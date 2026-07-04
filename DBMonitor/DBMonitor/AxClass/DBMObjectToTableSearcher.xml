@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMObjectToTableSearcher</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Utility class for listing all underlying tables for an AOD object
+/// </summary>
+///<remarks>
+///</remarks>
+final class DBMObjectToTableSearcher
+{
+    DBMUpdateStatisticsObjType objectType;
+    str objectName;
+    Dictionary dictionary;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates an instance of <c>DBMObjectToTableSearcher</c> class.
+    /// </summary>
+    /// <param name = "objType">
+    /// Type of the determinator object
+    /// </param>
+    /// <param name = "objName">
+    /// The name of the determinator object
+    /// </param>
+    /// <returns>
+    /// The new object
+    /// </returns>
+    public static DBMObjectToTableSearcher construct(DBMUpdateStatisticsObjType objType,str objName)
+    {
+        DBMObjectToTableSearcher searcher = new DBMObjectToTableSearcher();
+        searcher.parmObjectType(objType);
+        searcher.parmObjectName(objName);
+        return searcher;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmObjectType</Name>
+				<Source><![CDATA[
+    public DBMUpdateStatisticsObjType parmObjectType(DBMUpdateStatisticsObjType _objectType = objectType)
+    {
+        objectType = _objectType;
+        return objectType;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmObjectName</Name>
+				<Source><![CDATA[
+    public str parmObjectName(str _objectName = objectName)
+    {
+        objectName = _objectName;
+        return objectName;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    private void new()
+    {
+        dictionary = new Dictionary();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>search</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Searches all tables used in the determinator object
+    /// </summary>
+    /// <returns>
+    /// list of the tables
+    /// </returns>
+    public Set search()
+    {
+        Set retVal = new Set(Types::String);
+        switch(objectType)
+        {
+            case DBMUpdateStatisticsObjType::Table:
+                retVal = this.addTable(retVal,objectName);
+                break;
+            case DBMUpdateStatisticsObjType::View: //fall through
+            case DBMUpdateStatisticsObjType::DataEntity:
+                retVal = this.addView(retVal,objectName);
+                break;
+            case DBMUpdateStatisticsObjType::Form:
+                retVal = this.addForm(retVal,objectName);
+                break;
+        }
+        return retVal;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addTable</Name>
+				<Source><![CDATA[
+    private Set addTable(Set _prevTables,str _tableName)
+    {
+        Set retVal = Set::create(_prevTables.pack());
+        if (tableName2Id(_tableName))
+        {
+            SysDictTable dictTable = SysDictTable::newTableId(tableName2Id(_tableName));
+            retVal.add(dictTable.name(DbBackend::Sql));
+        }
+        return retVal;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addView</Name>
+				<Source><![CDATA[
+    private Set addView(Set _prevTables,str _viewName)
+    {
+        if (!tableName2Id(_viewName))
+        {
+            return _prevTables;
+        }
+        Set retVal = Set::create(_prevTables.pack());
+        SysDictView dictView = new SysDictView(tableName2Id(_viewName));
+        str viewSQLName = dictView.name(DbBackend::Sql);
+        str viewSQLNameWithScheme = 'dbo.'+viewSQLName;
+        str SQLText = @";WITH cteViews AS(
+    SELECT
+         re.referenced_id
+        ,o.type_desc
+        ,SCHEMA_NAME(o.schema_id) AS [schema]
+        ,o.name
+    FROM sys.dm_sql_referenced_entities (@viewName, 'OBJECT') re
+    JOIN sys.objects o ON re.referenced_id = o.object_id
+    WHERE re.referenced_minor_id = 0
+    UNION ALL
+    SELECT
+         viewTables.referenced_id
+        ,viewTables.type_desc
+        ,viewTables.[schema]
+        ,viewTables.name
+    FROM cteViews cte
+    OUTER APPLY(
+        SELECT
+             re2.referenced_id
+            ,o2.type_desc
+            ,SCHEMA_NAME(o2.schema_id) AS [schema]
+            ,o2.name
+        FROM sys.dm_sql_referenced_entities (cte.[schema] + '.' + cte.name, 'OBJECT') re2
+        JOIN sys.objects o2 ON re2.referenced_id = o2.object_id
+        WHERE (o2.type_desc = 'USER_TABLE'
+        or o2.type_desc = 'VIEW'
+        or o2.type_desc = 'SQL_TABLE_VALUED_FUNCTION')
+        and re2.referenced_minor_id = 0
+    ) AS viewTables
+    WHERE (cte.type_desc = 'VIEW' or cte.type_desc='SQL_TABLE_VALUED_FUNCTION')
+)
+SELECT distinct
+    [schema]
+    ,name
+FROM cteViews
+WHERE type_desc = 'USER_TABLE'
+ORDER BY name";
+        Connection connection = new Connection();
+        Statement statement = connection.createStatement();
+        SqlStatementExecutePermission perm;
+        perm = new SqlStatementExecutePermission(SQLText);
+        perm.assert();
+        Map sqlParams = SqlParams::create().add('viewName',viewSQLNameWithScheme);
+        ResultSet resultSet = statement.executeQueryWithParameters(SQLText,sqlParams);
+        while (resultSet.next())
+        {
+            retVal.add(resultSet.getString(2));
+        }
+        CodeAccessPermission::revertAssert();
+        return retVal;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addForm</Name>
+				<Source><![CDATA[
+    private Set addForm(Set _prevTables,str _formName)
+    {
+        Form form = new Form(_formName,true);
+        if (!form || (form.dataSourceCount() == 0))
+        {
+            return _prevTables;
+        }
+        Set retVal = Set::create(_prevTables.pack());
+        for(int i=1;i<=form.dataSourceCount();i++)
+        {
+            FormBuildDataSource fbds = form.dataSource(i);
+            SysDictTable dictTable = SysDictTable::newTableId(fbds.table());
+            if (dictTable.isView())
+            {
+                retVal = this.addView(retVal,dictTable.name());
+            }
+            else if (dictTable.isSQL() && !dictTable.isTempDb())
+            {
+                retVal = this.addTable(retVal,dictTable.name());
+            }
+        }
+        return retVal;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getTablesForObject</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// returns a list of tables used in the object
+    /// </summary>
+    /// <param name = "params">
+    /// container with parameters
+    /// </param>
+    /// <returns>
+    /// Container with a packed set of strings with table names
+    /// </returns>
+    public static container getTablesForObject(container params)
+    {
+        DBMUpdateStatisticsObjType objType;
+        str objName;
+        [objType,objName] = params;
+        return DBMObjectToTableSearcher::construct(objType,objName).search().pack();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

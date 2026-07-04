@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMDBSessionInfo</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMDBSessionInfo extends FormRun
+{
+}
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="">
+			<DataSource>
+				<Name>DBMDBSessionInfo</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        public void init()
+        {
+            super();
+            this.queryBuildDataSource().addSortField(fieldNum(DBMDBSessionInfo,Sorting),SortOrder::Ascending);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields>
+					<Field>
+						<DataField>batchJobId</DataField>
+						<Methods>
+							<Method>
+								<Name>jumpRef</Name>
+								<Source><![CDATA[
+            public void jumpRef()
+            {
+                BatchJob batchJob;
+                select firstonly batchJob
+                    where batchJob.RecId == DBMDBSessionInfo.batchJobId;
+                BatchJob::performJumpRef(batchJob);
+            }
+
+]]></Source>
+							</Method>
+						</Methods>
+					</Field>
+				</Fields>
+			</DataSource>
+		</DataSources>
+		<DataControls xmlns="" />
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>DBMDBSessionInfo</Name>
+			<Table>DBMDBSessionInfo</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>axSessionId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>axUserId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>batchCaption</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>batchJobId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>blockingSpid</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>className</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>currentSQL</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>cursorSQL</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>hostName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>indexName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>loginTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>nestingLevel</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>objectName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>programName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>recentSQL</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>requestMode</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>resourceDescription</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>resourceType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>rootSpid</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Sorting</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>spid</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>startTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>userContext</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Design>
+		<Caption xmlns="">@DBMLockMonitor:DBSessionInfo</Caption>
+		<DataSource xmlns="">DBMDBSessionInfo</DataSource>
+		<Pattern xmlns="">SimpleList</Pattern>
+		<PatternVersion xmlns="">1.1</PatternVersion>
+		<Style xmlns="">SimpleList</Style>
+		<TitleDataSource xmlns="">DBMDBSessionInfo</TitleDataSource>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPaneControl</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls />
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>FilterGroup</Name>
+				<Pattern>CustomAndQuickFilters</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl>
+						<Name>QuickFilterControl</Name>
+						<FormControlExtension>
+							<Name>QuickFilterControl</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>targetControlName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>placeholderText</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>defaultColumnName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+				<FrameType>None</FrameType>
+				<Style>CustomFilter</Style>
+				<ViewEditMode>Edit</ViewEditMode>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGridControl">
+				<Name>DBSessionGrid</Name>
+				<Type>Grid</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMDBSessionInfo_rootSpid</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>rootSpid</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMDBSessionInfo_nestingLevel</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>nestingLevel</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMDBSessionInfo_spid</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>spid</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMDBSessionInfo_blockingSpid</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>blockingSpid</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_currentSQL</Name>
+						<Height>1</Height>
+						<HeightMode>SizeToAvailable</HeightMode>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>currentSQL</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_cursorSQL</Name>
+						<Height>1</Height>
+						<HeightMode>SizeToAvailable</HeightMode>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>cursorSQL</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_recentSQL</Name>
+						<Height>1</Height>
+						<HeightMode>SizeToAvailable</HeightMode>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>recentSQL</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_userContext</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>userContext</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMDBSessionInfo_loginTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>loginTime</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMDBSessionInfo_startTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>startTime</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_hostName</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>hostName</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_programName</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>programName</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_resourceDescription</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>resourceDescription</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_resourceType</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>resourceType</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_requestMode</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>requestMode</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_objectName</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>objectName</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_indexName</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>indexName</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_axUserId</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>axUserId</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>DBMDBSessionInfo_axSessionId</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>axSessionId</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMDBSessionInfo_batchJobId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>batchJobId</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_batchCaption</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>batchCaption</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMDBSessionInfo_className</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>className</DataField>
+						<DataSource>DBMDBSessionInfo</DataSource>
+					</AxFormControl>
+				</Controls>
+				<Style>Tabular</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="" i:type="AxEdtUtcDateTime">
+	<Name>DBMSQLDBTuningRecommendationRevertActionInitiatedTime</Name>
+	<HelpText>@DBMonitor:DBMSQLDBTuningRecommendationRevertActionInitiatedTimeHelp</HelpText>
+	<Label>@DBMonitor:DBMSQLDBTuningRecommendationRevertActionInitiatedTime</Label>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

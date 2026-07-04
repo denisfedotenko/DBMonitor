@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMUpdateTableStatisticsController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Runs ordered reservation transfer into reserve pool
+/// </summary>
+///<remarks>
+///</remarks>
+public class DBMUpdateTableStatisticsController extends SysOperationServiceController
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        DBMUpdateTableStatisticsController controller;
+        controller = DBMUpdateTableStatisticsController::newFromArgs(_args);
+        controller.startOperation();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates an instance of <c>DBMUpdateTableStatisticsService</c> class.
+    /// </summary>
+    /// <param name = "_className">
+    /// The name of a service class.
+    /// </param>
+    /// <param name = "_methodName">
+    /// The name of a service operation.
+    /// </param>
+    /// <param name = "_executionMode">
+    /// The execution mode used to run the service operation.
+    /// </param>
+    protected void new(IdentifierName _className = classStr(DBMUpdateTableStatisticsService),
+                        IdentifierName _methodName = methodStr(DBMUpdateTableStatisticsService, process),
+                        SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        super(_className, _methodName, _executionMode);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>newFromArgs</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates a new instance of <c>DBMUpdateTableStatisticsController</c> class using an info from incoming Args.
+    /// </summary>
+    /// <param name = "_args">
+    /// An Args that comes from an external.
+    /// </param>
+    /// <returns>
+    /// A new instance of <c>DBMUpdateTableStatisticsController</c> class.
+    /// </returns>
+    public static DBMUpdateTableStatisticsController newFromArgs(Args _args)
+    {
+        DBMUpdateTableStatisticsController controller;
+    
+        controller = new DBMUpdateTableStatisticsController();
+        controller.parmArgs(_args);
+
+        return controller;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>templateForm</Name>
+				<Source><![CDATA[
+    public FormName templateForm()
+    {
+        return formStr(DBMUpdateTableStatisticsDialog);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dialogPostBuild</Name>
+				<Source><![CDATA[
+    protected void dialogPostBuild()
+    {
+        super();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryTextViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStoreQueryTextViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asQueryTextId;
+    str     asQuerySqlText;
+    str     asStatementSqlHandle;
+    str     asIsPartOfEncryptedModule;
+    str     asHasRestrictedText;
+    str     asRecId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStoreQueryTextViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        DictField DictFieldSQLText = new DictField(tableNum(DBMSQLQueryStoreQueryText), fieldNum(DBMSQLQueryStoreQueryText, QuerySQLText));
+        str sqlStmt = strFmt(@"SELECT
+            r.query_text_id AS %1,"
+            +strFmt('CONVERT([NVARCHAR](%1), r.query_sql_text)',DictFieldSQLText.stringLen()) + ' AS ' + asQuerySQLText + ', '+
+            @"r.statement_sql_handle AS %2,
+            r.is_part_of_encrypted_module AS %3,
+            r.has_restricted_text AS %4,
+            1010 AS recId
+            FROM sys.query_store_query_text r",
+        asQueryTextId,
+        asStatementSqlHandle,
+        asIsPartOfEncryptedModule,
+        asHasRestrictedText,
+            asRecId);
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStoreQueryText));
+        viewName            = view.name(DbBackend::Sql);
+        asQueryTextId = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryText, QueryTextId)).name(DbBackend::Sql);
+        asQuerySqlText = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryText, QuerySqlText)).name(DbBackend::Sql);
+        asStatementSqlHandle = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryText, StatementSqlHandle)).name(DbBackend::Sql);
+        asIsPartOfEncryptedModule = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryText, IsPartOfEncryptedModule)).name(DbBackend::Sql);
+        asHasRestrictedText = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryText, HasRestrictedText)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStoreQueryText, RecId)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStoreQueryTextViewBuilder construct()
+    {
+        return new DBMSQLQueryStoreQueryTextViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

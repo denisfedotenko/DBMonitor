@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDBSessionInfo</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMDBSessionInfo extends common
+{
+   
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>dummyInt</Name>
+				<Source><![CDATA[
+    static private str dummyInt()
+    {
+        return SysComputedColumn::returnLiteral(0);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dummyDateTime</Name>
+				<Source><![CDATA[
+    static private str dummyDateTime()
+    {
+        return SysComputedColumn::returnLiteral(DateTimeUtil::utcNow());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dummyStr</Name>
+				<Source><![CDATA[
+    static private str dummyStr()
+    {
+        return SysComputedColumn::returnLiteral('');
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMLockMonitor:DBSessionInfo</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<TitleField1>rootSpid</TitleField1>
+	<TitleField2>userContext</TitleField2>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>rootSpid</Name>
+			<HelpText>@DBMLockMonitor:RootSPIDHelp</HelpText>
+			<Label>@DBMLockMonitor:RootSPIDLabel</Label>
+			<ExtendedDataType>DBMSQLSPID</ExtendedDataType>
+			<ViewMethod>dummyInt</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>nestingLevel</Name>
+			<ExtendedDataType>Level</ExtendedDataType>
+			<ViewMethod>dummyInt</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>spid</Name>
+			<Label>@DBMLockMonitor:CurrentSPID</Label>
+			<ExtendedDataType>DBMSQLSPID</ExtendedDataType>
+			<ViewMethod>dummyInt</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>loginTime</Name>
+			<HelpText>@DBMLockMonitor:LoginTimeHelp</HelpText>
+			<Label>@DBMLockMonitor:LoginTimeLabel</Label>
+			<ExtendedDataType>UTCTimestamp</ExtendedDataType>
+			<ViewMethod>dummyDateTime</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>programName</Name>
+			<ExtendedDataType>DBMSQLProgramName</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>hostName</Name>
+			<ExtendedDataType>DBMSQLHostName</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>currentSQL</Name>
+			<HelpText>@DBMLockMonitor:CurrentSQLHelp</HelpText>
+			<Label>@DBMLockMonitor:CurrentSQLLabel</Label>
+			<ExtendedDataType>DBMSQLText</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>cursorSQL</Name>
+			<HelpText>@DBMLockMonitor:CursorSQLHelp</HelpText>
+			<Label>@DBMLockMonitor:CursorSQLLabel</Label>
+			<ExtendedDataType>DBMSQLText</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>recentSQL</Name>
+			<HelpText>@DBMLockMonitor:RecentSQLHelp</HelpText>
+			<Label>@DBMLockMonitor:RecentSQLLabel</Label>
+			<ExtendedDataType>DBMSQLText</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>blockingSpid</Name>
+			<HelpText>@DBMLockMonitor:BlockingSPIDHelp</HelpText>
+			<Label>@DBMLockMonitor:BlockingSPIDLabel</Label>
+			<ExtendedDataType>DBMSQLSPID</ExtendedDataType>
+			<ViewMethod>dummyInt</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedUtcDateTime">
+			<Name>startTime</Name>
+			<HelpText>@DBMLockMonitor:StartTimeHelp</HelpText>
+			<Label>@DBMLockMonitor:StartTimeLabel</Label>
+			<ExtendedDataType>UTCTimestamp</ExtendedDataType>
+			<ViewMethod>dummyDateTime</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>userContext</Name>
+			<ExtendedDataType>DBMSQLUserContext</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Sorting</Name>
+			<ViewMethod>dummyStr</ViewMethod>
+			<StringSize>1000</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>resourceDescription</Name>
+			<ExtendedDataType>DBMResourceDescription</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+			<StringSize>256</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>resourceType</Name>
+			<ExtendedDataType>DBMResourceType</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+			<StringSize>60</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>requestMode</Name>
+			<ExtendedDataType>DBMRequestMode</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+			<StringSize>60</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>objectName</Name>
+			<HelpText>@DBMLockMonitor:ObjectNameHelp</HelpText>
+			<ExtendedDataType>DBMSQLSysName</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+			<StringSize>128</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>indexName</Name>
+			<HelpText>@DBMLockMonitor:IndexNameHelp</HelpText>
+			<Label>@DBMLockMonitor:IndexNameLabel</Label>
+			<ExtendedDataType>DBMSQLSysName</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+			<StringSize>128</StringSize>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>axUserId</Name>
+			<ExtendedDataType>userId</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt">
+			<Name>axSessionId</Name>
+			<ExtendedDataType>SessionId</ExtendedDataType>
+			<ViewMethod>dummyInt</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>batchJobId</Name>
+			<Label>@SYS114515</Label>
+			<ExtendedDataType>RefRecId</ExtendedDataType>
+			<ViewMethod>dummyInt</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>batchCaption</Name>
+			<Label>@SYS114518</Label>
+			<ExtendedDataType>batchCaption</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>className</Name>
+			<ExtendedDataType>className</ExtendedDataType>
+			<ViewMethod>dummyStr</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDictionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDictionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

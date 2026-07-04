@@ -1,0 +1,52 @@
+ActiveQueries=Active queries
+ ;DBMSQLMon
+BlockingSPID=Blocking SPID
+ ;DBMSQLMon
+ClientRowCount=Client Row Count
+ ;DBMSQLMon
+ContextInfo=Context Info
+ ;DBMSQLMon
+CPUTime=CPU Time
+ ;DBMSQLMon
+DOP=DOP
+ ;DBMSQLMon
+GrantedMemory=Granted Query Memory
+ ;DBMSQLMon
+LastWaitType=Last Wait Type
+ ;DBMSQLMon
+LogicalReads=Logical Reads
+ ;DBMSQLMon
+NewLabel0=Label files created on 04/27/2023 11:00:40 for label file Id DBMSQLMon and language en-US
+ ;Label file comment - see above label
+PercentComplete=Percent complete
+ ;DBMSQLMon
+Reads=Reads
+ ;DBMSQLMon
+SessionCommand=Command
+ ;DBMSQLMon
+SessionId=Session id
+ ;DBMSQLMon
+SessionStatus=Status
+ ;DBMSQLMon
+SQLDBName=Database name
+ ;DBMSQLMon
+SQLHandle=SQL Handle
+ ;DBMSQLMon
+SQLPlanHandle=Plan Handle
+ ;DBMSQLMon
+SQLStatementHandle=Statement Handle
+ ;DBMSQLMon
+SQLText=SQL Text
+ ;DBMSQLMon
+SQLWaitTime=Wait Time
+ ;DBMSQLMon
+SQLWaitType=Wait Type
+ ;DBMSQLMon
+TotalElapsedTime=Total Elapsed Time
+ ;DBMSQLMon
+WaitResource=Wait Resource
+ ;DBMSQLMon
+WorkerCount=Worker Count
+ ;DBMSQLMon
+Writes=Writes
+ ;DBMSQLMon

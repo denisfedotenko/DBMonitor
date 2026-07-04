@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
+	<Name>DBMSQLActiveQueriesPageResource</Name>
+	<Label>@DBMonitor:DBMSQLActiveQueriesPageResource</Label>
+	<HelpText>@DBMonitor:DBMSQLActiveQueriesPageResourceHelp</HelpText>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+	<StringSize>64</StringSize>
+</AxEdt>

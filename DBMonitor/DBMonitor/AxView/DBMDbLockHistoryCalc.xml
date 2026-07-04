@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDbLockHistoryCalc</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMDbLockHistoryCalc extends common
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>duration</Name>
+				<Source><![CDATA[
+    private static str duration()
+    {
+        TableName viewName = viewStr(DBMDbLockHistoryCalc);
+        Name startDateTime = SysComputedColumn::returnField(viewName, identifierStr(DBMDbLockHistory),
+            fieldId2name(tableNum(DBMDbLockHistory), fieldNum(DBMDbLockHistory, startTime)));
+        Name endDateTime = SysComputedColumn::returnField(viewName, identifierStr(DBMDbLockHistory),
+            fieldId2name(tableNum(DBMDbLockHistory), fieldNum(DBMDbLockHistory, createdDateTime)));
+        return SysComputedColumn::DBMDBDurationAsString(endDateTime, startDateTime);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMLockMonitor:CalculatedFieldsforLocLog</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>RefRecId</Name>
+			<DataField>RecId</DataField>
+			<DataSource>DBMDbLockHistory</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>duration</Name>
+			<ExtendedDataType>DBMDurationStr</ExtendedDataType>
+			<ViewMethod>Duration</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>DBMDbLockHistory</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>DBMDbLockHistory</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

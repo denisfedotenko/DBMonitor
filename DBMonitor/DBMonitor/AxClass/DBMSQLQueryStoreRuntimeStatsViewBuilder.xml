@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreRuntimeStatsViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStoreRuntimeStatsViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asRuntimeStatsId;
+    str     asPlanId;
+    str     asRuntimeStatsIntervalId;
+    str     asExecutionType;
+    str     asExecutionTypeDesc;
+    str     asFirstExecutionTime;
+    str     asLastExecutionTime;
+    str     asCountExecutions;
+    str     asTotalDuration;
+    str     asTotalCpuTime;
+    str     asTotalLogicalIoReads;
+    str     asTotalLogicalIoWrites;
+    str     asTotalPhysicalIoReads;
+    str     asTotalClrTime;
+    str     asTotalDop;
+    str     asTotalQueryMaxUsedMemory;
+    str     asTotalRowcount;
+    str     asTotalNumPhysicalIoReads;
+    str     asTotalLogBytesUsed;
+    str     asTotalTempdbSpaceUsed;
+    str     asAvgDuration;
+    str     asLastDuration;
+    str     asMinDuration;
+    str     asMaxDuration;
+    str     asStdevDuration;
+    str     asAvgCpuTime;
+    str     asLastCpuTime;
+    str     asMinCpuTime;
+    str     asMaxCpuTime;
+    str     asStdevCpuTime;
+    str     asAvgLogicalIoReads;
+    str     asLastLogicalIoReads;
+    str     asMinLogicalIoReads;
+    str     asMaxLogicalIoReads;
+    str     asStdevLogicalIoReads;
+    str     asAvgLogicalIoWrites;
+    str     asLastLogicalIoWrites;
+    str     asMinLogicalIoWrites;
+    str     asMaxLogicalIoWrites;
+    str     asStdevLogicalIoWrites;
+    str     asAvgPhysicalIoReads;
+    str     asLastPhysicalIoReads;
+    str     asMinPhysicalIoReads;
+    str     asMaxPhysicalIoReads;
+    str     asStdevPhysicalIoReads;
+    str     asAvgClrTime;
+    str     asLastClrTime;
+    str     asMinClrTime;
+    str     asMaxClrTime;
+    str     asStdevClrTime;
+    str     asAvgDop;
+    str     asLastDop;
+    str     asMinDop;
+    str     asMaxDop;
+    str     asStdevDop;
+    str     asAvgQueryMaxUsedMemory;
+    str     asLastQueryMaxUsedMemory;
+    str     asMinQueryMaxUsedMemory;
+    str     asMaxQueryMaxUsedMemory;
+    str     asStdevQueryMaxUsedMemory;
+    str     asAvgRowcount;
+    str     asLastRowcount;
+    str     asMinRowcount;
+    str     asMaxRowcount;
+    str     asStdevRowcount;
+    str     asAvgNumPhysicalIoReads;
+    str     asLastNumPhysicalIoReads;
+    str     asMinNumPhysicalIoReads;
+    str     asMaxNumPhysicalIoReads;
+    str     asAvgLogBytesUsed;
+    str     asLastLogBytesUsed;
+    str     asMinLogBytesUsed;
+    str     asMaxLogBytesUsed;
+    str     asStdevLogBytesUsed;
+    str     asAvgTempdbSpaceUsed;
+    str     asLastTempdbSpaceUsed;
+    str     asMinTempdbSpaceUsed;
+    str     asMaxTempdbSpaceUsed;
+    str     asStdevTempdbSpaceUsed;
+    str     asAvgPageServerIoReads;
+    str     asLastPageServerIoReads;
+    str     asMinPageServerIoReads;
+    str     asMaxPageServerIoReads;
+    str     asStdevPageServerIoReads;
+    str     asReplicaGroupId;
+    str     asRecId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStoreRuntimeStatsViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement2019</Name>
+				<Source><![CDATA[
+        private str createSQLStatement2019()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.runtime_stats_id AS %1,
+            r.plan_id AS %2,
+            r.runtime_stats_interval_id AS %3,
+            r.execution_type AS %4,
+            CONVERT([NVARCHAR](MAX), r.execution_type_desc) AS %5,
+            r.first_execution_time AS %6,
+            r.last_execution_time AS %7,
+            r.count_executions AS %8,
+            r.avg_duration AS %9,
+            r.last_duration AS %10,
+            r.min_duration AS %11,
+            r.max_duration AS %12,
+            r.stdev_duration AS %13,
+            r.avg_cpu_time AS %14,
+            r.last_cpu_time AS %15,
+            r.min_cpu_time AS %16,
+            r.max_cpu_time AS %17,
+            r.stdev_cpu_time AS %18,
+            r.avg_logical_io_reads AS %19,
+            r.last_logical_io_reads AS %20,
+            r.min_logical_io_reads AS %21,
+            r.max_logical_io_reads AS %22,
+            r.stdev_logical_io_reads AS %23,
+            r.avg_logical_io_writes AS %24,
+            r.last_logical_io_writes AS %25,
+            r.min_logical_io_writes AS %26,
+            r.max_logical_io_writes AS %27,
+            r.stdev_logical_io_writes AS %28,
+            r.avg_physical_io_reads AS %29,
+            r.last_physical_io_reads AS %30,
+            r.min_physical_io_reads AS %31,
+            r.max_physical_io_reads AS %32,
+            r.stdev_physical_io_reads AS %33,
+            r.avg_clr_time AS %34,
+            r.last_clr_time AS %35,
+            r.min_clr_time AS %36,
+            r.max_clr_time AS %37,
+            r.stdev_clr_time AS %38,
+            r.avg_dop AS %39,
+            r.last_dop AS %40,
+            r.min_dop AS %41,
+            r.max_dop AS %42,
+            r.stdev_dop AS %43,
+            r.avg_query_max_used_memory AS %44,
+            r.last_query_max_used_memory AS %45,
+            r.min_query_max_used_memory AS %46,
+            r.max_query_max_used_memory AS %47,
+            r.stdev_query_max_used_memory AS %48,
+            r.avg_rowcount AS %49,
+            r.last_rowcount AS %50,
+            r.min_rowcount AS %51,
+            r.max_rowcount AS %52,
+            r.stdev_rowcount AS %53,
+            r.avg_num_physical_io_reads AS %54,
+            r.last_num_physical_io_reads AS %55,
+            r.min_num_physical_io_reads AS %56,
+            r.max_num_physical_io_reads AS %57,
+            r.avg_log_bytes_used AS %58,
+            r.last_log_bytes_used AS %59,
+            r.min_log_bytes_used AS %60,
+            r.max_log_bytes_used AS %61,
+            r.stdev_log_bytes_used AS %62,
+            r.avg_tempdb_space_used AS %63,
+            r.last_tempdb_space_used AS %64,
+            r.min_tempdb_space_used AS %65,
+            r.max_tempdb_space_used AS %66,
+            r.stdev_tempdb_space_used AS %67,
+            r.avg_duration * r.count_executions AS %68,
+            r.avg_cpu_time * r.count_executions AS %69,
+            r.avg_logical_io_reads * r.count_executions AS %70,
+            r.avg_logical_io_writes * r.count_executions AS %71,
+            r.avg_physical_io_reads * r.count_executions AS %72,
+            r.avg_clr_time * r.count_executions AS %73,
+            r.avg_dop * r.count_executions AS %74,
+            r.avg_query_max_used_memory * r.count_executions AS %75,
+            r.avg_rowcount * r.count_executions AS %76,
+            r.avg_num_physical_io_reads * r.count_executions AS %77,
+            r.avg_log_bytes_used * r.count_executions AS %78,
+            r.avg_tempdb_space_used * r.count_executions AS %79,
+            0 AS %80,
+            1010 AS %81
+            FROM sys.query_store_runtime_stats r",
+        asRuntimeStatsId,
+        asPlanId,
+        asRuntimeStatsIntervalId,
+        asExecutionType,
+        asExecutionTypeDesc,
+        asFirstExecutionTime,
+        asLastExecutionTime,
+        asCountExecutions,
+        asAvgDuration,
+        asLastDuration,
+        asMinDuration,
+        asMaxDuration,
+        asStdevDuration,
+        asAvgCpuTime,
+        asLastCpuTime,
+        asMinCpuTime,
+        asMaxCpuTime,
+        asStdevCpuTime,
+        asAvgLogicalIoReads,
+        asLastLogicalIoReads,
+        asMinLogicalIoReads,
+        asMaxLogicalIoReads,
+        asStdevLogicalIoReads,
+        asAvgLogicalIoWrites,
+        asLastLogicalIoWrites,
+        asMinLogicalIoWrites,
+        asMaxLogicalIoWrites,
+        asStdevLogicalIoWrites,
+        asAvgPhysicalIoReads,
+        asLastPhysicalIoReads,
+        asMinPhysicalIoReads,
+        asMaxPhysicalIoReads,
+        asStdevPhysicalIoReads,
+        asAvgClrTime,
+        asLastClrTime,
+        asMinClrTime,
+        asMaxClrTime,
+        asStdevClrTime,
+        asAvgDop,
+        asLastDop,
+        asMinDop,
+        asMaxDop,
+        asStdevDop,
+        asAvgQueryMaxUsedMemory,
+        asLastQueryMaxUsedMemory,
+        asMinQueryMaxUsedMemory,
+        asMaxQueryMaxUsedMemory,
+        asStdevQueryMaxUsedMemory,
+        asAvgRowcount,
+        asLastRowcount,
+        asMinRowcount,
+        asMaxRowcount,
+        asStdevRowcount,
+        asAvgNumPhysicalIoReads,
+        asLastNumPhysicalIoReads,
+        asMinNumPhysicalIoReads,
+        asMaxNumPhysicalIoReads,
+        asAvgLogBytesUsed,
+        asLastLogBytesUsed,
+        asMinLogBytesUsed,
+        asMaxLogBytesUsed,
+        asStdevLogBytesUsed,
+        asAvgTempdbSpaceUsed,
+        asLastTempdbSpaceUsed,
+        asMinTempdbSpaceUsed,
+        asMaxTempdbSpaceUsed,
+        asStdevTempdbSpaceUsed,
+        asTotalDuration,
+        asTotalCpuTime,
+        asTotalLogicalIoReads,
+        asTotalLogicalIoWrites,
+        asTotalPhysicalIoReads,
+        asTotalClrTime,
+        asTotalDop,
+        asTotalQueryMaxUsedMemory,
+        asTotalRowcount,
+        asTotalNumPhysicalIoReads,
+        asTotalLogBytesUsed,
+        asTotalTempdbSpaceUsed,
+        asReplicaGroupId,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement2022</Name>
+				<Source><![CDATA[
+    private str createSQLStatement2022()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.runtime_stats_id AS %1,
+            r.plan_id AS %2,
+            r.runtime_stats_interval_id AS %3,
+            r.execution_type AS %4,
+            CONVERT([NVARCHAR](MAX), r.execution_type_desc) AS %5,
+            r.first_execution_time AS %6,
+            r.last_execution_time AS %7,
+            r.count_executions AS %8,
+            r.avg_duration AS %9,
+            r.last_duration AS %10,
+            r.min_duration AS %11,
+            r.max_duration AS %12,
+            r.stdev_duration AS %13,
+            r.avg_cpu_time AS %14,
+            r.last_cpu_time AS %15,
+            r.min_cpu_time AS %16,
+            r.max_cpu_time AS %17,
+            r.stdev_cpu_time AS %18,
+            r.avg_logical_io_reads AS %19,
+            r.last_logical_io_reads AS %20,
+            r.min_logical_io_reads AS %21,
+            r.max_logical_io_reads AS %22,
+            r.stdev_logical_io_reads AS %23,
+            r.avg_logical_io_writes AS %24,
+            r.last_logical_io_writes AS %25,
+            r.min_logical_io_writes AS %26,
+            r.max_logical_io_writes AS %27,
+            r.stdev_logical_io_writes AS %28,
+            r.avg_physical_io_reads AS %29,
+            r.last_physical_io_reads AS %30,
+            r.min_physical_io_reads AS %31,
+            r.max_physical_io_reads AS %32,
+            r.stdev_physical_io_reads AS %33,
+            r.avg_clr_time AS %34,
+            r.last_clr_time AS %35,
+            r.min_clr_time AS %36,
+            r.max_clr_time AS %37,
+            r.stdev_clr_time AS %38,
+            r.avg_dop AS %39,
+            r.last_dop AS %40,
+            r.min_dop AS %41,
+            r.max_dop AS %42,
+            r.stdev_dop AS %43,
+            r.avg_query_max_used_memory AS %44,
+            r.last_query_max_used_memory AS %45,
+            r.min_query_max_used_memory AS %46,
+            r.max_query_max_used_memory AS %47,
+            r.stdev_query_max_used_memory AS %48,
+            r.avg_rowcount AS %49,
+            r.last_rowcount AS %50,
+            r.min_rowcount AS %51,
+            r.max_rowcount AS %52,
+            r.stdev_rowcount AS %53,
+            r.avg_num_physical_io_reads AS %54,
+            r.last_num_physical_io_reads AS %55,
+            r.min_num_physical_io_reads AS %56,
+            r.max_num_physical_io_reads AS %57,
+            r.avg_log_bytes_used AS %58,
+            r.last_log_bytes_used AS %59,
+            r.min_log_bytes_used AS %60,
+            r.max_log_bytes_used AS %61,
+            r.stdev_log_bytes_used AS %62,
+            r.avg_tempdb_space_used AS %63,
+            r.last_tempdb_space_used AS %64,
+            r.min_tempdb_space_used AS %65,
+            r.max_tempdb_space_used AS %66,
+            r.stdev_tempdb_space_used AS %67,
+            r.avg_duration * r.count_executions AS %68,
+            r.avg_cpu_time * r.count_executions AS %69,
+            r.avg_logical_io_reads * r.count_executions AS %70,
+            r.avg_logical_io_writes * r.count_executions AS %71,
+            r.avg_physical_io_reads * r.count_executions AS %72,
+            r.avg_clr_time * r.count_executions AS %73,
+            r.avg_dop * r.count_executions AS %74,
+            r.avg_query_max_used_memory * r.count_executions AS %75,
+            r.avg_rowcount * r.count_executions AS %76,
+            r.avg_num_physical_io_reads * r.count_executions AS %77,
+            r.avg_log_bytes_used * r.count_executions AS %78,
+            r.avg_tempdb_space_used * r.count_executions AS %79,
+            r.replica_group_id AS %80,
+            1010 AS %81
+            FROM sys.query_store_runtime_stats r",
+        asRuntimeStatsId,
+        asPlanId,
+        asRuntimeStatsIntervalId,
+        asExecutionType,
+        asExecutionTypeDesc,
+        asFirstExecutionTime,
+        asLastExecutionTime,
+        asCountExecutions,
+        asAvgDuration,
+        asLastDuration,
+        asMinDuration,
+        asMaxDuration,
+        asStdevDuration,
+        asAvgCpuTime,
+        asLastCpuTime,
+        asMinCpuTime,
+        asMaxCpuTime,
+        asStdevCpuTime,
+        asAvgLogicalIoReads,
+        asLastLogicalIoReads,
+        asMinLogicalIoReads,
+        asMaxLogicalIoReads,
+        asStdevLogicalIoReads,
+        asAvgLogicalIoWrites,
+        asLastLogicalIoWrites,
+        asMinLogicalIoWrites,
+        asMaxLogicalIoWrites,
+        asStdevLogicalIoWrites,
+        asAvgPhysicalIoReads,
+        asLastPhysicalIoReads,
+        asMinPhysicalIoReads,
+        asMaxPhysicalIoReads,
+        asStdevPhysicalIoReads,
+        asAvgClrTime,
+        asLastClrTime,
+        asMinClrTime,
+        asMaxClrTime,
+        asStdevClrTime,
+        asAvgDop,
+        asLastDop,
+        asMinDop,
+        asMaxDop,
+        asStdevDop,
+        asAvgQueryMaxUsedMemory,
+        asLastQueryMaxUsedMemory,
+        asMinQueryMaxUsedMemory,
+        asMaxQueryMaxUsedMemory,
+        asStdevQueryMaxUsedMemory,
+        asAvgRowcount,
+        asLastRowcount,
+        asMinRowcount,
+        asMaxRowcount,
+        asStdevRowcount,
+        asAvgNumPhysicalIoReads,
+        asLastNumPhysicalIoReads,
+        asMinNumPhysicalIoReads,
+        asMaxNumPhysicalIoReads,
+        asAvgLogBytesUsed,
+        asLastLogBytesUsed,
+        asMinLogBytesUsed,
+        asMaxLogBytesUsed,
+        asStdevLogBytesUsed,
+        asAvgTempdbSpaceUsed,
+        asLastTempdbSpaceUsed,
+        asMinTempdbSpaceUsed,
+        asMaxTempdbSpaceUsed,
+        asStdevTempdbSpaceUsed,
+        asTotalDuration,
+        asTotalCpuTime,
+        asTotalLogicalIoReads,
+        asTotalLogicalIoWrites,
+        asTotalPhysicalIoReads,
+        asTotalClrTime,
+        asTotalDop,
+        asTotalQueryMaxUsedMemory,
+        asTotalRowcount,
+        asTotalNumPhysicalIoReads,
+        asTotalLogBytesUsed,
+        asTotalTempdbSpaceUsed,
+        asReplicaGroupId,
+        asRecId);
+        return sqlStmt;
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        if (DBMSQLUtils::databaseCompatibilityLevel() >= 160)
+        {
+            return this.createSQLStatement2022();
+        }
+        else
+        {
+            return this.createSQLStatement2019();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStoreRuntimeStats));
+        viewName            = view.name(DbBackend::Sql);
+        asRuntimeStatsId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, RuntimeStatsId)).name(DbBackend::Sql);
+        asPlanId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, PlanId)).name(DbBackend::Sql);
+        asRuntimeStatsIntervalId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, RuntimeStatsIntervalId)).name(DbBackend::Sql);
+        asExecutionType = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, ExecutionType)).name(DbBackend::Sql);
+        asExecutionTypeDesc = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, ExecutionTypeDesc)).name(DbBackend::Sql);
+        asFirstExecutionTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, FirstExecutionTime)).name(DbBackend::Sql);
+        asLastExecutionTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastExecutionTime)).name(DbBackend::Sql);
+        asCountExecutions = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, CountExecutions)).name(DbBackend::Sql);
+        asTotalDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalDuration)).name(DbBackend::Sql);
+        asTotalCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalCpuTime)).name(DbBackend::Sql);
+        asTotalLogicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalLogicalIoReads)).name(DbBackend::Sql);
+        asTotalLogicalIoWrites = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalLogicalIoWrites)).name(DbBackend::Sql);
+        asTotalPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalPhysicalIoReads)).name(DbBackend::Sql);
+        asTotalClrTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalClrTime)).name(DbBackend::Sql);
+        asTotalDop = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalDop)).name(DbBackend::Sql);
+        asTotalQueryMaxUsedMemory = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalQueryMaxUsedMemory)).name(DbBackend::Sql);
+        asTotalRowcount = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalRowcount)).name(DbBackend::Sql);
+        asTotalNumPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalNumPhysicalIoReads)).name(DbBackend::Sql);
+        asTotalLogBytesUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalLogBytesUsed)).name(DbBackend::Sql);
+        asTotalTempdbSpaceUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, TotalTempdbSpaceUsed)).name(DbBackend::Sql);
+        asAvgDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgDuration)).name(DbBackend::Sql);
+        asLastDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastDuration)).name(DbBackend::Sql);
+        asMinDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinDuration)).name(DbBackend::Sql);
+        asMaxDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxDuration)).name(DbBackend::Sql);
+        asStdevDuration = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevDuration)).name(DbBackend::Sql);
+        asAvgCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgCpuTime)).name(DbBackend::Sql);
+        asLastCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastCpuTime)).name(DbBackend::Sql);
+        asMinCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinCpuTime)).name(DbBackend::Sql);
+        asMaxCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxCpuTime)).name(DbBackend::Sql);
+        asStdevCpuTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevCpuTime)).name(DbBackend::Sql);
+        asAvgLogicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgLogicalIoReads)).name(DbBackend::Sql);
+        asLastLogicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastLogicalIoReads)).name(DbBackend::Sql);
+        asMinLogicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinLogicalIoReads)).name(DbBackend::Sql);
+        asMaxLogicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxLogicalIoReads)).name(DbBackend::Sql);
+        asStdevLogicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevLogicalIoReads)).name(DbBackend::Sql);
+        asAvgLogicalIoWrites = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgLogicalIoWrites)).name(DbBackend::Sql);
+        asLastLogicalIoWrites = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastLogicalIoWrites)).name(DbBackend::Sql);
+        asMinLogicalIoWrites = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinLogicalIoWrites)).name(DbBackend::Sql);
+        asMaxLogicalIoWrites = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxLogicalIoWrites)).name(DbBackend::Sql);
+        asStdevLogicalIoWrites = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevLogicalIoWrites)).name(DbBackend::Sql);
+        asAvgPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgPhysicalIoReads)).name(DbBackend::Sql);
+        asLastPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastPhysicalIoReads)).name(DbBackend::Sql);
+        asMinPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinPhysicalIoReads)).name(DbBackend::Sql);
+        asMaxPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxPhysicalIoReads)).name(DbBackend::Sql);
+        asStdevPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevPhysicalIoReads)).name(DbBackend::Sql);
+        asAvgClrTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgClrTime)).name(DbBackend::Sql);
+        asLastClrTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastClrTime)).name(DbBackend::Sql);
+        asMinClrTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinClrTime)).name(DbBackend::Sql);
+        asMaxClrTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxClrTime)).name(DbBackend::Sql);
+        asStdevClrTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevClrTime)).name(DbBackend::Sql);
+        asAvgDop = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgDop)).name(DbBackend::Sql);
+        asLastDop = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastDop)).name(DbBackend::Sql);
+        asMinDop = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinDop)).name(DbBackend::Sql);
+        asMaxDop = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxDop)).name(DbBackend::Sql);
+        asStdevDop = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevDop)).name(DbBackend::Sql);
+        asAvgQueryMaxUsedMemory = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgQueryMaxUsedMemory)).name(DbBackend::Sql);
+        asLastQueryMaxUsedMemory = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastQueryMaxUsedMemory)).name(DbBackend::Sql);
+        asMinQueryMaxUsedMemory = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinQueryMaxUsedMemory)).name(DbBackend::Sql);
+        asMaxQueryMaxUsedMemory = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxQueryMaxUsedMemory)).name(DbBackend::Sql);
+        asStdevQueryMaxUsedMemory = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevQueryMaxUsedMemory)).name(DbBackend::Sql);
+        asAvgRowcount = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgRowcount)).name(DbBackend::Sql);
+        asLastRowcount = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastRowcount)).name(DbBackend::Sql);
+        asMinRowcount = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinRowcount)).name(DbBackend::Sql);
+        asMaxRowcount = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxRowcount)).name(DbBackend::Sql);
+        asStdevRowcount = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevRowcount)).name(DbBackend::Sql);
+        asAvgNumPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgNumPhysicalIoReads)).name(DbBackend::Sql);
+        asLastNumPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastNumPhysicalIoReads)).name(DbBackend::Sql);
+        asMinNumPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinNumPhysicalIoReads)).name(DbBackend::Sql);
+        asMaxNumPhysicalIoReads = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxNumPhysicalIoReads)).name(DbBackend::Sql);
+        asAvgLogBytesUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgLogBytesUsed)).name(DbBackend::Sql);
+        asLastLogBytesUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastLogBytesUsed)).name(DbBackend::Sql);
+        asMinLogBytesUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinLogBytesUsed)).name(DbBackend::Sql);
+        asMaxLogBytesUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxLogBytesUsed)).name(DbBackend::Sql);
+        asStdevLogBytesUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevLogBytesUsed)).name(DbBackend::Sql);
+        asAvgTempdbSpaceUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, AvgTempdbSpaceUsed)).name(DbBackend::Sql);
+        asLastTempdbSpaceUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, LastTempdbSpaceUsed)).name(DbBackend::Sql);
+        asMinTempdbSpaceUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MinTempdbSpaceUsed)).name(DbBackend::Sql);
+        asMaxTempdbSpaceUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, MaxTempdbSpaceUsed)).name(DbBackend::Sql);
+        asStdevTempdbSpaceUsed = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, StdevTempdbSpaceUsed)).name(DbBackend::Sql);
+        asReplicaGroupId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, ReplicaGroupId)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStats, RecId)).name(DbBackend::Sql);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStoreRuntimeStatsViewBuilder construct()
+    {
+        return new DBMSQLQueryStoreRuntimeStatsViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

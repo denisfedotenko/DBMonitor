@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>SystemAdministration.DBMonitor</Name>
+	<Customizations />
+	<Elements>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>Inquiries</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementSubMenu">
+				<Name>DBMonitor</Name>
+				<Label>@DBMonitor:DBMonitor</Label>
+				<Elements>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMDBSessionInfo</Name>
+						<MenuItemName>DBMDBSessionInfo</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMDBLockHistory</Name>
+						<MenuItemName>DBMDBLockHistory</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSQLRunningQueries</Name>
+						<MenuItemName>DBMSQLRunningQueries</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMDBResourceUsage</Name>
+						<MenuItemName>DBMDBResourceUsage</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMDBResourceUsageArchive</Name>
+						<MenuItemName>DBMDBResourceUsageArchive</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSQLQueryStatsForm</Name>
+						<MenuItemName>DBMSQLQueryStatsForm</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSQLQueryStoreQuery</Name>
+						<MenuItemName>DBMSQLQueryStoreQuery</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSQLDBTuningRecommendations</Name>
+						<MenuItemName>DBMSQLDBTuningRecommendations</MenuItemName>
+					</AxMenuElement>
+				</Elements>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>Periodic</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>DBMLockMonitorBatch</Name>
+				<MenuItemName>DBMLockMonitorBatch</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>Periodic</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>DBMDBLockHistoryCleanup</Name>
+				<MenuItemName>DBMDBLockHistoryCleanup</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>Periodic</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>DBMDBUsageMonitorBatch</Name>
+				<MenuItemName>DBMDBUsageMonitorBatch</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>Periodic</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>DBMUpdateTableStatistics</Name>
+				<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+				<Parameters>DBMUpdateTableStatisticsService.process</Parameters>
+			</MenuElement>
+		</AxMenuExtensionElement>
+	</Elements>
+	<MenuElementModifications />
+	<PropertyModifications />
+</AxMenuExtension>

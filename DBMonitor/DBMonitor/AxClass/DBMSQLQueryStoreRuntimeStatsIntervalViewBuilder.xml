@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder extends ApplicationSQLObjects
+{
+    str     viewName;
+    str     asRuntimeStatsIntervalId;
+    str     asStartTime;
+    str     asEndTime;
+    str     asComment;
+    str     asTime;
+    str     asHour;
+    str     asDay;
+    str     asWeek;
+    str     asMonth;
+    str     asRecId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            r.runtime_stats_interval_id AS %1,
+            r.start_time AS %2,
+            r.end_time AS %3,
+            CONVERT([NVARCHAR](MAX), r.comment) AS %4,
+            DATEADD(second, DATEDIFF(second, r.start_time, r.end_time) / 2, r.start_time) AS %5,
+            DATEADD(hour, DATEDIFF(hour, 0, DATEADD(second, DATEDIFF(second, r.start_time, r.end_time) / 2, r.start_time)), 0) AS %6,
+            DATEADD(day, DATEDIFF(day, 0, DATEADD(second, DATEDIFF(second, r.start_time, r.end_time) / 2, r.start_time)), 0) AS %7,
+            DATEADD(week, DATEDIFF(week, 0, DATEADD(second, DATEDIFF(second, r.start_time, r.end_time) / 2, r.start_time)), 0) AS %8,
+            DATEADD(month, DATEDIFF(month, 0, DATEADD(second, DATEDIFF(second, r.start_time, r.end_time) / 2, r.start_time)), 0) AS %9,
+            1010 AS %10
+            FROM sys.query_store_runtime_stats_interval r",
+        asRuntimeStatsIntervalId,
+        asStartTime,
+        asEndTime,
+        asComment,
+        asTime,
+        asHour,
+        asDay,
+        asWeek,
+        asMonth,
+            asRecId);
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLQueryStoreRuntimeStatsInterval));
+        viewName            = view.name(DbBackend::Sql);
+        asRuntimeStatsIntervalId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, RuntimeStatsIntervalId)).name(DbBackend::Sql);
+        asStartTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, StartTime)).name(DbBackend::Sql);
+        asEndTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, EndTime)).name(DbBackend::Sql);
+        asComment = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Comment)).name(DbBackend::Sql);
+        asTime = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Time)).name(DbBackend::Sql);
+        asHour = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Hour)).name(DbBackend::Sql);
+        asDay = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Day)).name(DbBackend::Sql);
+        asWeek = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Week)).name(DbBackend::Sql);
+        asMonth = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, Month)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, RecId)).name(DbBackend::Sql);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder construct()
+    {
+        return new DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

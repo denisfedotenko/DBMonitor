@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMLockMonitorBatch</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// The main batch job for monitoring and collecting lock ingo
+/// </summary>
+public class DBMLockMonitorBatch extends RunBaseBatch
+{
+    Map lockTrees;
+    Map generations;
+    #OCCRetryCount
+
+    
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// the main run() method
+    /// </summary>
+    public void run()
+    {
+        while (true)
+        {
+            SystemJobParameters systemJobParameters = SystemJobParameters::find();
+            if (!systemJobParameters.DBMActivateLockMonitor)
+            {
+                break;
+            }
+            if (this.parseLocks())
+            {
+                sleep(systemJobParameters.DBMLockMonReScanFreq * 1000);
+            }
+            else
+            {
+                sleep(systemJobParameters.DBMLockMonMonitorFreq * 1000);
+            }
+
+
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createLocksSnapshot</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// creates an in-memory copy of the current session info
+    /// </summary>
+    /// <returns>
+    /// returns temporary table copy of the current session info
+    /// </returns>
+
+    private DBMDBSessionInfo createLocksSnapshot()
+    {
+        DBMDBSessionInfo    lockSnapshot;
+        DBMDBSessionInfo    dbSessionInfo;
+        lockSnapshot.setTmp();
+        insert_recordset locksnapShot(rootSpid,nestingLevel,spid,loginTime,programName,hostName,currentSQL,cursorSQL,recentSQL,blockingSpid,startTime,userContext,sorting,
+                                      resourceDescription,resourceType,requestMode, objectName, indexName, axUserId,axSessionId,BatchJobId,BatchCaption,ClassName )
+            select rootSpid,nestingLevel,spid,loginTime,programName,hostName,currentSQL,cursorSQL,recentSQL,blockingSpid,startTime,userContext,sorting,
+                                      resourceDescription,resourceType,requestMode, objectName, indexName,axUserId,axSessionId,BatchJobId,BatchCaption,ClassName
+                from DBSessionInfo;
+        return lockSnapshot;
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parseLocks</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// parses collected lock info and saves it into the instance variable
+    /// </summary>
+    /// <returns>
+    /// true if there are waiting locks
+    /// </returns>
+
+    private boolean parseLocks()
+    {
+        Map currentLockTrees = new Map(Types::Integer, Types::Class);
+        DBMDBSessionInfo    lockSnapshot = this.createLocksSnapshot();
+        MapEnumerator me;
+        List branches;
+        while select rootSpid
+            from lockSnapshot
+            group by rootSpid
+            where lockSnapshot.blockingSpid != 0
+        {
+            currentLockTrees.add(lockSnapshot.rootSpid, new List(Types::Record));
+        }
+        if (currentLockTrees.elements())
+        {
+            while select lockSnapshot
+            order by sorting
+            {
+                if (currentLockTrees.exists(lockSnapshot.rootSpid))
+                {
+                    branches = currentLockTrees.lookup(lockSnapshot.rootSpid);
+                    if (lockSnapshot.rootSpid == lockSnapshot.spid)
+                    {
+                        branches.addStart(lockSnapshot);
+                    }
+                    else
+                    {
+                        branches.addEnd(lockSnapshot);
+                    }
+                    currentLockTrees.insert(lockSnapshot.rootSpid,branches);
+                }
+            }
+        }
+        if (!lockTrees)
+        {
+            lockTrees = new Map(Types::Integer, Types::Class);
+        }
+        if (!generations)
+        {
+            generations = new Map(Types::Integer, Types::Integer);
+        }
+        List toDelete = new List(Types::Integer);
+        me = lockTrees.getEnumerator();
+        while (me.moveNext())
+        {
+            if (!currentLockTrees.exists(me.currentKey()))
+            {
+                int generation = generations.lookup(me.currentKey());
+                if (generation)
+                {
+                    this.dumpLockInfo(me.currentValue());
+                }
+                toDelete.addEnd(me.currentKey());
+            }
+            else
+            {
+                branches = currentLockTrees.lookup(me.currentKey());
+                lockTrees.insert(me.currentKey(), branches);
+                int generation =  generations.lookup(me.currentKey());
+                generation++;
+                generations.insert(me.currentKey(),generation);
+            }
+        }
+        ListEnumerator le = toDelete.getEnumerator();
+        while (le.moveNext())
+        {
+            lockTrees.remove(le.current());
+        }
+        me = currentLockTrees.getEnumerator();
+        while (me.moveNext())
+        {
+            if (!lockTrees.exists(me.currentKey()))
+            {
+                lockTrees.insert(me.currentKey(),me.currentValue());
+                generations.insert(me.currentKey(),0);
+            }
+        }
+        return lockTrees.elements();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dumpLockInfo</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// dumps collected lock info with the latest list of the waiting sessions before the lock was released
+    /// </summary>
+    private void dumpLockInfo(List _lockInfo)
+    {
+        try
+        {
+            ttsbegin;
+            DBMDbLockHistory lockHistory;
+            ListEnumerator le = _lockInfo.getEnumerator();
+            RecordInsertList ril = new RecordInsertList(tableNum(DBMDbLockHistory));
+            while (le.moveNext())
+            {
+                lockHistory.clear();
+                lockHistory.initFromDBSessionInfo(le.current());
+                ril.add(lockHistory);
+            }
+            ril.insertDatabase();
+            ttscommit;
+        }
+        #StandardRetryCatchBlock
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>canRunInNewSession</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Describes whether the class is designed for execution in a new session.
+    /// </summary>
+    /// <returns>
+    /// true if the class is designed for execution the operation in a new session; otherwise, false.
+    /// </returns>
+    protected boolean canRunInNewSession()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>description</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Provides the description for the batch job.
+    /// </summary>
+    /// <returns>
+    /// The description for the batch job.
+    /// </returns>
+    public static ClassDescription description()
+    {
+        return "@DBMLockMonitor:DBMLockMon";
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>mustGoBatch</Name>
+				<Source><![CDATA[
+    boolean mustGoBatch()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>scheduleForBatchExecution</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Schedules a job to run using given recurrence data
+    /// </summary>
+    public void scheduleForBatchExecution()
+    {
+        changecompany('dat')
+        {
+            this.batchInfo();
+            batchInfo.parmBatchExecute(this.mustGoBatch());
+            batchInfo.parmCaption(this.caption());
+            SysRecurrenceData recurrenceData = SysRecurrence::defaultRecurrence();
+            recurrenceData = SysRecurrence::setRecurrenceStartDateTime(recurrenceData, DateTimeUtil::addSeconds(DateTimeUtil::utcNow(), 1));
+            recurrenceData = SysRecurrence::setRecurrenceNoEnd(recurrenceData);
+            recurrenceData = SysRecurrence::setRecurrenceUnit(recurrenceData, SysRecurrenceUnit::Minute, 5);
+            batchInfo.parmRecurrenceData(recurrenceData);
+            batchInfo.parmCritical(NoYes::Yes);
+            batchInfo.parmBatchHeader().parmLogLevel(BatchLogLevel::Never);
+            batchInfo.doBatch();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>batchJobExists</Name>
+				<Source><![CDATA[
+    private boolean batchJobExists()
+    {
+        BatchJob batchJob;
+        Batch batch;
+
+        select firstonly RecId from batchJob
+            exists join batch
+            where batchJob.RecId == batch.BatchJobId
+                && batch.ClassNumber == classIdGet(this);
+
+        return batchJob.RecId != 0;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    static void main(Args args)
+    {
+        DBMLockMonitorBatch                 lockMonitorBatch = new DBMLockMonitorBatch();
+        ;
+        if (!lockMonitorBatch.batchJobExists())
+        {
+            lockMonitorBatch.scheduleForBatchExecution();
+        }
+        else
+        {
+            warning(strFmt("@DBMLockMonitor:BatchAlreadyExists",DBMLockMonitorBatch::description()));
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

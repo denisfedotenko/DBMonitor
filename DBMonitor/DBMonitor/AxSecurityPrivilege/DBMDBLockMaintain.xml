@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPrivilege xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMDBLockMaintain</Name>
+	<Label>@DBMLockMonitor:LockMonitorMaintain</Label>
+	<DataEntityPermissions />
+	<DirectAccessPermissions />
+	<EntryPoints>
+		<AxSecurityEntryPointReference>
+			<Name>DBMDBLockHistory</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>DBMDBLockHistory</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>DBMDBLockHistory</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMDBSessionInfo</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>DBMDBSessionInfo</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>DBMDBSessionInfo</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>SystemJobParameters</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>SystemJobParameters</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>SystemJobParameters</Name>
+					<Controls />
+					<DataSources>
+						<AxSecurityEntryPointReferenceFormDataSource>
+							<Name>SystemJobParameters</Name>
+							<Fields>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMActivateLockMonitor</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMLockMonMonitorFreq</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMLockMonReScanFreq</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMActivateDBResourceMonitor</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMDBResArchivalUnit</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMDBResDaysToKeep</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+								<AxSecurityEntryPointReferenceFormDataSourceField>
+									<Name>DBMDBResDaysToKeepInArchive</Name>
+									<Grant>
+										<Read>Allow</Read>
+										<Update>Allow</Update>
+									</Grant>
+								</AxSecurityEntryPointReferenceFormDataSourceField>
+							</Fields>
+						</AxSecurityEntryPointReferenceFormDataSource>
+					</DataSources>
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMSQLRunningQueries</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>DBMSQLRunningQueries</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>DBMSQLActiveQueriesForm</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMDBResourceUsage</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>DBMDBResourceUsage</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>DBMSQLActiveQueriesForm</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMDBResourceUsageArchive</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>DBMDBResourceUsageArchive</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>DBMDBResourceUsageArchive</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMDBUsageMonitorBatch</Name>
+			<Grant>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>DBMDBUsageMonitorBatch</ObjectName>
+			<ObjectType>MenuItemAction</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMLockMonitorBatch</Name>
+			<Grant>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>DBMLockMonitorBatch</ObjectName>
+			<ObjectType>MenuItemAction</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>DBMDBLockHistoryCleanup</Name>
+			<Grant>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>DBMDBLockHistoryCleanup</ObjectName>
+			<ObjectType>MenuItemAction</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+	</EntryPoints>
+	<FormControlOverrides />
+</AxSecurityPrivilege>

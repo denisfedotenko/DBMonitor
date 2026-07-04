@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStatsTopEnum</Name>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Top10</Name>
+			<Label>@DBMonitor:DBMSQLQueryStatsTop10</Label>
+			<Value>0</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Top100</Name>
+			<Label>@DBMonitor:DBMSQLQueryStatsTop100</Label>
+			<Value>1</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Top1000</Name>
+			<Label>@DBMonitor:DBMSQLQueryStatsTop1000</Label>
+			<Value>2</Value>
+		</AxEnumValue>
+	</EnumValues>
+</AxEnum>
