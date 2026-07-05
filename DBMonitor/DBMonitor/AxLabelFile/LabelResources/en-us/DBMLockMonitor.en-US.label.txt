@@ -63,7 +63,7 @@ DBResourceUsageEntityView=Database resource usage entity - View
  ;DBMLockMonitor
 DBResourceUsageMonitor=DB Resource Usage Monitor
  ;DBMLockMonitor
-DBResourceUsageMonitorBatch=DBM Database resource usage monitor batch
+DBResourceUsageMonitorBatch=Database resource usage monitor batch
  ;DBMLockMonitor
 DBResourceusagemonitoringoptions=DB Resource usage monitoring options
  ;DBMLockMonitor
@@ -73,13 +73,13 @@ EndTime=End time
  ;DBMLockMonitor
 HostName=Host name
  ;DBMLockMonitor
-DBMDBLockHistoryEntityMaintain=DBM DB Lock History Entity - Maintain
+DBMDBLockHistoryEntityMaintain=DB Lock History Entity - Maintain
  ;DBMLockMonitor
-DBMDbLockHistoryEntityView=DBM DB Lock History Entity - View
+DBMDbLockHistoryEntityView=DB Lock History Entity - View
  ;DBMLockMonitor
-DBMDBLockingHistory=DBM DB Locking History
+DBMDBLockingHistory=DB Locking History
  ;DBMLockMonitor
-DBMLockMon=DBM Lock Monitor
+DBMLockMon=Lock Monitor
  ;DBMLockMonitor
 IndexNameHelp=Name of the index locked/to be locked
  ;DBMLockMonitor
