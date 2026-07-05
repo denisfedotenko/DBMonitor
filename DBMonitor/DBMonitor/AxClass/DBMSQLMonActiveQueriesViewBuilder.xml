@@ -98,42 +98,6 @@ public final class DBMSQLMonActiveQueriesViewBuilder extends ApplicationSQLObjec
 			<Method>
 				<Name>createViewSqlStmt</Name>
 				<Source><![CDATA[
-    /// <summary>
-    /// Returns the SQL statement to create the <c>BOSSalesLineForPicking</c> view.
-    /// </summary>
-    /// <remarks>
-    /*
-    CREATE VIEW [dbo].[BOSSALESLINEFORPICKING]
-SELECT
-  r.session_Id AS SessionId,
-  r.start_Time AS startTime,
-  r.Status AS Status,
-  r.Command AS command,
-  CONVERT([varchar](128), r.SQL_Handle, 1) AS SQLHandle,
-  CONVERT([varchar](128), r.Plan_Handle, 1) AS PlanHandle,
-  DB_NAME(r.database_id) AS DBName,
-  r.Blocking_Session_Id AS BlockingSessionId,
-  ISNULL(r.Wait_Type, '') AS WaitType,
-  r.Wait_Time AS WaitTime,
-  ISNULL(r.Last_Wait_Type, '') AS LastWaitType,
-  r.Percent_Complete AS PercentComplete,
-  CAST(r.Context_Info AS varchar(128)) AS ContextInfo,
-  r.CPU_Time AS CPUTime,
-  r.Total_Elapsed_Time AS ElapsedTime,
-  r.Reads AS Reads,
-  r.Writes AS Writes,
-  r.Logical_Reads AS LogicalReads,
-  r.Row_Count AS ClientRowCount,
-  r.Granted_query_Memory AS GrantedMemory,
-  r.Dop AS DOP,
-  ISNULL(r.parallel_Worker_Count, 0) AS WorkerCount,
-  st.text AS SQLText,
-  1010 AS recId
-FROM sys.dm_exec_requests r
-CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) AS st
-WHERE r.sql_handle IS NOT NULL
-
-    */
     /// </remarks>
     private str createViewSqlStmt()
     {

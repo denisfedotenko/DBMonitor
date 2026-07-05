@@ -277,7 +277,7 @@ FROM sys.dm_exec_query_plan(%1)
         sqlStatementText = strFmt(@'
     DECLARE @SQLPlan NVARCHAR(MAX);
 SELECT TOP 1 @SQLPlan = CONVERT(NVARCHAR(MAX), query_plan)
-FROM sys.dm_exec_query_plan(%1)
+FROM sys.dm_exec_query_plan_stats(%1)
         DECLARE @Size INT = 512;
         WITH Chunks AS (
     SELECT CAST(SUBSTRING(@SQLPlan, 1, @Size) AS NVARCHAR(512)) AS PlanFragment,

@@ -228,61 +228,51 @@ public class DBMSQLActiveQueriesForm extends FormRun
 					i:nil="true" />
 				<Controls>
 					<AxFormControl xmlns=""
-						i:type="AxFormActionPaneTabControl">
-						<Name>QueryData</Name>
-						<Type>ActionPaneTab</Type>
+						i:type="AxFormButtonGroupControl">
+						<Name>QueryOps</Name>
+						<Type>ButtonGroup</Type>
 						<FormControlExtension
 							i:nil="true" />
 						<Controls>
 							<AxFormControl xmlns=""
-								i:type="AxFormButtonGroupControl">
-								<Name>QueryText</Name>
-								<Type>ButtonGroup</Type>
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLText</Name>
+								<Type>MenuFunctionButton</Type>
 								<FormControlExtension
 									i:nil="true" />
-								<Controls>
-									<AxFormControl xmlns=""
-										i:type="AxFormMenuFunctionButtonControl">
-										<Name>DBMSQLText</Name>
-										<Type>MenuFunctionButton</Type>
-										<FormControlExtension
-											i:nil="true" />
-										<MenuItemName>DBMSQLText</MenuItemName>
-										<NeedsRecord>Yes</NeedsRecord>
-									</AxFormControl>
-									<AxFormControl xmlns=""
-										i:type="AxFormButtonControl">
-										<Name>DropPlan</Name>
-										<HelpText>@DBMonitor:DropPlanHelp</HelpText>
-										<Type>Button</Type>
-										<FormControlExtension
-											i:nil="true" />
-										<NeedsRecord>Yes</NeedsRecord>
-										<Text>@DBMonitor:DropPlanLabel</Text>
-									</AxFormControl>
-									<AxFormControl xmlns=""
-										i:type="AxFormButtonControl">
-										<Name>QueryPlan</Name>
-										<HelpText>@DBMonitor:DownloadPlanHelp</HelpText>
-										<Type>Button</Type>
-										<FormControlExtension
-											i:nil="true" />
-										<NeedsRecord>Yes</NeedsRecord>
-										<Text>@DBMonitor:DownloadPlanLabel</Text>
-									</AxFormControl>
-									<AxFormControl xmlns=""
-										i:type="AxFormButtonControl">
-										<Name>LivePlan</Name>
-										<HelpText>@DBMonitor:LivePlanHelp</HelpText>
-										<Type>Button</Type>
-										<FormControlExtension
-											i:nil="true" />
-										<Text>@DBMonitor:LivePlanLabel</Text>
-									</AxFormControl>
-								</Controls>
+								<MenuItemName>DBMSQLText</MenuItemName>
+								<NeedsRecord>Yes</NeedsRecord>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>DropPlan</Name>
+								<HelpText>@DBMonitor:DropPlanHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:DropPlanLabel</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>QueryPlan</Name>
+								<HelpText>@DBMonitor:DownloadPlanHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:DownloadPlanLabel</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>LivePlan</Name>
+								<HelpText>@DBMonitor:LivePlanHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Text>@DBMonitor:LivePlanLabel</Text>
 							</AxFormControl>
 						</Controls>
-						<Caption>@DBMonitor:QueryData</Caption>
 					</AxFormControl>
 				</Controls>
 			</AxFormControl>
