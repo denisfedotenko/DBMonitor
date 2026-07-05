@@ -40,19 +40,31 @@ The archived database resource usage log is available under *System administrati
 
 ## Active queries 
 The form shows currently active queries and their execution stats.
-The list of the currently executed queries is available under *System administration->Inqueries->DatabaseMonitor->Active queries* <Description is to be improved>
+The list of the currently executed queries is available under *System administration->Inqueries->DatabaseMonitor->Active queries* 
+The form shows currenty executing queries, based on the DMV [sys.dm_exec_requests](https://learn.microsoft.com/de-de/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql?view=sql-server-ver17) Less important fields of the DMV are not included into the form, but can be added via a saved form view.
+The following actions are available in the action bar:
+- SQL Text sample. Ths form shows combination of the query text and the parameters gathered from the query plan in the plan cache. First of all - these parameters are the parameters, used for the query compilation/first execution. Most probably the current execution uses different parameters. Second - in the latest versions of SQL Sevrer not every executed statement makes it into the query plan cache. So, if you see an empty screen, most probably the query is not in the plan cache. Finally, if the query is complex, my logic to fetch the query parameters values fails. (It happens if the parametrized query fetches data from another parametrized query. My logic cannot find the correct <ParameterList> block in the query plan. To be fixed). Yet for the queries, generated from more or regular X++ code, the query text is fetched without issues.
+- Drop plan. Drops the plan of the current statement from the plan cache. The statement continues execution with the old plan, but on the next execution the plan will be regenerated. If you get the SQL Server message "Cannot free the plan because a plan was not found in the database plan cache that corresponds to the specified plan handle. Specify a cached plan handle for the database. For a list of cached plan handles, query the sys.dm_exec_query_stats dynamic management view.", it means that your query is not in the plan cache.
+- Query plan. Returns the query plan for the current statement, taken from the query plan cache. If it does not return anything, it means that the query is not in the plan cache.
+- Live plan. The live query plan fetched from the DMV (sys.dm_exec_query_statistics_xml)[https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-statistics-xml-transact-sql?view=azuresqldb-current] This DMV is available only if a certain trace flag is enabled on the SQL Server. It returns the current query plan for the SPID even if the plan is not cached. This function is useful if one of your statement that usually takes seconds to execute now is running for 5 minutes and you have no idea whether it is going to finish anywhere soon. The Live query plan shows information about the query progress and if you download it several times, you can gauge the execution progress,
+ 
+
 
 ## SQL Statement cache
 The form shows content of the SQL Server statement cache
-The form is available under *System administration->Inqueries->DatabaseMonitor->SQL Statement cache* <Description is to be improved>
-
+The form is available under *System administration->Inqueries->DatabaseMonitor->SQL Statement cache* The forkm is based on the DMV [sys.dm_exec_query_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-stats-transact-sql?view=sql-server-ver17). By default it shows the top 10/100/1000 queries with the highest total execution time. 
+- SQL Text sample. Ths form shows combination of the query text and the parameters gathered from the query plan in the plan cache. First of all - these parameters are the parameters, used for the query compilation/first execution. Most probably the current execution uses different parameters. If the query is complex, my logic to fetch the query parameters values fails. (It happens if the parametrized query fetches data from another parametrized query. My logic cannot find the correct <ParameterList> block in the query plan. To be fixed). Yet for the queries, generated from more or regular X++ code, the query text is fetched without issues.
+- Drop plan. Drops the plan of the current statement from the plan cache. The statement continues execution with the old plan, but on the next execution the plan will be regenerated. If you get the SQL Server message "Cannot free the plan because a plan was not found in the database plan cache that corresponds to the specified plan handle. Specify a cached plan handle for the database. For a list of cached plan handles, query the sys.dm_exec_query_stats dynamic management view.", it means that your query is not in the plan cache.
+- Clear cache. Removes all cached query plans from the cache. Do not use in production. (Ok - you can use, but the SQL Server will have high CPU utilization in the next 3-5 minutes, because almost every query would require a new compilation). Yet it is very useful feature for testing. You can clear the statement cache before executiong your piece of code and in the end check the heaviest queries, check their parameters, plans and so on.
+- Query plan. Returns the query plan for the current statement, taken from the query plan cache. 
+- Actual query plan. The query plan taken from the DMV [sys.dm_exec_query_plan_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-stats-transact-sql?view=azuresqldb-current). The plan contains the timing info from the last actual execution of the query (not just estimated timings from the query compilation)
+- 
 ## Query store
 The form shows content of the SQL Server query store
 The form is available under *System administration->Inqueries->DatabaseMonitor->Query store* <Description is to be improved>
 
 ## Tuning recommendations
 The form shows content of SQL Server DMV [sys.dm_db_tuning_recommendations](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-tuning-recommendations-transact-sql?view=sql-server-ver17)
-The form is available under *System administration->Inqueries->DatabaseMonitor->Tuning recommendations* 
-<Description is to be improved>
+The form is available under *System administration->Inqueries->DatabaseMonitor->Tuning recommendations* I have not really used this DMV a lot, so I cannot provide any additional info so far.
 
 
