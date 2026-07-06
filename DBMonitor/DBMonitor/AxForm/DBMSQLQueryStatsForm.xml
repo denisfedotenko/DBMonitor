@@ -32,6 +32,26 @@ public class DBMSQLQueryStatsForm extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>getStartOffset</Name>
+				<Source><![CDATA[
+    public int getStartOffset()
+    {
+        return DBMSQLQueryStats.StatementStartOffset;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getEndOffset</Name>
+				<Source><![CDATA[
+    public int getEndOffset()
+    {
+        return DBMSQLQueryStats.StatementEndOffset;
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>

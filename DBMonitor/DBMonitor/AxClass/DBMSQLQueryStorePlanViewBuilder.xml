@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStorePlanViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStorePlanViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStorePlanViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asPlanId;
@@ -135,12 +135,12 @@ public final class DBMSQLQueryStorePlanViewBuilder extends ApplicationSQLObjects
             asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>
 				<Name>createSQLStatement2022</Name>
 				<Source><![CDATA[
-
     private str createSQLStatement2022()
     {
         str sqlStmt = strFmt(@"SELECT
@@ -203,12 +203,12 @@ public final class DBMSQLQueryStorePlanViewBuilder extends ApplicationSQLObjects
             asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>
 				<Name>createSQLStatement</Name>
 				<Source><![CDATA[
-
     private str createSQLStatement()
     {
         if (DBMSQLUtils::databaseCompatibilityLevel() >= 160)

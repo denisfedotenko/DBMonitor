@@ -3,7 +3,7 @@
 	<Name>DBMSQLMonActiveQueriesViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLMonActiveQueriesViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLMonActiveQueriesViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asSessionId;

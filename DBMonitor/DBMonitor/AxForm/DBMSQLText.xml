@@ -16,6 +16,8 @@ public class DBMSQLText extends FormRun
     DBMSQLQueryStoreQueryTextId querytextId;
     DBMSQLQueryStorePlanId queryPlanId;
     boolean isPlanCacheBased;
+    int startOffset;
+    int endOffset;
 }
 ]]></Source>
 			</Method>
@@ -29,7 +31,9 @@ public class DBMSQLText extends FormRun
         {
             FormRun callerForm = element.args().caller() as FormRun;
             if (formHasMethod(callerForm, identifierStr(getSQLHandle))
-                && formHasMethod(callerForm, identifierStr(getPlanHandle)))
+                && formHasMethod(callerForm, identifierStr(getPlanHandle))
+                && formHasMethod(callerForm, identifierStr(getStartOffset))
+                && formHasMethod(callerForm, identifierStr(getEndOffset)))
             {
                 callerFormRun = callerForm;
                 isPlanCacheBased = true;
@@ -52,7 +56,9 @@ public class DBMSQLText extends FormRun
         {
             statementHandle = callerFormRun.getSQLHandle();
             planHandle = callerFormRun.getPlanHandle();
-            SQLTextSample = DBMSQLUtils::getSqlTextSample(statementHandle, planHandle);
+            startOffset = callerFormRun.getStartOffset();
+            endOffset = callerFormRun.getEndOffset();
+            SQLTextSample = DBMSQLUtils::getSqlTextSample(statementHandle, planHandle,startOffset,endOffset);
         }
         else
         {

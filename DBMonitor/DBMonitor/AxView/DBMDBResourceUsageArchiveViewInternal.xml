@@ -13,7 +13,7 @@ public class DBMDBResourceUsageArchiveViewInternal extends common
 				<Source><![CDATA[
     private static str timestamp()
     {
-        return SysComputedColumn::DBMDBDateBucket(
+        return DBMSQLUtils::DBMDBDateBucket(
             SysComputedColumn::returnField(viewstr(DBMDBResourceUsageArchiveViewInternal),
                                            identifierStr(DBMDBResourceUsage),
                                            fieldStr(DBMDBResourceUsage,timeStamp)),

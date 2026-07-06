@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStoreQueryHintsViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStoreQueryHintsViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStoreQueryHintsViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asQueryHintId;
@@ -84,6 +84,7 @@ public final class DBMSQLQueryStoreQueryHintsViewBuilder extends ApplicationSQLO
         asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>
@@ -117,6 +118,7 @@ public final class DBMSQLQueryStoreQueryHintsViewBuilder extends ApplicationSQLO
         asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>
@@ -133,6 +135,7 @@ public final class DBMSQLQueryStoreQueryHintsViewBuilder extends ApplicationSQLO
             return this.createSQLStatement2019();
         }
     }
+
 ]]></Source>
 			</Method>
 			<Method>

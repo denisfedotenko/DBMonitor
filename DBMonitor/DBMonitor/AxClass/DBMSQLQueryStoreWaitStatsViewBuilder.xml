@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStoreWaitStatsViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStoreWaitStatsViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStoreWaitStatsViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asWaitStatsId;
@@ -60,7 +60,6 @@ public final class DBMSQLQueryStoreWaitStatsViewBuilder extends ApplicationSQLOb
 			<Method>
 				<Name>createSQLStatement2019</Name>
 				<Source><![CDATA[
-
     private str createSQLStatement2019()
     {
         str sqlStmt = strFmt(@"SELECT
@@ -97,12 +96,12 @@ public final class DBMSQLQueryStoreWaitStatsViewBuilder extends ApplicationSQLOb
         asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>
 				<Name>createSQLStatement2022</Name>
 				<Source><![CDATA[
-
     private str createSQLStatement2022()
     {
         str sqlStmt = strFmt(@"SELECT

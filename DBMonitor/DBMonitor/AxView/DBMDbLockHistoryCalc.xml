@@ -19,7 +19,7 @@ public class DBMDbLockHistoryCalc extends common
             fieldId2name(tableNum(DBMDbLockHistory), fieldNum(DBMDbLockHistory, startTime)));
         Name endDateTime = SysComputedColumn::returnField(viewName, identifierStr(DBMDbLockHistory),
             fieldId2name(tableNum(DBMDbLockHistory), fieldNum(DBMDbLockHistory, createdDateTime)));
-        return SysComputedColumn::DBMDBDurationAsString(endDateTime, startDateTime);
+        return DBMSQLUtils::DBMDBDurationAsString(endDateTime, startDateTime);
     }
 
 ]]></Source>

@@ -22,7 +22,7 @@ public class DBMDBUsageArchiveView extends common
         orderBy.addEnd([SysComputedColumn::returnField(viewstr(DBMDBUsageArchiveView),
         identifierStr(DBMDBResourceUsageArchiveRaw),
         fieldStr(DBMDBResourceUsageArchiveRaw,timeStamp)),SortOrder::Ascending]);
-        return SysComputedColumn::DBMDBRowNumOverOrderBy(partitionBy, orderBy);
+        return DBMSQLUtils::DBMDBRowNumOverOrderBy(partitionBy, orderBy);
     }
 
 ]]></Source>

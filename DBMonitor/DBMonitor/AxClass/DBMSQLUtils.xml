@@ -8,6 +8,8 @@ public final class DBMSQLUtils
 
 
 
+    
+
 }
 ]]></Declaration>
 		<Methods>
@@ -119,7 +121,7 @@ where database_id=DB_ID()";
 			<Method>
 				<Name>getSqlTextSample</Name>
 				<Source><![CDATA[
-    public static DBMSqlText getSqlTextSample(DBMSQLHandle _sqlHandle, DBMSQLHandle _planHandle)
+    public static DBMSqlText getSqlTextSample(DBMSQLHandle _sqlHandle, DBMSQLHandle _planHandle, int _startOffset, int _endOffset)
     {
         str sqlStatementText;
         Connection connection = new Connection();
@@ -127,15 +129,99 @@ where database_id=DB_ID()";
         Statement statement;
         ResultSet sqlResult;
         DBMSqlText QuerySqlText;
-        sqlStatementText = strFmt(@'SELECT TOP 1 SUBSTRING(st.text, (qs.statement_start_offset/2)+1,
-        ((CASE qs.statement_end_offset
+        str sqlQuery = strFmt(@"
+DECLARE @ParmText NVARCHAR(MAX);
+DECLARE @PlanXML XML
+select @PlanXML = query_plan
+from sys.dm_exec_query_plan(%1);
+
+WITH XMLNAMESPACES (DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan')
+select @ParmText = STRING_AGG('DECLARE ' + parmTable.parmName + ' ' + parmTable.parmDataType + ' = ' + parmTable.parmValue, '; ')
+    from (
+SELECT
+    p.pList.value('@Column', 'NVARCHAR(128)') AS ParmName,
+    p.pList.value('@ParameterDataType', 'NVARCHAR(128)') AS ParmDataType,
+    COALESCE(
+        p.pList.value('@ParameterRuntimeValue', 'NVARCHAR(MAX)'),
+        p.pList.value('@ParameterCompiledValue', 'NVARCHAR(MAX)')
+    ) AS parmValue
+FROM @PlanXML.nodes('//ParameterList/ColumnReference') AS p(pList)) as parmTable;
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@Parmtext, 1, @Size) AS NVARCHAR(512)) AS TextFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@Parmtext, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@Parmtext)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)
+
+    ", _planHandle);
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+        str parmText;
+      
+        while (sqlResult.next())
+        {
+            parmText += sqlResult.getString(1);
+        }
+        sqlResult.close();
+        statement.close();
+        CodeAccessPermission::revertAssert();
+
+        str sqlStatementTextParametrized = strFmt(@'
+    DECLARE @QueryText NVARCHAR(MAX);
+SELECT TOP 1 @Querytext = CONVERT(NVARCHAR(MAX), SUBSTRING(st.text, (%2/2)+1,
+        ((CASE %2
           WHEN -1 THEN DATALENGTH(st.text)
-         ELSE qs.statement_end_offset
-         END - qs.statement_start_offset)/2) + 1) AS statement_text
-FROM sys.dm_exec_query_stats AS qs
-CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) AS st
-WHERE qs.sql_handle = %1
-',_sqlHandle);
+         ELSE %3
+         END - %2)/2) + 1))
+FROM sys.dm_exec_sql_text(%1) AS st;
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@Querytext, 1, @Size) AS NVARCHAR(512)) AS TextFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@Querytext, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@Querytext)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)'
+,_sqlHandle,_startOffset,_endOffset);
+        str sqlStatementTextSimple = strFmt(@'
+    DECLARE @QueryText NVARCHAR(MAX);
+SELECT TOP 1 @Querytext = CONVERT(NVARCHAR(MAX), st.text)
+FROM sys.dm_exec_sql_text(%1) AS st;
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@Querytext, 1, @Size) AS NVARCHAR(512)) AS TextFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@Querytext, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@Querytext)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)'
+,_sqlHandle,_startOffset,_endOffset);
+        if (parmText)
+        {
+            sqlStatementText = sqlStatementTextParametrized;
+        }
+        else
+        {
+            sqlStatementText = sqlStatementTextSimple;
+        }
         permission = new SqlStatementExecutePermission(sqlStatementText);
         // Open the code access permission scope.
         permission.assert();
@@ -143,46 +229,19 @@ WHERE qs.sql_handle = %1
         statement = connection.createStatement();
         sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
       
-        if (sqlResult.next())
+        while(sqlResult.next())
         {
-            querySqlText = sqlResult.getString(1);
+            querySqlText += sqlResult.getString(1);
         }
       
         sqlResult.close();
         statement.close();
         CodeAccessPermission::revertAssert();
 
-        str sqlQuery = strFmt(@"
-    select STRING_AGG('DECLARE ' + parmTable.parmName + ' ' + parmTable.parmDataType + ' = ' + parmTable.parmValue, '; ')
-    from (
-        select parmtable.parms.value('@Column', 'NVARCHAR(128)') as parmName,
-               parmtable.parms.value('@ParameterDataType', 'NVARCHAR(128)') as parmDataType,
-               parmtable.parms.value('@ParameterCompiledValue', 'nvarchar(128)') as parmValue
-        from (
-            select TRY_CONVERT(XML, SUBSTRING(
-                convert(NVARCHAR(MAX), query_plan),
-                CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)),
-                CHARINDEX('</ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)) + LEN('</ParameterList>') - CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan))
-            )) AS Parameters
-            from sys.dm_exec_query_plan(%1)
-        ) as parameterList
-        outer apply parameterList.Parameters.nodes('//ParameterList/ColumnReference') as parmtable(parms)
-    ) as parmTable", _planHandle);        
-        permission = new SqlStatementExecutePermission(sqlQuery);
-
-        // Open the code access permission scope.
-        permission.assert();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
-      
-        if (sqlResult.next())
+        if (parmText)
         {
-            querySqlText = sqlResult.getString(1)+'\n' + querySQLText;
+            querySqlText = parmText +'\n' + querySQLText;
         }
-        sqlResult.close();
-        statement.close();
-
-        CodeAccessPermission::revertAssert();
         
       
         return querySqlText;
@@ -476,6 +535,123 @@ where plan_id = %1
         statement.close();
         CodeAccessPermission::revertAssert();
         return QueryPlan;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DBMDBRowNumOverOrderBy</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates ROW_Number expression with the Over clause
+    /// </summary>
+    /// <param name="_partitionBy">
+    /// the list of fields to partition the output
+    /// </param>
+    /// <param name="_orderBy">
+    /// the list of fields to order inside the parition
+    /// </param>
+    /// <returns>
+    /// A String that contains an expression for a row number over a specified partition
+    /// </returns>
+    public static str DBMDBRowNumOverOrderBy(List _partitionBy, List _orderBy = null)
+    {
+        str retVal ='ROW_NUMBER()';
+        ListEnumerator le = _partitionBy.getEnumerator();
+        boolean partitionByIsInitialized;
+        boolean orderByIsInitialized;
+        SortOrder sortOrder;
+        Str fldName;
+        str orderString;
+        while (le.moveNext())
+        {
+            if (!partitionByIsInitialized)
+            {
+                retVal += strFmt('OVER(PARTITION BY %1',le.current());
+                partitionByIsInitialized = true;
+            }
+            else
+            {
+                retVal += strFmt(', %1',le.current());
+            }
+
+        }
+        if (!prmIsDefault(_orderBy))
+        {
+            le = _orderBy.getEnumerator();
+            while (le.moveNext())
+            {
+                [fldName,sortOrder] = le.current();
+                orderString = (sortOrder==SortOrder::Ascending)?'ASC':'DESC';
+                if (!orderByIsInitialized)
+                {
+                    retVal += strFmt(' ORDER BY %1 %2',fldName,orderString);
+                    orderByIsInitialized = true;
+                }
+                else
+                {
+                    retVal += strFmt(', %1 %2',fldName,orderString);
+                }
+            }
+
+        }
+        retVal +=' )';
+        return retVal;
+ 
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DBMDBDateBucket</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Rounds datetime to a specified number of the time units
+    /// </summary>
+    /// <param name="_fieldName">
+    /// A String value that contains the return date field
+    /// </param>
+    /// <param name="_rounding">
+    /// A reference to a field or literal with an integet number of time units
+    /// </param>
+    /// <param name="_datepart">
+    /// A string with the timeunit (see https://learn.microsoft.com/en-us/sql/t-sql/functions/date-bucket-transact-sql?view=sql-server-ver16 )
+    /// </param>
+    /// <returns>
+    /// A String that contains an expression formatted as a dateOfWeek expression
+    /// </returns>
+    public static str DBMDBDateBucket(str _fieldName, str _rounding, str _datepart)
+    {
+        if (false) //DBMSQLUtils::databaseCompatibilityLevel() >= 160) //to be uncommented after CHE's local SQL Server is upgraded to SQL 2022
+        {
+            return strFmt('DATE_BUCKET(%1,%2,%3)',_datepart,_rounding, _fieldName);
+        }
+        else
+        {
+            return strFmt('dateadd(%1, datediff(%1,0,%3) / %2 * %2, 0)',_datepart,_rounding, _fieldName);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>DBMDBDurationAsString</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Rounds datetime to a specified number of the time units
+    /// </summary>
+    /// <param name="_expressionEndDateTime">
+    /// A String value that contains the end date time for the duration
+    /// </param>
+    /// <param name="_expressionStartDateTime">
+    /// A String value that contains the start date time for the duration
+    /// </param>
+    /// <returns>
+    /// A String that contains an expression with the duration as a string
+    /// </returns>
+    public static str DBMDBDurationAsString(str _expressionEndDateTime, str _expressionStartDateTime)
+    {
+        return strFmt('iif(CONVERT(int,DATEDIFF(DAY, %1, %2))<24850,CONVERT(varchar, DATEADD(SECOND, DATEDIFF(SECOND, %1, %2), 0), 108),CONVERT(varchar, DATEADD(SECOND, 0, 0), 108))',_expressionStartDateTime,_expressionEndDateTime);
     }
 
 ]]></Source>

@@ -33,6 +33,26 @@ public class DBMSQLActiveQueriesForm extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>getStartOffset</Name>
+				<Source><![CDATA[
+    public int getStartOffset()
+    {
+        return DBMSQLActiveQueries.StatementStartOffset;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getEndOffset</Name>
+				<Source><![CDATA[
+    public int getEndOffset()
+    {
+        return DBMSQLActiveQueries.StatementEndOffset;
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>

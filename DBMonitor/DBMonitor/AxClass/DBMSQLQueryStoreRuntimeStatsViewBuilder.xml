@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStoreRuntimeStatsViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStoreRuntimeStatsViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStoreRuntimeStatsViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asRuntimeStatsId;
@@ -299,6 +299,7 @@ public final class DBMSQLQueryStoreRuntimeStatsViewBuilder extends ApplicationSQ
         asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>
@@ -472,6 +473,7 @@ public final class DBMSQLQueryStoreRuntimeStatsViewBuilder extends ApplicationSQ
         asRecId);
         return sqlStmt;
     }
+
 ]]></Source>
 			</Method>
 			<Method>

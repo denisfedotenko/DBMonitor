@@ -6,7 +6,7 @@
 /// <summary>
 /// View builder class for the view with the SQL Sessions
 /// </summary>
-public final class DBMSQLSessionInfoViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLSessionInfoViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     

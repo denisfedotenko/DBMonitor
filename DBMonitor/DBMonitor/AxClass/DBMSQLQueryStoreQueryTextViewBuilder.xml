@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStoreQueryTextViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStoreQueryTextViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStoreQueryTextViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asQueryTextId;

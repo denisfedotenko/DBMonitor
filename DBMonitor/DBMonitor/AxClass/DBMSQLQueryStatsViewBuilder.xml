@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStatsViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStatsViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStatsViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asRecId;

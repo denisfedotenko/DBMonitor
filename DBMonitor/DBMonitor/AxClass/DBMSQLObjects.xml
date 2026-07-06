@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLObjects</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Provides support for synchronizing application-managed objects with the database.
+/// Cloned from the standard class ApplicationSQLObjects to keep the best practice check happy
+/// </summary>
+abstract class DBMSQLObjects
+{
+    Connection connection;
+    protected static const container SQLObjectsCreatedKey = [1];
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>dropFunction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Drops the SQL function that has the specified name.
+    /// </summary>
+    /// <param name="_functionName">
+    /// The name of the function to drop.
+    /// </param>
+    /// <returns>
+    /// true if the function drop was successful; otherwise, false.
+    /// </returns>
+    protected boolean dropFunction(str _functionName)
+    {
+        str sqlStatementText;
+
+        sqlStatementText = strFmt(@"
+            IF EXISTS
+                  (SELECT 1
+                  FROM sys.objects o WITH (NOLOCK)
+                  WHERE o.[name] = N'%1'
+                  AND o.[type] IN (N'FN', N'TF')
+                  )
+              BEGIN
+                DROP FUNCTION [dbo].[%1];
+              END;
+            ", _functionName);
+
+        return this.executeSqlStatementWithParameters(sqlStatementText, SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dropTrigger</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Drops the SQL trigger that has the specified name.
+    /// </summary>
+    /// <param name="_triggerName">
+    /// The name of the trigger to drop.
+    /// </param>
+    /// <returns>
+    /// true if the trigger drop was successful; otherwise, false.
+    /// </returns>
+    protected boolean dropTrigger(str _triggerName)
+    {
+        str sqlStatementText;
+        str triggerNewName = strreplace(_triggerName, "'", "''");
+
+        sqlStatementText = strFmt(@"
+            IF OBJECTPROPERTY(OBJECT_ID(N'[%2]'), 'ISTRIGGER') = 1
+            BEGIN
+                DROP TRIGGER [dbo].[%1];
+            END;
+            ", _triggerName, triggerNewName);
+        return this.executeTriggerCommand('ApplicationSQLObjects', 'dropTrigger', sqlStatementText);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeTriggerCommand</Name>
+				<Source><![CDATA[
+    protected boolean executeTriggerCommand(ClassName _className, MethodName _methodName, str _sqlStatementText)
+    {
+        #ApplicationFoundationFlights;
+        utcdatetime startTime, endTime;
+
+        if (isFlightEnabled(#EnableDDLExecutionTelemetry))
+        {
+            startTime = DateTimeUtil::utcNow();
+        }
+
+        boolean success = this.executeSqlStatementWithParameters(_sqlStatementText, SqlParams::create());
+
+        if (isFlightEnabled(#EnableDDLExecutionTelemetry))
+        {
+            endTime = DateTimeUtil::utcNow();
+            Microsoft.Dynamics.ApplicationPlatform.XppServices.Instrumentation.SystemRuntimeEventSource::EventWriteDDLExecutionTelemetry(_className,
+                _methodName, _sqlStatementText, DateTimeUtil::getDifference(endTime, startTime));
+        }
+
+        return success;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>existFunction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Indicates whether the SQL function with the specified name exists.
+    /// </summary>
+    /// <param name="_functionName">
+    ///    The name of the function.
+    /// </param>
+    /// <returns>
+    ///    true if the SQL function exists; otherwise, false.
+    /// </returns>
+    protected boolean existFunction(str _functionName)
+    {
+        str sqlStatementText;
+        ResultSet resultSet;
+        boolean funcExists;
+
+        sqlStatementText = @"
+            SELECT 1
+            FROM sys.objects o WITH (NOLOCK)
+            WHERE o.[name] = @Name
+            AND o.[type] IN (N'FN', N'TF')";
+
+        Map parameters = SqlParams::create();
+        parameters.add('Name', _functionName);
+
+        resultSet = this.executeSqlStatementQueryWithParameters(sqlStatementText, parameters);
+
+        if (resultSet && resultSet.next())
+        {
+            funcExists = resultSet.getBoolean(1);
+        }
+
+        return funcExists;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dropProcedure</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Drops the SQL stored procedure with the specified name.
+    /// </summary>
+    /// <param name="_procedureName">
+    ///    The name of the stored procedure to drop.
+    /// </param>
+    /// <returns>
+    ///    true if the drop was successful; otherwise, false.
+    /// </returns>
+    protected boolean dropProcedure(str _procedureName)
+    {
+        str sqlStatementText;
+
+        sqlStatementText = strFmt(@"
+            IF EXISTS
+                  (SELECT 1
+                  FROM sys.procedures p WITH (NOLOCK)
+                  WHERE p.[name] = N'%1'
+                  )
+              BEGIN
+                DROP PROCEDURE [%1];
+              END;
+            ", _procedureName);
+
+        return this.executeSqlStatementWithParameters(sqlStatementText, SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dropView</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Drops the SQL view that has the specified name.
+    /// </summary>
+    /// <param name="_viewName">
+    /// The name of the view to drop.
+    /// </param>
+    /// <returns>
+    /// true if the view drop was successful; otherwise, false.
+    /// </returns>
+    protected boolean dropView(str _viewName)
+    {
+        str sqlStatementText;
+
+        sqlStatementText = strFmt(@"
+            IF EXISTS
+                  (SELECT 1
+                  FROM sys.views v WITH (NOLOCK)
+                  WHERE v.[name] = N'%1'
+                  )
+              BEGIN
+                DROP VIEW [%1];
+              END;
+            ", _viewName);
+
+        return this.executeSqlStatementWithParameters(sqlStatementText, SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeSqlStatementWithParameters</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Executes the specified SQL statement text,  passing the specified parameters
+    /// </summary>
+    /// <param name="_sqlStatementText">
+    ///    The SQL statement text to execute.
+    /// </param>
+    /// <param name="_parameters">
+    ///    The parameters containing values for @Names in the SQL statement.
+    /// </param>
+    /// <returns>
+    ///    true if the execution was successful; otherwise, false.
+    /// </returns>
+    protected boolean executeSqlStatementWithParameters(str _sqlStatementText, Map _parameters)
+    {
+        boolean isSuccessful;
+        str sqlStatementText;
+
+        SqlStatementExecutePermission permission;
+        Statement statement;
+
+        sqlStatementText = strLRTrim(_sqlStatementText);
+
+        if (sqlStatementText)
+        {
+            permission = new SqlStatementExecutePermission(sqlStatementText);
+
+            // Open the code access permission scope.
+            permission.assert();
+
+            statement = connection.createStatement();
+
+            try
+            {
+                statement.executeUpdateWithParameters(sqlStatementText, _parameters);
+                isSuccessful = true;
+            }
+            catch
+            {
+                // An error was thrown from the statement execution.
+                isSuccessful = false;
+            }
+
+            // Close the code access permission scope.
+            CodeAccessPermission::revertAssert();
+        }
+
+        return isSuccessful;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeSqlStatementQueryWithParameters</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Executes the specified SQL statement text.
+    /// </summary>
+    /// <param name="_sqlStatementText">
+    /// The SQL statement text to execute.
+    /// </param>
+    /// <param name="_parameters">
+    /// The parameters containing values for @Names in the SQL auery.
+    /// </param>
+    /// <returns>
+    /// The <c>ResultSet</c> object of the executed SQL statement.
+    /// </returns>
+    protected ResultSet executeSqlStatementQueryWithParameters(str _sqlStatementText, Map _parameters)
+    {
+        ResultSet resultSet;
+
+        str sqlStatementText;
+
+        SqlStatementExecutePermission permission;
+        Statement statement;
+
+        sqlStatementText = strLRTrim(_sqlStatementText);
+
+        if (sqlStatementText)
+        {
+            permission = new SqlStatementExecutePermission(sqlStatementText);
+
+            // Open the code access permission scope.
+            permission.assert();
+
+            statement = connection.createStatement();
+
+            try
+            {
+                resultSet = statement.executeQueryWithParameters(sqlStatementText, _parameters);
+                statement.close();
+            }
+            catch
+            {
+                // An error was thrown from the statement execution.
+                resultSet = null;
+            }
+
+            // Close the code access permission scope.
+            CodeAccessPermission::revertAssert();
+        }
+
+        return resultSet;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeSqlStatementScalarWithParameters</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Executes the specified SQL statement text.
+    /// </summary>
+    /// <param name="_sqlStatementText">
+    /// The SQL statement text to execute.
+    /// </param>
+    /// <param name="_parameters">
+    /// The parameters containing values for @Names in the SQL statement.
+    /// </param>
+    /// <returns>
+    /// The single string result of the query.
+    /// </returns>
+    protected str executeSqlStatementScalarWithParameters(str _sqlStatementText, Map _parameters)
+    {
+        ResultSet resultSet;
+        str sqlStatementText;
+        str ret;
+
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        sqlStatementText = strLRTrim(_sqlStatementText);
+
+        if (sqlStatementText)
+        {
+            permission = new SqlStatementExecutePermission(sqlStatementText);
+
+            // Open the code access permission scope.
+            permission.assert();
+
+            statement = connection.createStatement();
+
+            try
+            {
+                resultSet = statement.executeQueryWithParameters(sqlStatementText, _parameters);
+                if (resultSet.next())
+                {
+                    ret = resultSet.getString(1);
+                }
+                resultSet.close();
+                statement.close();
+            }
+            catch
+            {
+                // An error was thrown from the statement execution.
+                resultSet = null;
+            }
+
+            // Close the code access permission scope.
+            CodeAccessPermission::revertAssert();
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>existProcedure</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Indicates whether the SQL stored procedure with the specified name exists.
+    /// </summary>
+    /// <param name="_procedureName">
+    ///    The name of the stored procedure.
+    /// </param>
+    /// <returns>
+    ///    true if the SQL stored procedure exists; otherwise, false.
+    /// </returns>
+    protected boolean existProcedure(str _procedureName)
+    {
+        str sqlStatementText;
+        ResultSet resultSet;
+        boolean procExists;
+
+        sqlStatementText = @"
+            SELECT 1
+            FROM sys.procedures p WITH (NOLOCK)
+            WHERE p.[name] = @Name;
+            ";
+
+        Map parameters = SqlParams::create();
+        parameters.add('Name', _procedureName);
+
+        resultSet = this.executeSqlStatementQueryWithParameters(sqlStatementText, parameters);
+
+        if (resultSet && resultSet.next())
+        {
+            procExists = resultSet.getBoolean(1);
+        }
+
+        return procExists;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initalizes the database connection.
+    /// </summary>
+    /// <param name = "_runOnSeparateUserConnection">true if commands should execute on a separate user connection; false if commands should use an existing connection.</param>
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        if (_runOnSeparateUserConnection)
+        {
+            connection = new UserConnection();
+        }
+        else
+        {
+            connection = new Connection();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createFunctions</Name>
+				<Source><![CDATA[
+    protected boolean createFunctions()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createTriggers</Name>
+				<Source><![CDATA[
+    protected boolean createTriggers()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createStoredProcedures</Name>
+				<Source><![CDATA[
+    protected boolean createStoredProcedures()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSqlObjects</Name>
+				<Source><![CDATA[
+    protected boolean createSqlObjects()
+    {
+        boolean isSuccessful;
+
+        try
+        {
+            connection.ttsbegin();
+
+            // Create the views.
+            isSuccessful = this.createViews();
+
+            // Create the functions.
+            isSuccessful = isSuccessful && this.createFunctions();
+
+            // Create the procedures.
+            isSuccessful = isSuccessful && this.createStoredProcedures();
+
+            // Create the triggers.
+            isSuccessful = isSuccessful && this.createTriggers();
+
+            if (isSuccessful)
+            {
+                connection.ttscommit();
+            }
+            else
+            {
+                connection.ttsabort();
+            }
+        }
+        finally
+        {
+            connection.finalize();
+        }
+
+        return isSuccessful;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

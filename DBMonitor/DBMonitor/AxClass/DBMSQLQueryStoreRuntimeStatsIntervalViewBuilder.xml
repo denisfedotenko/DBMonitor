@@ -3,7 +3,7 @@
 	<Name>DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-public final class DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder extends ApplicationSQLObjects
+public final class DBMSQLQueryStoreRuntimeStatsIntervalViewBuilder extends DBMSQLObjects
 {
     str     viewName;
     str     asRuntimeStatsIntervalId;
