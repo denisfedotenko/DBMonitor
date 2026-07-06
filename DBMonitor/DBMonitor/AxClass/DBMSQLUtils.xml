@@ -428,8 +428,71 @@ FROM sys.dm_exec_query_statistics_xml(%1)
         SqlStatementExecutePermission permission;
         Statement statement;
         ResultSet sqlResult;
+        str sqlQuery = strFmt(@"
+DECLARE @ParmText NVARCHAR(MAX);
+DECLARE @PlanXML XML
+select @PlanXML = query_plan
+from sys.query_store_plan
+where plan_id = %1;
+WITH XMLNAMESPACES (DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan')
+select @ParmText = STRING_AGG('DECLARE ' + parmTable.parmName + ' ' + parmTable.parmDataType + ' = ' + parmTable.parmValue, '; ')
+    from (
+    SELECT
+    p.pList.value('@Column', 'NVARCHAR(128)') AS ParmName,
+    p.pList.value('@ParameterDataType', 'NVARCHAR(128)') AS ParmDataType,
+    COALESCE(
+        p.pList.value('@ParameterRuntimeValue', 'NVARCHAR(MAX)'),
+        p.pList.value('@ParameterCompiledValue', 'NVARCHAR(MAX)')
+    ) AS parmValue
+    FROM @PlanXML.nodes('//ParameterList/ColumnReference') AS p(pList)) as parmTable;
+        DECLARE @Size INT = 512;
+WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@Parmtext, 1, @Size) AS NVARCHAR(512)) AS TextFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@Parmtext, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@Parmtext)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)
+
+    ", _queryPlanId);
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        str parmList;
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+      
+        while (sqlResult.next())
+        {
+            parmList = parmList+sqlResult.getString(1);
+        }
+        sqlResult.close();
+        statement.close();
+      
+        CodeAccessPermission::revertAssert();
+        
         DBMSqlText QuerySqlText;
-        sqlStatementText = strFmt(@'select query_sql_text from sys.query_store_query_text where query_text_id = %1',_queryTextId);
+        sqlStatementText = strFmt(@'
+    DECLARE @QueryText NVARCHAR(MAX);
+     SELECT TOP 1 @Querytext = CONVERT(NVARCHAR(MAX), query_sql_text)
+        from sys.query_store_query_text where query_text_id = %1;
+        DECLARE @Size INT = 512;
+        WITH Chunks AS (
+    SELECT CAST(SUBSTRING(@Querytext, 1, @Size) AS NVARCHAR(512)) AS TextFragment,
+           @Size + 1 AS NextPos
+    UNION ALL
+    SELECT CAST(SUBSTRING(@Querytext, NextPos, @Size) AS NVARCHAR(512)),
+           NextPos + @Size
+    FROM Chunks
+    WHERE NextPos <= LEN(@Querytext)
+            )
+            SELECT * FROM Chunks
+            OPTION (MAXRECURSION 0)'
+,_queryTextId);
         permission = new SqlStatementExecutePermission(sqlStatementText);
         // Open the code access permission scope.
         permission.assert();
@@ -437,53 +500,26 @@ FROM sys.dm_exec_query_statistics_xml(%1)
         statement = connection.createStatement();
         sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
       
-        if (sqlResult.next())
+        while (sqlResult.next())
         {
-            querySqlText = sqlResult.getString(1);
+            querySqlText += sqlResult.getString(1);
         }
         sqlResult.close();
         statement.close();
-        System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex('(?s)^\([^)]+\)\s*(.*)');
-        System.Text.RegularExpressions.Match match = regex.Match(querySqlText);
-        if (match.Success)
+        if (parmList)
         {
+            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex('(?s)^\([^)]+\)\s*(.*)');
+            System.Text.RegularExpressions.Match match = regex.Match(querySqlText);
+            if (match.Success)
+            {
                 QuerySqlText = match.get_Groups().get_Item(2).get_Value();
+            }
         }
         CodeAccessPermission::revertAssert();
-
-        str sqlQuery = strFmt(@"
-    select STRING_AGG('DECLARE ' + parmTable.parmName + ' ' + parmTable.parmDataType + ' = ' + parmTable.parmValue, '; ')
-    from (
-        select parmtable.parms.value('@Column', 'NVARCHAR(128)') as parmName,
-               parmtable.parms.value('@ParameterDataType', 'NVARCHAR(128)') as parmDataType,
-               parmtable.parms.value('@ParameterCompiledValue', 'nvarchar(128)') as parmValue
-        from (
-            select TRY_CONVERT(XML, SUBSTRING(
-                convert(NVARCHAR(MAX), query_plan),
-                CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)),
-                CHARINDEX('</ParameterList>', CONVERT(NVARCHAR(MAX), query_plan)) + LEN('</ParameterList>') - CHARINDEX('<ParameterList>', CONVERT(NVARCHAR(MAX), query_plan))
-            )) AS Parameters
-            from sys.query_store_plan
-            where plan_id = %1
-        ) as parameterList
-        outer apply parameterList.Parameters.nodes('//ParameterList/ColumnReference') as parmtable(parms)
-    ) as parmTable", _queryPlanId);
-        permission = new SqlStatementExecutePermission(sqlQuery);
-
-        // Open the code access permission scope.
-        permission.assert();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
-      
-        if (sqlResult.next())
+        if (parmList)
         {
-            querySqlText = sqlResult.getString(1)+'\n' + querySQLText;
+            QuerySqlText = parmList +'\n' + QuerySqlText;
         }
-        sqlResult.close();
-        statement.close();
-      
-        CodeAccessPermission::revertAssert();
-        
       
         return querySqlText;
     }
