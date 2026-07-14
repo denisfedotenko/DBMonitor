@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLDBTuningConfigurationsViewBuilder</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class DBMSQLDBTuningConfigurationsViewBuilder extends DBMSQLObjects
+{
+    str     viewName;
+    str     asRecId;
+    str     asOption;
+    str     asOptionValue;
+    str     asType;
+    str     asTypeValue;
+    str     asDetails;
+    str     asState;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createViews</Name>
+				<Source><![CDATA[
+    protected boolean createViews()
+    {
+        return this.dropView(viewName) && this.executeSqlStatementWithParameters(this.createViewSqlStmt(),SqlParams::create());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args args)
+    {
+        var builder = DBMSQLDBTuningConfigurationsViewBuilder::construct();
+        builder.createSqlObjects();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createViewSqlStmt</Name>
+				<Source><![CDATA[
+    private str createViewSqlStmt()
+    {
+        str sqlStmt = 'CREATE VIEW ' + viewName + ' AS ' + this.createSQLStatement();
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement140</Name>
+				<Source><![CDATA[
+    private str createSQLStatement140()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            CONVERT([NVARCHAR](60), r.[option]) AS %1,
+            CONVERT([NVARCHAR](60), r.option_value) AS %2,
+            CONVERT([NVARCHAR](60), r.type) AS %3,
+            CONVERT([NVARCHAR](60), r.type_value) AS %4,
+            CONVERT([NVARCHAR](MAX), r.details) AS %5,
+            r.state AS %6,
+            1010 AS %7
+            FROM sys.database_automatic_tuning_configurations r",
+        asOption,
+        asOptionValue,
+        asType,
+        asTypeValue,
+        asDetails,
+        asState,
+        asRecId);
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatementFallback</Name>
+				<Source><![CDATA[
+    private str createSQLStatementFallback()
+    {
+        str sqlStmt = strFmt(@"SELECT
+            '' AS %1,
+            '' AS %2,
+            '' AS %3,
+            '' AS %4,
+            '' AS %5,
+            0 AS %6,
+            1010 AS %7
+            FROM sys.databases r WHERE 1=0",
+        asOption,
+        asOptionValue,
+        asType,
+        asTypeValue,
+        asDetails,
+        asState,
+        asRecId);
+        return sqlStmt;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSQLStatement</Name>
+				<Source><![CDATA[
+    private str createSQLStatement()
+    {
+        if (DBMSQLUtils::databaseCompatibilityLevel() >= 140)
+        {
+            return this.createSQLStatement140();
+        }
+        else
+        {
+            return this.createSQLStatementFallback();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super();
+        this.initialize();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initialize</Name>
+				<Source><![CDATA[
+    protected void initialize(boolean _runOnSeparateUserConnection = false)
+    {
+        super(_runOnSeparateUserConnection);
+
+        SysDictView view    = new SysDictView(tableNum(DBMSQLDBTuningConfigurations));
+        viewName            = view.name(DbBackend::Sql);
+        asOption = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, Option)).name(DbBackend::Sql);
+        asOptionValue = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, OptionValue)).name(DbBackend::Sql);
+        asType = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, Type)).name(DbBackend::Sql);
+        asTypeValue = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, TypeValue)).name(DbBackend::Sql);
+        asDetails = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, Details)).name(DbBackend::Sql);
+        asState = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, State)).name(DbBackend::Sql);
+        asRecId = view.fieldObject(fieldNum(DBMSQLDBTuningConfigurations, RecId)).name(DbBackend::Sql);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static DBMSQLDBTuningConfigurationsViewBuilder construct()
+    {
+        return new DBMSQLDBTuningConfigurationsViewBuilder();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
