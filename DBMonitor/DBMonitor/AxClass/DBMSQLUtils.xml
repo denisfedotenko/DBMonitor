@@ -10,6 +10,9 @@ public final class DBMSQLUtils
 
     
 
+    
+
+
 }
 ]]></Declaration>
 		<Methods>
@@ -688,6 +691,88 @@ where plan_id = %1
     public static str DBMDBDurationAsString(str _expressionEndDateTime, str _expressionStartDateTime)
     {
         return strFmt('iif(CONVERT(int,DATEDIFF(DAY, %1, %2))<24850,CONVERT(varchar, DATEADD(SECOND, DATEDIFF(SECOND, %1, %2), 0), 108),CONVERT(varchar, DATEADD(SECOND, 0, 0), 108))',_expressionStartDateTime,_expressionEndDateTime);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>forcePlanQueryStore</Name>
+				<Source><![CDATA[
+    public static void forcePlanQueryStore(DBMSQLQueryStoreQueryId _queryId, DBMSQLQueryStorePlanId _queryPlanId)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str sqlQuery = "EXECUTE sp_query_store_force_plan @QueryId, @PlanId;";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        Map params = SqlParams::create();
+        params.add('QueryId', _queryId);
+        params.add('PlanId', _queryPlanId);
+        statement.executeUpdateWithParameters(sqlQuery, params);
+        statement.close();
+        CodeAccessPermission::revertAssert();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>unforcePlanQueryStore</Name>
+				<Source><![CDATA[
+    public static void unforcePlanQueryStore(DBMSQLQueryStoreQueryId _queryId, DBMSQLQueryStorePlanId _queryPlanId)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str sqlQuery = "EXECUTE sp_query_store_unforce_plan @QueryId, @PlanId;";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        Map params = SqlParams::create();
+        params.add('QueryId', _queryId);
+        params.add('PlanId', _queryPlanId);
+        statement.executeUpdateWithParameters(sqlQuery, params);
+        statement.close();
+        CodeAccessPermission::revertAssert();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setPlanAutoCorrectionQueryStore</Name>
+				<Source><![CDATA[
+    public static void setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreQueryId _queryId, boolean _enable)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str sqlQuery = "EXECUTE sys.sp_configure_automatic_tuning 'FORCE_LAST_GOOD_PLAN_EXTENDED_CHECK', 'QUERY', @QueryId, @Option;";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        Map params = SqlParams::create();
+        params.add('QueryId', _queryId);
+        if (_enable)
+        {
+            params.add('Option', 'ON');
+        }
+        else
+        {
+            params.add('Option', 'OFF');
+        }
+        statement.executeUpdateWithParameters(sqlQuery, params);
+        statement.close();
+        CodeAccessPermission::revertAssert();
     }
 
 ]]></Source>

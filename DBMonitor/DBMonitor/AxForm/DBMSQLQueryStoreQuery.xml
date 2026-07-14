@@ -38,6 +38,35 @@ public class DBMSQLQueryStoreQuery extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>refreshPlanView</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    private void refreshPlanView()
+    {
+        DBMSQLQueryStorePlanExt localPlan;
+        select firstonly localPlan
+        where localPlan.PlanId == DBMSQLQueryStorePlanExt.PlanId;
+        DBMSQLQueryStorePlanExt.data(localPlan);
+        DBMSQLQueryStorePlanExt_ds.setCurrent();
+        DBMSQLQueryStorePlanExt_ds.refresh();
+        element.enablePlanButtons();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>enablePlanButtons</Name>
+				<Source><![CDATA[
+    private void enablePlanButtons()
+    {
+        unforcePlan.enabled(DBMSQLQueryStorePlanExt.IsForcedPlan);
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>
@@ -204,11 +233,63 @@ public class DBMSQLQueryStoreQuery extends FormRun
 
 ]]></Source>
 					</Method>
+					<Method>
+						<Name>active</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public int active()
+        {
+            int ret;
+        
+            ret = super();
+        
+            return ret;
+        }
+
+]]></Source>
+					</Method>
 				</Methods>
 				<Fields />
 			</DataSource>
 		</DataSources>
 		<DataControls xmlns="">
+			<Control>
+				<Name>EnableAPRC</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            DBMSQLUtils::setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreExt.queryId,true);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>disableAPRC</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            DBMSQLUtils::setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreExt.queryId,false);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
 			<Control>
 				<Name>TopSelectionComboBox</Name>
 				<Type>ComboBox</Type>
@@ -297,6 +378,48 @@ public class DBMSQLQueryStoreQuery extends FormRun
             super();
             Filename fileName = strFmt('QP%1.sqlplan', DBMSQLQueryStorePlanExt.queryPlanHash);
             File::SendStringAsFileToUser(DBMSQLUtils::getQueryStorePlan(DBMSQLQueryStorePlanExt.PlanId),fileName);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>forcePlan</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            DBMSQLUtils::forcePlanQueryStore(DBMSQLQueryStorePlanExt.QueryId, DBMSQLQueryStorePlanExt.planId);
+            element.refreshPlanView();    
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>unforcePlan</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            DBMSQLUtils::unforcePlanQueryStore(DBMSQLQueryStorePlanExt.queryId, DBMSQLQueryStorePlanExt.planId);
+            element.refreshPlanView();
         }
 
 ]]></Source>
@@ -753,6 +876,38 @@ public class DBMSQLQueryStoreQuery extends FormRun
 							</AxFormControl>
 						</Controls>
 					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>QueryActions</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>EnableAPRC</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<HelpText>@DBMonitor:EnableAPRCHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:EnableAPRCLabel</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>disableAPRC</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<HelpText>@DBMonitor:DisableAPRCHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:DisableAPRCLabel</Text>
+							</AxFormControl>
+						</Controls>
+						<DataSource>DBMSQLQueryStoreExt</DataSource>
+					</AxFormControl>
 				</Controls>
 			</AxFormControl>
 			<AxFormControl xmlns=""
@@ -1196,7 +1351,30 @@ public class DBMSQLQueryStoreQuery extends FormRun
 								<NeedsRecord>Yes</NeedsRecord>
 								<Text>@DBMonitor:DownloadPlanLabel</Text>
 							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>forcePlan</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<HelpText>@DBMonitor:forcePlanHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:forcePlanLabel</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>unforcePlan</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<HelpText>@DBMonitor:unforcePlanHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:unforcePlanLabel</Text>
+							</AxFormControl>
 						</Controls>
+						<DataSource>DBMSQLQueryStorePlanExt</DataSource>
 					</AxFormControl>
 					<AxFormControl xmlns=""
 						i:type="AxFormButtonGroupControl">
