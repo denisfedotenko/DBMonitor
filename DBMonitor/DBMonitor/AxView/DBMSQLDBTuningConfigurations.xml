@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLDBTuningConfigurations</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLDBTuningConfigurations extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>emptyStr</Name>
+				<Source><![CDATA[
+    public static str emptyStr()
+    {
+        return SysComputedColumnBase::returnLiteral('');
+    }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>zero</Name>
+				<Source><![CDATA[
+    public static str zero()
+    {
+        return SysComputedColumnBase::returnLiteral(0);
+    }
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<Label>@DBMonitor:DBMSQLDBTuningConfigurations</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<FieldGroups />
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Option</Name>
+			<ExtendedDataType>DBMSQLDBTuningConfigurationOption</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>OptionValue</Name>
+			<ExtendedDataType>DBMSQLDBTuningConfigurationOptionValue</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Type</Name>
+			<ExtendedDataType>DBMSQLDBTuningConfigurationType</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>TypeValue</Name>
+			<ExtendedDataType>DBMSQLDBTuningConfigurationTypeValue</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedString">
+			<Name>Details</Name>
+			<ExtendedDataType>DBMSQLDBTuningConfigurationDetails</ExtendedDataType>
+			<ViewMethod>emptyStr</ViewMethod>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>State</Name>
+			<ExtendedDataType>DBMSQLDBTuningConfigurationState</ExtendedDataType>
+			<ViewMethod>zero</ViewMethod>
+			<EnumType>NoYes</EnumType>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>SQLDIctionary</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>SQLDIctionary</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>
