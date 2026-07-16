@@ -28,6 +28,7 @@ public class DBMSQLDBTuningConfigurations extends common
 			</Method>
 		</Methods>
 	</SourceCode>
+	<HelpText>@DBMonitor:DBMSQLDBTuningConfigurationsHelp</HelpText>
 	<Label>@DBMonitor:DBMSQLDBTuningConfigurations</Label>
 	<SubscriberAccessLevel>
 		<Read>Allow</Read>
