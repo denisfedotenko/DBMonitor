@@ -71,77 +71,9 @@ public final class DBMSQLQueryStorePlanViewBuilder extends DBMSQLObjects
 ]]></Source>
 			</Method>
 			<Method>
-				<Name>createSQLStatement2019</Name>
+				<Name>createSQLStatement</Name>
 				<Source><![CDATA[
-        private str createSQLStatement2019()
-    {
-        str sqlStmt = strFmt(@"SELECT
-            r.plan_id AS %1,
-            r.query_id AS %2,
-            r.plan_group_id AS %3,
-            CONVERT([NVARCHAR](MAX), r.engine_version) AS %4,
-            r.compatibility_level AS %5,
-            r.query_plan_hash AS %6,
-            CONVERT([NVARCHAR](MAX), r.query_plan) AS %7,
-            r.is_online_index_plan AS %8,
-            r.is_trivial_plan AS %9,
-            r.is_parallel_plan AS %10,
-            r.is_forced_plan AS %11,
-            r.is_natively_compiled AS %12,
-            r.force_failure_count AS %13,
-            r.last_force_failure_reason AS %14,
-            CONVERT([NVARCHAR](MAX), r.last_force_failure_reason_desc) AS %15,
-            r.count_compiles AS %16,
-            r.initial_compile_start_time AS %17,
-            r.last_compile_start_time AS %18,
-            r.last_execution_time AS %19,
-            r.avg_compile_duration AS %20,
-            r.last_compile_duration AS %21,
-            r.plan_forcing_type AS %22,
-            CONVERT([NVARCHAR](MAX), r.plan_forcing_type_desc) AS %23,
-            0 AS %24,
-            0 AS %25,
-            0 AS %26,
-            '' AS %27,
-            1010 AS %28
-            FROM sys.query_store_plan r",
-        asPlanId,
-        asQueryId,
-        asPlanGroupId,
-        asEngineVersion,
-        asCompatibilityLevel,
-        asQueryPlanHash,
-        asQueryPlan,
-        asIsOnlineIndexPlan,
-        asIsTrivialPlan,
-        asIsParallelPlan,
-        asIsForcedPlan,
-        asIsNativelyCompiled,
-        asForceFailureCount,
-        asLastForceFailureReason,
-        asLastForceFailureReasonDesc,
-        asCountCompiles,
-        asInitialCompileStartTime,
-        asLastCompileStartTime,
-        asLastExecutionTime,
-        asAvgCompileDuration,
-        asLastCompileDuration,
-        asPlanForcingType,
-        asPlanForcingTypeDesc,
-        asHasCompileReplayScript,
-        asIsOptimizedPlanForcingDisabled,
-        asPlanType,
-        asPlanTypeDesc,
-            asRecId);
-        return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatement2022</Name>
-				<Source><![CDATA[
-    private str createSQLStatement2022()
+    private str createSQLStatement()
     {
         str sqlStmt = strFmt(@"SELECT
             r.plan_id AS %1,
@@ -202,23 +134,6 @@ public final class DBMSQLQueryStorePlanViewBuilder extends DBMSQLObjects
         asPlanTypeDesc,
             asRecId);
         return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatement</Name>
-				<Source><![CDATA[
-    private str createSQLStatement()
-    {
-        if (DBMSQLUtils::databaseCompatibilityLevel() >= 160)
-        {
-            return this.createSQLStatement2022();
-        }
-        else
-        {
-            return this.createSQLStatement2019();
-        }
     }
 
 ]]></Source>

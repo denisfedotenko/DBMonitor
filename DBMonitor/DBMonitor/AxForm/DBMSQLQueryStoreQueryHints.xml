@@ -7,9 +7,30 @@
 				<Name>classDeclaration</Name>
 				<Source><![CDATA[
 [Form]
-public class DBMSQLQueryStoreQueryHints extends FormRun
+public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
 {
+    DBMSQLQueryStoreQueryId queryId;
 }
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryId</Name>
+				<Source><![CDATA[
+    public DBMSQLQueryStoreQueryId getQueryId()
+    {
+        return queryId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>refresh</Name>
+				<Source><![CDATA[
+    public void refresh()
+    {
+        DBMSQLQueryStoreQueryHints_ds.executeQuery();
+    }
+
 ]]></Source>
 			</Method>
 		</Methods>
@@ -26,8 +47,7 @@ public class DBMSQLQueryStoreQueryHints extends FormRun
             if (element.args().dataSet() == tableNum(DBMSQLQueryStoreExt))
             {
                 DBMSQLQueryStoreExt queryExt = element.args().record() as DBMSQLQueryStoreExt;
-                QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
-                qbrQueryId.value(queryValue(queryExt.queryId));
+                queryId = queryExt.queryId;
         
             }
             else
@@ -35,10 +55,11 @@ public class DBMSQLQueryStoreQueryHints extends FormRun
                 if (element.args().dataSet() == tableNum(DBMSQLQueryStoreQuery))
                 {
                     DBMSQLQueryStoreQuery query = element.args().record() as DBMSQLQueryStoreQuery;
-                    QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, queryId));
-                    qbrQueryId.value(queryValue(query.queryId));
+                    queryId = query.queryId;
                 }
             }
+            QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
+            qbrQueryId.value(queryValue(queryId));
 
             super();
         }
@@ -49,7 +70,43 @@ public class DBMSQLQueryStoreQueryHints extends FormRun
 				<Fields />
 			</DataSource>
 		</DataSources>
-		<DataControls xmlns="" />
+		<DataControls xmlns="">
+			<Control>
+				<Name>clearAllHints</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            DBMSQLUtils::clearQueryHintsQueryStore(DBMSQLQueryStoreQueryHints.QueryId);
+            DBMSQLQueryStoreQueryHints_ds.executeQuery();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>addHint</Name>
+				<Type>DropDialogButton</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            DBMSQLQueryStoreQueryHints_ds.executeQuery();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
 		<Members xmlns="" />
 	</SourceCode>
 	<DataSources>
@@ -112,7 +169,36 @@ public class DBMSQLQueryStoreQueryHints extends FormRun
 				<Type>ActionPane</Type>
 				<FormControlExtension
 					i:nil="true" />
-				<Controls />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>HintActions</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>clearAllHints</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<HelpText>@DBMonitor:ClearAllHintsHelp</HelpText>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NeedsRecord>Yes</NeedsRecord>
+								<Text>@DBMonitor:ClearAllHintsLabel</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormDropDialogButtonControl">
+								<Name>addHint</Name>
+								<Type>DropDialogButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>DBMSQLHint</MenuItemName>
+							</AxFormControl>
+						</Controls>
+					</AxFormControl>
+				</Controls>
 			</AxFormControl>
 			<AxFormControl xmlns=""
 				i:type="AxFormGroupControl">
@@ -240,6 +326,7 @@ public class DBMSQLQueryStoreQueryHints extends FormRun
 						<DataSource>DBMSQLQueryStoreQueryHints</DataSource>
 					</AxFormControl>
 				</Controls>
+				<DataSource>DBMSQLQueryStoreQueryHints</DataSource>
 				<Style>Tabular</Style>
 			</AxFormControl>
 		</Controls>

@@ -50,9 +50,9 @@ public final class DBMSQLDBTuningConfigurationsViewBuilder extends DBMSQLObjects
 ]]></Source>
 			</Method>
 			<Method>
-				<Name>createSQLStatement140</Name>
+				<Name>createSQLStatement</Name>
 				<Source><![CDATA[
-    private str createSQLStatement140()
+    private str createSQLStatement()
     {
         str sqlStmt = strFmt(@"SELECT
             CONVERT([NVARCHAR](60), r.[option]) AS %1,
@@ -71,49 +71,6 @@ public final class DBMSQLDBTuningConfigurationsViewBuilder extends DBMSQLObjects
         asState,
         asRecId);
         return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatementFallback</Name>
-				<Source><![CDATA[
-    private str createSQLStatementFallback()
-    {
-        str sqlStmt = strFmt(@"SELECT
-            '' AS %1,
-            '' AS %2,
-            '' AS %3,
-            '' AS %4,
-            '' AS %5,
-            0 AS %6,
-            1010 AS %7
-            FROM sys.databases r WHERE 1=0",
-        asOption,
-        asOptionValue,
-        asType,
-        asTypeValue,
-        asDetails,
-        asState,
-        asRecId);
-        return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatement</Name>
-				<Source><![CDATA[
-    private str createSQLStatement()
-    {
-        if (DBMSQLUtils::databaseCompatibilityLevel() >= 140)
-        {
-            return this.createSQLStatement140();
-        }
-        else
-        {
-            return this.createSQLStatementFallback();
-        }
     }
 
 ]]></Source>

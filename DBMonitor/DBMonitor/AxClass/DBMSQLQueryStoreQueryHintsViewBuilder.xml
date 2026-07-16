@@ -54,43 +54,9 @@ public final class DBMSQLQueryStoreQueryHintsViewBuilder extends DBMSQLObjects
 ]]></Source>
 			</Method>
 			<Method>
-				<Name>createSQLStatement2019</Name>
+				<Name>createSQLStatement</Name>
 				<Source><![CDATA[
-    private str createSQLStatement2019()
-    {
-        str sqlStmt = strFmt(@"SELECT
-            0 AS %1,
-            0 AS %2,
-            0 AS %3,
-            '' AS %4,
-            0 AS %5,
-            '' AS %6,
-            0 AS %7,
-            0 AS %8,
-            '' AS %9,
-            '' AS %10,
-            1010 AS %11
-            FROM sys.query_store_query WHERE 1=0",
-        asQueryHintId,
-        asQueryId,
-        asReplicaGroupId,
-        asQueryHintText,
-        asLastQueryHintFailureReason,
-        asLastQueryHintFailureReasonDesc,
-        asQueryHintFailureCount,
-        asSource,
-        asSourceDesc,
-        asComment,
-        asRecId);
-        return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatement2022</Name>
-				<Source><![CDATA[
-    private str createSQLStatement2022()
+    private str createSQLStatement()
     {
         str sqlStmt = strFmt(@"SELECT
             r.query_hint_id AS %1,
@@ -117,23 +83,6 @@ public final class DBMSQLQueryStoreQueryHintsViewBuilder extends DBMSQLObjects
         asComment,
         asRecId);
         return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatement</Name>
-				<Source><![CDATA[
-    private str createSQLStatement()
-    {
-        if (DBMSQLUtils::databaseCompatibilityLevel() >= 160)
-        {
-            return this.createSQLStatement2022();
-        }
-        else
-        {
-            return this.createSQLStatement2019();
-        }
     }
 
 ]]></Source>

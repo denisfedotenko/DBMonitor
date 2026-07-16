@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuItemDisplay xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>DBMSQLDBTuningConfigurations</Name>
+	<ImageLocation>File</ImageLocation>
+	<Label>@DBMLockMonitor:AutoTuningConfig</Label>
+	<Object>DBMSQLDBTuningConfigurations</Object>
+</AxMenuItemDisplay>

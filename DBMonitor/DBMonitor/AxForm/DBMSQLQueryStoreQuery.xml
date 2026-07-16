@@ -41,9 +41,6 @@ public class DBMSQLQueryStoreQuery extends FormRun
 			<Method>
 				<Name>refreshPlanView</Name>
 				<Source><![CDATA[
-    /// <summary>
-    ///
-    /// </summary>
     private void refreshPlanView()
     {
         DBMSQLQueryStorePlanExt localPlan;
@@ -63,6 +60,32 @@ public class DBMSQLQueryStoreQuery extends FormRun
     private void enablePlanButtons()
     {
         unforcePlan.enabled(DBMSQLQueryStorePlanExt.IsForcedPlan);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>enableQueryButtons</Name>
+				<Source><![CDATA[
+    private void enableQueryButtons()
+    {
+        disableAPRC.enabled(DBMSQLQueryStoreExt.isEnabledForAPRC);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>refreshQueryView</Name>
+				<Source><![CDATA[
+    private void refreshQueryView()
+    {
+        DBMSQLQueryStoreExt localQuery;
+        select firstonly localQuery
+        where localQuery.queryId == DBMSQLQueryStoreExt.QueryId;
+        DBMSQLQueryStoreExt.data(localQuery);
+        DBMSQLQueryStoreExt_ds.setCurrent();
+        DBMSQLQueryStoreExt_ds.refresh();
+        element.enableQueryButtons();
     }
 
 ]]></Source>
@@ -160,6 +183,25 @@ public class DBMSQLQueryStoreQuery extends FormRun
 
 ]]></Source>
 					</Method>
+					<Method>
+						<Name>active</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public int active()
+        {
+            int ret;
+        
+            ret = super();
+            element.enableQueryButtons();
+        
+            return ret;
+        }
+
+]]></Source>
+					</Method>
 				</Methods>
 				<Fields />
 			</DataSource>
@@ -245,6 +287,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
             int ret;
         
             ret = super();
+            element.enablePlanButtons();
         
             return ret;
         }
@@ -267,6 +310,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
         {
             super();
             DBMSQLUtils::setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreExt.queryId,true);
+            element.refreshQueryView();
         }
 
 ]]></Source>
@@ -284,6 +328,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
         {
             super();
             DBMSQLUtils::setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreExt.queryId,false);
+            element.refreshQueryView();
         }
 
 ]]></Source>
@@ -435,6 +480,9 @@ public class DBMSQLQueryStoreQuery extends FormRun
 			<Table>DBMSQLQueryStoreExt</Table>
 			<Fields>
 				<AxFormDataSourceField>
+					<DataField>APRCMode</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>AvgBindCpuTime</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
@@ -496,6 +544,9 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>InitialCompileStartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>isEnabledForAPRC</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>MaxClrTime</DataField>
@@ -580,6 +631,9 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>QuerySqlText</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryTextId</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>RecId</DataField>
@@ -1295,6 +1349,24 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgTempdbSpaceUsed</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormCheckBoxControl">
+										<Name>DBMSQLQueryStoreExt_isEnabledForAPRC</Name>
+										<Type>CheckBox</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>isEnabledForAPRC</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormStringControl">
+										<Name>DBMSQLQueryStoreExt_APRCMode</Name>
+										<Type>String</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>APRCMode</DataField>
 										<DataSource>DBMSQLQueryStoreExt</DataSource>
 									</AxFormControl>
 								</Controls>

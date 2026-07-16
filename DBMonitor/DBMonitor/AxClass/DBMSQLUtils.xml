@@ -13,6 +13,7 @@ public final class DBMSQLUtils
     
 
 
+
 }
 ]]></Declaration>
 		<Methods>
@@ -71,52 +72,6 @@ public final class DBMSQLUtils
         CodeAccessPermission::revertAssert();
       
         return edition;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>databaseCompatibilityLevel</Name>
-				<Source><![CDATA[
-    /// <summary>
-    /// Return compatibatibility level of the current database
-    /// </summary>
-    /// <returns>
-    /// Integer number with the compatibility_level 
-    /// (see https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql-compatibility-level?view=sql-server-ver16#compatibility_level--160--150--140--130--120--110--100--90--80- )
-    /// </returns>
-    public static int databaseCompatibilityLevel()
-    {
-        str sqlStatementText;
-        Connection connection = new Connection();
-
-        SqlStatementExecutePermission permission;
-        Statement statement;
-        ResultSet sqlResult;
-        int compatibilityLevel;
-
-        sqlStatementText = @"SELECT compatibility_level
-FROM sys.databases
-where database_id=DB_ID()";
-        permission = new SqlStatementExecutePermission(sqlStatementText);
-
-        // Open the code access permission scope.
-        permission.assert();
-
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-      
-        compatibilityLevel =0;
-        if (sqlResult.next())
-        {
-            compatibilityLevel = sqlResult.getInt(1);
-        }
-      
-        sqlResult.close();
-        statement.close();
-        CodeAccessPermission::revertAssert();
-      
-        return compatibilityLevel;
     }
 
 ]]></Source>
@@ -751,17 +706,35 @@ where plan_id = %1
     public static void setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreQueryId _queryId, boolean _enable)
     {
         str sqlStatementText;
+        str optionMode;
+        if (!_enable)
+        {
+            DBMIsQueryEnabledForAPRC isQueryEnabledForAPRC;
+            select firstonly isQueryEnabledForAPRC
+            where isQueryEnabledForAPRC.queryId == _queryId;
+            if (!isQueryEnabledForAPRC.queryId)
+            {
+                return;
+            }
+            optionMode = isQueryEnabledForAPRC.Option;
+
+        }
+        else
+        {
+            optionMode = 'FORCE_LAST_GOOD_PLAN_EXTENDED_CHECK';
+        }
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
         ResultSet sqlResult;
-        str sqlQuery = "EXECUTE sys.sp_configure_automatic_tuning 'FORCE_LAST_GOOD_PLAN_EXTENDED_CHECK', 'QUERY', @QueryId, @Option;";
+        str sqlQuery = "EXECUTE sys.sp_configure_automatic_tuning @OptionMode, 'QUERY', @QueryId, @Option;";
         permission = new SqlStatementExecutePermission(sqlQuery);
         // Open the code access permission scope.
         permission.assert();
         statement = connection.createStatement();
         Map params = SqlParams::create();
         params.add('QueryId', _queryId);
+        params.add('OptionMode', optionMode);
         if (_enable)
         {
             params.add('Option', 'ON');
@@ -770,6 +743,77 @@ where plan_id = %1
         {
             params.add('Option', 'OFF');
         }
+        statement.executeUpdateWithParameters(sqlQuery, params);
+        statement.close();
+        CodeAccessPermission::revertAssert();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>try_cast</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Creates a cast expression.
+    /// </summary>
+    /// <param name="_returnFieldCastable">
+    /// A String value that contains the return field expression to cast.
+    /// </param>
+    /// <param name="_targetDataType">
+    /// The type of data to cast to the field value.
+    /// </param>
+    /// <returns>
+    /// A String that contains an expression formatted as a cast expression.
+    /// </returns>
+    public static str try_cast(str _returnFieldCastable, str _targetDataType)
+    {
+        return 'TRY_CAST(' + _returnFieldCastable + ' AS '+ _targetDataType +')';
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>clearQueryHintsQueryStore</Name>
+				<Source><![CDATA[
+    public static void clearQueryHintsQueryStore(DBMSQLQueryStoreQueryId _queryId)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str sqlQuery = "EXEC sp_query_store_clear_hints @QueryId;";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        Map params = SqlParams::create();
+        params.add('QueryId', _queryId);
+        statement.executeUpdateWithParameters(sqlQuery, params);
+        statement.close();
+        CodeAccessPermission::revertAssert();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setQueryHintsQueryStore</Name>
+				<Source><![CDATA[
+    public static void setQueryHintsQueryStore(DBMSQLQueryStoreQueryId _queryId, DBMSQLQueryStoreQueryHintText _hints)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str sqlQuery = "EXECUTE sys.sp_query_store_set_hints @queryId, @queryHints;";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        // Open the code access permission scope.
+        permission.assert();
+        statement = connection.createStatement();
+        Map params = SqlParams::create();
+        params.add('queryId', _queryId);
+        params.add('queryHints', _hints);
         statement.executeUpdateWithParameters(sqlQuery, params);
         statement.close();
         CodeAccessPermission::revertAssert();

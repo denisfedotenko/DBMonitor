@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="" i:type="AxEdtString">
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
 	<Name>DBMSQLQueryStoreQueryHintText</Name>
 	<HelpText>@DBMonitor:DBMSQLQueryStoreQueryHintTextHelp</HelpText>
 	<Label>@DBMonitor:DBMSQLQueryStoreQueryHintText</Label>
-	<StringSize>-1</StringSize>
 	<ArrayElements />
 	<Relations />
 	<TableReferences />
+	<StringSize>512</StringSize>
 </AxEdt>

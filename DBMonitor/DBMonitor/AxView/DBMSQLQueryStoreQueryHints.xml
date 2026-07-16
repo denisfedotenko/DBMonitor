@@ -57,6 +57,7 @@ public class DBMSQLQueryStoreQueryHints extends common
 			<Name>QueryHintText</Name>
 			<ExtendedDataType>DBMSQLQueryStoreQueryHintText</ExtendedDataType>
 			<ViewMethod>emptyStr</ViewMethod>
+			<StringSize>512</StringSize>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldComputedInt">

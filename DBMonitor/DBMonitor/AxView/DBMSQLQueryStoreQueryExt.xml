@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryExt</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMSQLQueryStoreQueryExt extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>isEnabledForAPRC</Name>
+				<Source><![CDATA[
+    private static str isEnabledForAPRC()
+    {
+        return SysComputedColumn::if(
+            SysComputedColumn::isNotNullExpression(
+                SysComputedColumn::comparisonField(viewStr(DBMSQLQueryStoreQueryExt),
+                    identifierStr(DBMIsQueryEnabledForAPRC),
+                    FieldStr(DBMIsQueryEnabledForAPRC,OptionValue))),
+                SysComputedColumn::if(
+                    SysComputedColumn::compareExpressions(
+                            SysComputedColumn::comparisonField(viewStr(DBMSQLQueryStoreQueryExt),
+                            identifierStr(DBMIsQueryEnabledForAPRC),
+                            FieldStr(DBMIsQueryEnabledForAPRC,OptionValue)),
+                            '=',
+                            SysComputedColumn::comparisonLiteral('ON')),
+                    SysComputedColumn::returnLiteral(NoYes::Yes),
+                    SysComputedColumn::returnLiteral(NoYes::No)),
+                SysComputedColumn::returnLiteral(NoYes::No));
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<Visible>No</Visible>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgBindCpuTime</Name>
+			<DataField>AvgBindCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgBindDuration</Name>
+			<DataField>AvgBindDuration</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgCompileDuration</Name>
+			<DataField>AvgCompileDuration</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgCompileMemoryKb</Name>
+			<DataField>AvgCompileMemoryKb</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgOptimizeCpuTime</Name>
+			<DataField>AvgOptimizeCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>AvgOptimizeDuration</Name>
+			<DataField>AvgOptimizeDuration</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>BatchSqlHandle</Name>
+			<DataField>BatchSqlHandle</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>ContextSettingsId</Name>
+			<DataField>ContextSettingsId</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsClouddbInternalQuery</Name>
+			<DataField>IsClouddbInternalQuery</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>IsInternalQuery</Name>
+			<DataField>IsInternalQuery</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastBindCpuTime</Name>
+			<DataField>LastBindCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastBindDuration</Name>
+			<DataField>LastBindDuration</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastCompileBatchOffsetEnd</Name>
+			<DataField>LastCompileBatchOffsetEnd</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastCompileBatchOffsetStart</Name>
+			<DataField>LastCompileBatchOffsetStart</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastCompileBatchSqlHandle</Name>
+			<DataField>LastCompileBatchSqlHandle</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastCompileDuration</Name>
+			<DataField>LastCompileDuration</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastCompileMemoryKb</Name>
+			<DataField>LastCompileMemoryKb</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastCompileStartTime</Name>
+			<DataField>LastCompileStartTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>InitialCompileStartTime</Name>
+			<DataField>InitialCompileStartTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>CountCompiles</Name>
+			<DataField>CountCompiles</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedEnum">
+			<Name>isEnabledForAPRC</Name>
+			<HelpText>@DBMonitor:EnabledForAPRCHelp</HelpText>
+			<Label>@DBMonitor:EnabledForAPRCLabel</Label>
+			<ExtendedDataType>NoYesId</ExtendedDataType>
+			<ViewMethod>isEnabledForAPRC</ViewMethod>
+			<EnumType>NOyes</EnumType>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastExecutionTime</Name>
+			<DataField>LastExecutionTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastOptimizeCpuTime</Name>
+			<DataField>LastOptimizeCpuTime</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>LastOptimizeDuration</Name>
+			<DataField>LastOptimizeDuration</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>MaxCompileMemoryKb</Name>
+			<DataField>MaxCompileMemoryKb</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>ObjectId</Name>
+			<DataField>ObjectId</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>parameterizationType</Name>
+			<DataField>parameterizationType</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryHash</Name>
+			<DataField>QueryHash</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryId</Name>
+			<DataField>QueryId</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryParameterizationTypeDesc</Name>
+			<DataField>QueryParameterizationTypeDesc</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryTextId</Name>
+			<DataField>QueryTextId</DataField>
+			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>APRCMode</Name>
+			<DataField>Option</DataField>
+			<DataSource>DBMIsQueryEnabledForAPRC</DataSource>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>DBMSQLQueryStoreQuery</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>DBMSQLQueryStoreQuery</Table>
+				<DataSources>
+					<AxQuerySimpleEmbeddedDataSource>
+						<Name>DBMIsQueryEnabledForAPRC</Name>
+						<DynamicFields>Yes</DynamicFields>
+						<Table>DBMIsQueryEnabledForAPRC</Table>
+						<DataSources />
+						<DerivedDataSources />
+						<Fields />
+						<Ranges />
+						<JoinMode>OuterJoin</JoinMode>
+						<Relations>
+							<AxQuerySimpleDataSourceRelation>
+								<Name>QueryDataSourceRelation1</Name>
+								<Field>QueryId</Field>
+								<JoinDataSource>DBMSQLQueryStoreQuery</JoinDataSource>
+								<RelatedField>queryId</RelatedField>
+							</AxQuerySimpleDataSourceRelation>
+						</Relations>
+					</AxQuerySimpleEmbeddedDataSource>
+				</DataSources>
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

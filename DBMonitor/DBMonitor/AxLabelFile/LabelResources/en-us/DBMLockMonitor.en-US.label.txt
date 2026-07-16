@@ -1,4 +1,4 @@
-ActivateDBResourceMon=Activate DB Resource monitor
+﻿ActivateDBResourceMon=Activate DB Resource monitor
  ;DBMLockMonitor
 ActivateLockMonitorLabel=Activate lock monitor
  ;DBMLockMonitor
@@ -6,6 +6,8 @@ ActivateLockMontorHelp=Activates a job, periodically checking for locks
  ;DBMLockMonitor
 ArchiveUnit=Archival unit (minutes)
  ;DBMLockMonitor
+AutoTuningConfig=Auto tuning configuration
+ ;DBLockMonitor
 BatchAlreadyExists=Batch job "%1" already exists in the batch queue
  ;DBMLockMonitor
 BlockingSPIDHelp=The first SPID blocking the current session
@@ -49,6 +51,14 @@ DataIoPercentMaxLabel=Max data IO percent
  ;DBMLockMonitor
 DataIoPercentMinLabel=Min data IO percent
  ;DBMLockMonitor
+DBMDBLockHistoryEntityMaintain=DB Lock History Entity - Maintain
+ ;DBMLockMonitor
+DBMDbLockHistoryEntityView=DB Lock History Entity - View
+ ;DBMLockMonitor
+DBMDBLockingHistory=DB Locking History
+ ;DBMLockMonitor
+DBMLockMon=Lock Monitor
+ ;DBMLockMonitor
 DBResourceUsage=Database resource usage
  ;DBMLockMonitor
 DBResourceUsageArchive=DB Resource Usage Archive
@@ -71,15 +81,9 @@ DBSessionInfo=Database sessions
  ;DBMLockMonitor
 EndTime=End time
  ;DBMLockMonitor
+EnterTheHint=Enter the hint
+ ;DBMLockMonitor
 HostName=Host name
- ;DBMLockMonitor
-DBMDBLockHistoryEntityMaintain=DB Lock History Entity - Maintain
- ;DBMLockMonitor
-DBMDbLockHistoryEntityView=DB Lock History Entity - View
- ;DBMLockMonitor
-DBMDBLockingHistory=DB Locking History
- ;DBMLockMonitor
-DBMLockMon=Lock Monitor
  ;DBMLockMonitor
 IndexNameHelp=Name of the index locked/to be locked
  ;DBMLockMonitor
@@ -199,6 +203,7 @@ OurDBUsage=Our database usage
  ;DBMLockMonitor
 ProgramName=Program name
  ;DBMLockMonitor
+QueryHintTip=The hint should look approximately like "OPTION (RECOMPILE, MAXDOP 2)"
 RecentSQLHelp=The most recent SQL text executed in the current session
  ;DBMLockMonitor
 RecentSQLLabel=Recent SQL

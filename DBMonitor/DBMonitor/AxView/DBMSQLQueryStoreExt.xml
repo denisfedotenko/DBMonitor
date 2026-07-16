@@ -41,67 +41,67 @@ public class DBMSQLQueryStoreExt extends common
 			i:type="AxViewFieldBound">
 			<Name>QueryId</Name>
 			<DataField>QueryId</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>AvgOptimizeCpuTime</Name>
 			<DataField>AvgOptimizeCpuTime</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>AvgOptimizeDuration</Name>
 			<DataField>AvgOptimizeDuration</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>AvgCompileMemoryKb</Name>
 			<DataField>AvgCompileMemoryKb</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>AvgCompileDuration</Name>
 			<DataField>AvgCompileDuration</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>AvgBindDuration</Name>
 			<DataField>AvgBindDuration</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>AvgBindCpuTime</Name>
 			<DataField>AvgBindCpuTime</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>CountCompiles</Name>
 			<DataField>CountCompiles</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>InitialCompileStartTime</Name>
 			<DataField>InitialCompileStartTime</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>MaxCompileMemoryKb</Name>
 			<DataField>MaxCompileMemoryKb</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
 			<Name>parameterizationType</Name>
 			<DataField>parameterizationType</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 		<AxViewField xmlns=""
 			i:type="AxViewFieldBound">
@@ -456,7 +456,23 @@ public class DBMSQLQueryStoreExt extends common
 			i:type="AxViewFieldBound">
 			<Name>QueryTextId</Name>
 			<DataField>QueryTextId</DataField>
-			<DataSource>DBMSQLQueryStoreQuery</DataSource>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>isEnabledForAPRC</Name>
+			<HelpText>@DBMonitor:EnabledForAPRCHelp</HelpText>
+			<Label>@DBMonitor:EnabledForAPRCLabel</Label>
+			<DataField>isEnabledForAPRC</DataField>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>APRCMode</Name>
+			<HelpText>@DBMonitor:APRCModeHelp</HelpText>
+			<Label>@DBMonitor:APRCModeLabel</Label>
+			<DataField>APRCMode</DataField>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
 	</Fields>
 	<Indexes />
@@ -470,9 +486,9 @@ public class DBMSQLQueryStoreExt extends common
 		</SourceCode>
 		<DataSources>
 			<AxQuerySimpleRootDataSource>
-				<Name>DBMSQLQueryStoreQuery</Name>
+				<Name>DBMSQLQueryStoreQueryExt</Name>
 				<DynamicFields>Yes</DynamicFields>
-				<Table>DBMSQLQueryStoreQuery</Table>
+				<Table>DBMSQLQueryStoreQueryExt</Table>
 				<DataSources>
 					<AxQuerySimpleEmbeddedDataSource>
 						<Name>DBMSQLQueryStoreQueryText</Name>
@@ -486,7 +502,7 @@ public class DBMSQLQueryStoreExt extends common
 							<AxQuerySimpleDataSourceRelation>
 								<Name>QueryDataSourceRelation1</Name>
 								<Field>QueryTextId</Field>
-								<JoinDataSource>DBMSQLQueryStoreQuery</JoinDataSource>
+								<JoinDataSource>DBMSQLQueryStoreQueryExt</JoinDataSource>
 								<RelatedField>QueryTextId</RelatedField>
 							</AxQuerySimpleDataSourceRelation>
 						</Relations>
@@ -509,7 +525,7 @@ public class DBMSQLQueryStoreExt extends common
 									<AxQuerySimpleDataSourceRelation>
 										<Name>QueryDataSourceRelation1</Name>
 										<Field>QueryId</Field>
-										<JoinDataSource>DBMSQLQueryStoreQuery</JoinDataSource>
+										<JoinDataSource>DBMSQLQueryStoreQueryExt</JoinDataSource>
 										<RelatedField>QueryId</RelatedField>
 									</AxQuerySimpleDataSourceRelation>
 									<AxQuerySimpleDataSourceRelation>

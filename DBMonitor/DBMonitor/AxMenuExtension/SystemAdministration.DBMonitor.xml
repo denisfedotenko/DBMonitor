@@ -50,6 +50,11 @@
 						<Name>DBMSQLDBTuningRecommendations</Name>
 						<MenuItemName>DBMSQLDBTuningRecommendations</MenuItemName>
 					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSQLDBTuningConfigurations</Name>
+						<MenuItemName>DBMSQLDBTuningConfigurations</MenuItemName>
+					</AxMenuElement>
 				</Elements>
 			</MenuElement>
 		</AxMenuExtensionElement>

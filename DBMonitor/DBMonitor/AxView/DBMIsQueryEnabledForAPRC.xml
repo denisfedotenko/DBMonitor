@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxView xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMIsQueryEnabledForAPRC</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class DBMIsQueryEnabledForAPRC extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>queryId</Name>
+				<Source><![CDATA[
+    private static str queryId()
+    {
+        return DBMSQLUtils::try_cast(SysComputedColumn::returnField(viewstr(DBMIsQueryEnabledForAPRC), 
+                                                                    identifierStr(DBMSQLDBTuningConfigurations),
+                                                                    fieldstr(DBMSQLDBTuningConfigurations,TypeValue)),
+                                     'bigint');
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<Visible>No</Visible>
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>Option</Name>
+			<DataField>Option</DataField>
+			<DataSource>DBMSQLDBTuningConfigurations</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>OptionValue</Name>
+			<DataField>OptionValue</DataField>
+			<DataSource>DBMSQLDBTuningConfigurations</DataSource>
+		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldComputedInt64">
+			<Name>queryId</Name>
+			<ExtendedDataType>DBMSQLQueryStoreQueryId</ExtendedDataType>
+			<ViewMethod>queryId</ViewMethod>
+		</AxViewField>
+	</Fields>
+	<Indexes />
+	<Mappings />
+	<Relations />
+	<StateMachines />
+	<ViewMetadata>
+		<Name>Metadata</Name>
+		<SourceCode>
+			<Methods />
+		</SourceCode>
+		<DataSources>
+			<AxQuerySimpleRootDataSource>
+				<Name>DBMSQLDBTuningConfigurations</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<Table>DBMSQLDBTuningConfigurations</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges>
+					<AxQuerySimpleDataSourceRange>
+						<Name>Option</Name>
+						<Field>Option</Field>
+						<Value>FORCE_LAST_GOOD_PLAN_EXTENDED_CHECK</Value>
+					</AxQuerySimpleDataSourceRange>
+					<AxQuerySimpleDataSourceRange>
+						<Name>Type</Name>
+						<Field>Type</Field>
+						<Value>Query</Value>
+					</AxQuerySimpleDataSourceRange>
+					<AxQuerySimpleDataSourceRange>
+						<Name>Option1</Name>
+						<Field>Option</Field>
+						<Value>FORCE_LAST_GOOD_PLAN</Value>
+					</AxQuerySimpleDataSourceRange>
+				</Ranges>
+				<GroupBy />
+				<Having />
+				<OrderBy />
+			</AxQuerySimpleRootDataSource>
+		</DataSources>
+	</ViewMetadata>
+</AxView>

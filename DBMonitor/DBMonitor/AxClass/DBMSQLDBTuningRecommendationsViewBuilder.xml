@@ -62,9 +62,9 @@ public final class DBMSQLDBTuningRecommendationsViewBuilder extends DBMSQLObject
 ]]></Source>
 			</Method>
 			<Method>
-				<Name>createSQLStatement140</Name>
+				<Name>createSQLStatement</Name>
 				<Source><![CDATA[
-    private str createSQLStatement140()
+    private str createSQLStatement()
     {
         str sqlStmt = strFmt(@"SELECT
             CONVERT([NVARCHAR](128), r.name) AS %1,
@@ -107,73 +107,6 @@ public final class DBMSQLDBTuningRecommendationsViewBuilder extends DBMSQLObject
         asDetails,
         asRecId);
         return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatementFallback</Name>
-				<Source><![CDATA[
-    private str createSQLStatementFallback()
-    {
-        str sqlStmt = strFmt(@"SELECT
-            '' AS %1,
-            '' AS %2,
-            '' AS %3,
-            GETUTCDATE() AS %4,
-            GETUTCDATE() AS %5,
-            '' AS %6,
-            0 AS %7,
-            0 AS %8,
-            GETUTCDATE() AS %9,
-            0 AS %10,
-            '' AS %11,
-            GETUTCDATE() AS %12,
-            GETUTCDATE() AS %13,
-            0 AS %14,
-            '' AS %15,
-            GETUTCDATE() AS %16,
-            0 AS %17,
-            '' AS %18,
-            1010 AS %19
-            FROM sys.databases r WHERE 1=0",
-        asName,
-        asType,
-        asReason,
-        asValidSince,
-        asLastRefresh,
-        asState,
-        asIsExecutableAction,
-        asIsRevertableAction,
-        asExecuteActionStartTime,
-        asExecuteActionDuration,
-        asExecuteActionInitiatedBy,
-        asExecuteActionInitiatedTime,
-        asRevertActionStartTime,
-        asRevertActionDuration,
-        asRevertActionInitiatedBy,
-        asRevertActionInitiatedTime,
-        asScore,
-        asDetails,
-        asRecId);
-        return sqlStmt;
-    }
-
-]]></Source>
-			</Method>
-			<Method>
-				<Name>createSQLStatement</Name>
-				<Source><![CDATA[
-    private str createSQLStatement()
-    {
-        if (DBMSQLUtils::databaseCompatibilityLevel() >= 140)
-        {
-            return this.createSQLStatement140();
-        }
-        else
-        {
-            return this.createSQLStatementFallback();
-        }
     }
 
 ]]></Source>
