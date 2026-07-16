@@ -155,23 +155,25 @@ public class DBMSQLDBTuningConfigurations extends FormRun
 			<AxFormControl xmlns=""
 				i:type="AxFormGroupControl">
 				<Name>Footer</Name>
-				<Pattern>FieldsFieldGroups</Pattern>
-				<PatternVersion>1.1</PatternVersion>
+				<Pattern>FillText</Pattern>
+				<PatternVersion>UX7 1.0</PatternVersion>
 				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
 				<FormControlExtension
 					i:nil="true" />
 				<Controls>
 					<AxFormControl xmlns=""
 						i:type="AxFormStringControl">
 						<Name>Details</Name>
+						<HeightMode>SizeToAvailable</HeightMode>
 						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
 						<FormControlExtension
 							i:nil="true" />
 						<DataField>Details</DataField>
 						<DataSource>DBMSQLDBTuningConfigurations</DataSource>
 					</AxFormControl>
 				</Controls>
-				<ColumnsMode>Fill</ColumnsMode>
 			</AxFormControl>
 		</Controls>
 	</Design>
