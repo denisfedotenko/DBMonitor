@@ -13,6 +13,9 @@
 public class DBMUpdateTableStatisticsContract implements SysOperationInitializable,SysOperationValidatable
 {
     private Set tables;    
+    private DBMStatSamplingMode samplingMode;
+    private DBMStatSamplingScope samplingScope;
+    private int64 sampleSize;
 }
 ]]></Declaration>
 		<Methods>
@@ -32,12 +35,49 @@ public class DBMUpdateTableStatisticsContract implements SysOperationInitializab
 ]]></Source>
 			</Method>
 			<Method>
+				<Name>parmSamplingMode</Name>
+				<Source><![CDATA[
+    public DBMStatSamplingMode parmSamplingMode(DBMStatSamplingMode _samplingMode = samplingMode)
+    {
+        samplingMode = _samplingMode;
+        return samplingMode;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmSamplingScope</Name>
+				<Source><![CDATA[
+    public DBMStatSamplingScope parmSamplingScope(DBMStatSamplingScope _samplingScope = samplingScope)
+    {
+        samplingScope = _samplingScope;
+        return samplingScope;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmSampleSize</Name>
+				<Source><![CDATA[
+    public int64 parmSampleSize(int64 _sampleSize = sampleSize)
+    {
+        if (samplingScope == DBMStatSamplingScope::Percent && _sampleSize>100)
+        {
+            _sampleSize = 100;
+        }
+        sampleSize = _sampleSize;
+        return sampleSize;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
 				<Name>initialize</Name>
 				<Source><![CDATA[
     public void initialize()
-  {
-      tables = new Set(Types::String);
-  }
+    {
+        tables = new Set(Types::String);
+    }
 
 ]]></Source>
 			</Method>

@@ -1445,6 +1445,16 @@ public class DBMSQLQueryStoreQuery extends FormRun
 								<NeedsRecord>Yes</NeedsRecord>
 								<Text>@DBMonitor:unforcePlanLabel</Text>
 							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>UpdateStatistics</Name>
+								<HelpText>@DBMonitor:UpdateStatistics</HelpText>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
+								<MenuItemType>Action</MenuItemType>
+							</AxFormControl>
 						</Controls>
 						<DataSource>DBMSQLQueryStorePlanExt</DataSource>
 					</AxFormControl>

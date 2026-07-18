@@ -584,6 +584,16 @@ public class DBMSQLQueryStatsForm extends FormRun
 								<NeedsRecord>Yes</NeedsRecord>
 								<Text>@DBMonitor:DownloadActualPlanLabel</Text>
 							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>UpdateStatistics</Name>
+								<HelpText>@DBMonitor:UpdateStatistics</HelpText>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
+								<MenuItemType>Action</MenuItemType>
+							</AxFormControl>
 						</Controls>
 					</AxFormControl>
 				</Controls>

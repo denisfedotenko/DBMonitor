@@ -1,38 +1,54 @@
-NewLabel0=Label files created on 02/27/2025 23:36:42 for label file Id DBMUpdateTableStats and language en-US
-;Label file comment - see above label
-availableTables=Available tables
-;DBMUpdateTableStats
+﻿availableTables=Available tables
+ ;DBMUpdateTableStats
 ChooseTables=Choose tables for statistics update
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 DataEntity=Data Entity
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 DeterminingObject=Object
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 fetchingTheTableList=Fetching the table list...
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 Form=Form
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
+FullScan=Full scan
+ ;DBMUpdateTableStats
 ListOfTablesHelp=List of tables for statistics update
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 ListOfTablesLabel=List of tables
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
+NewLabel0=Label files created on 02/27/2025 23:36:42 for label file Id DBMUpdateTableStats and language en-US
+ ;Label file comment - see above label
+Resample=Resample
+ ;DBMUpdateTableStats
+Sample=Sample
+ ;DBMUpdateTableStats
+SamplePercent=Sample N Percent
+ ;DBMUpdateTableStats
+SampleRows=Sample N Rows
+ ;DBMUpdateTableStats
+SampleSize=Sample size
+ ;DBMUpdateTableStats
+SamplingScope=Sampling scope
+ ;DBMUpdateTableStats
 selectedTables=Selected tables
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 SelectFromTables=Select from the available tables
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 StatisticsWereUpdated=Statistics were updated for the table %1, consumed time %2
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
+StatSamplingMode=Sampling mode
+ ;DBMUpdateTableStats
 Table=Table
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 TableListIsEmpty=List of the tables is empty
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 UpdateStatistics=Update table statistics
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 UpdateStatisticsObjectHelp=Choose the type of the object to update statistics
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 UpdateStatisticsObjectLabel=Object type
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 UpdateTableStatisticsMaintain=Update table statistics - Maintain
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats
 View=View
-;DBMUpdateTableStats
+ ;DBMUpdateTableStats

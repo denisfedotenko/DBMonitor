@@ -9,6 +9,7 @@
 ///</remarks>
 public class DBMUpdateTableStatisticsService extends SysOperationServiceBase
 {
+    private str sampleDef;
 }
 ]]></Declaration>
 		<Methods>
@@ -23,6 +24,7 @@ public class DBMUpdateTableStatisticsService extends SysOperationServiceBase
     /// </param>
     public void process(DBMUpdateTableStatisticsContract _contract)
     {
+        sampleDef = this.getSampleDef(_contract);
         SetEnumerator se = _contract.parmTables().getEnumerator();
         while (se.moveNext())
         {
@@ -45,7 +47,7 @@ public class DBMUpdateTableStatisticsService extends SysOperationServiceBase
     {
         utcdatetime startTime = DateTimeUtil::getSystemDateTime();
         Connection connection = new Connection();
-        str statementText = strFmt('UPDATE STATISTICS dbo.%1 WITH FULLSCAN',_tableName);
+        str statementText = strFmt('UPDATE STATISTICS dbo.%1 WITH %2',_tableName, sampleDef);
         Statement statement = connection.createStatement();
         SqlStatementExecutePermission perm;
         perm = new SqlStatementExecutePermission(statementText);
@@ -55,6 +57,31 @@ public class DBMUpdateTableStatisticsService extends SysOperationServiceBase
         Info(strFmt("@DBMUpdateTableStats:StatisticsWereUpdated",
                     _tableName,
             time2Str(DateTimeUtil::getDifference(DateTimeUtil::getSystemDateTime(),startTime),TimeSeparator::Colon,TimeFormat::Hour24)));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getSampleDef</Name>
+				<Source><![CDATA[
+    private str getSampleDef(DBMUpdateTableStatisticsContract _contract)
+    {
+        str ret;
+        switch (_contract.parmSamplingMode())
+        {
+            case DBMStatSamplingMode::FullScan:
+                ret = 'FULLSCAN';
+                break;
+            case DBMStatSamplingMode::Resample:
+                ret = 'RESAMPLE';
+                break;
+            case DBMStatSamplingMode::Sample:
+                ret = strFmt('SAMPLE %1 %2',
+                    _contract.parmSampleSize(),
+                    _contract.parmSamplingScope() == DBMStatSamplingScope::Rows ? 'ROWS' : 'PERCENT');
+                break;
+        }
+        return ret;
     }
 
 ]]></Source>

@@ -6,14 +6,6 @@
 public final class DBMSQLUtils
 {
 
-
-
-    
-
-    
-
-
-
 }
 ]]></Declaration>
 		<Methods>
@@ -57,18 +49,28 @@ public final class DBMSQLUtils
 
         // Open the code access permission scope.
         permission.assert();
-
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-      
-        edition = '';
-        if (sqlResult.next())
+        try
         {
-            edition = sqlResult.getString(1);
-        }
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
       
-        sqlResult.close();
-        statement.close();
+            edition = '';
+            if (sqlResult.next())
+            {
+                edition = sqlResult.getString(1);
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
       
         return edition;
@@ -122,16 +124,28 @@ FROM @PlanXML.nodes('//ParameterList/ColumnReference') AS p(pList)) as parmTable
 
         // Open the code access permission scope.
         permission.assert();
+        str parmText;
+        try
+        {
         statement = connection.createStatement();
         sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
-        str parmText;
       
         while (sqlResult.next())
         {
             parmText += sqlResult.getString(1);
         }
-        sqlResult.close();
-        statement.close();
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
 
         str sqlStatementTextParametrized = strFmt(@'
@@ -184,16 +198,27 @@ FROM sys.dm_exec_sql_text(%1) AS st;
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-      
-        while(sqlResult.next())
+        try
         {
-            querySqlText += sqlResult.getString(1);
-        }
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
       
-        sqlResult.close();
-        statement.close();
+            while(sqlResult.next())
+            {
+                querySqlText += sqlResult.getString(1);
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
 
         if (parmText)
@@ -222,10 +247,18 @@ FROM sys.dm_exec_sql_text(%1) AS st;
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        statement.executeUpdateWithParameters(sqlStatementText, SqlParams::create());
-      
-        statement.close();
+        try
+        {
+            statement = connection.createStatement();
+            statement.executeUpdateWithParameters(sqlStatementText, SqlParams::create());
+        }
+        finally
+        {
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
         
     }
@@ -263,17 +296,29 @@ FROM sys.dm_exec_query_plan(%1)
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-      
-        while (sqlResult.next())
+        try
         {
-            sb.append(sqlResult.getString(1));
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+            while (sqlResult.next())
+            {
+                sb.append(sqlResult.getString(1));
+            }
+            QueryPlan = sb.toString();
         }
-        QueryPlan = sb.toString();
-        sqlResult.close();
-        statement.close();
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
         return QueryPlan;
     }
@@ -311,17 +356,29 @@ FROM sys.dm_exec_query_plan_stats(%1)
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-      
-        while (sqlResult.next())
+        try
         {
-            sb.append(sqlResult.getString(1));
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+            while (sqlResult.next())
+            {
+                sb.append(sqlResult.getString(1));
+            }
+            QueryPlan = sb.toString();
         }
-        QueryPlan = sb.toString();
-        sqlResult.close();
-        statement.close();
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
         return QueryPlan;
     }
@@ -359,17 +416,29 @@ FROM sys.dm_exec_query_statistics_xml(%1)
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-      
-        while (sqlResult.next())
+        try
         {
-            sb.append(sqlResult.getString(1));
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+            while (sqlResult.next())
+            {
+                sb.append(sqlResult.getString(1));
+            }
+            QueryPlan = sb.toString();
         }
-        QueryPlan = sb.toString();
-        sqlResult.close();
-        statement.close();
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
         return QueryPlan;
     }
@@ -421,16 +490,27 @@ WITH Chunks AS (
         str parmList;
         // Open the code access permission scope.
         permission.assert();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
-      
-        while (sqlResult.next())
+        try
         {
-            parmList = parmList+sqlResult.getString(1);
-        }
-        sqlResult.close();
-        statement.close();
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
       
+            while (sqlResult.next())
+            {
+                parmList = parmList+sqlResult.getString(1);
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
         
         DBMSqlText QuerySqlText;
@@ -455,15 +535,27 @@ WITH Chunks AS (
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-      
-        while (sqlResult.next())
+        try
         {
-            querySqlText += sqlResult.getString(1);
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+      
+            while (sqlResult.next())
+            {
+                querySqlText += sqlResult.getString(1);
+            }
         }
-        sqlResult.close();
-        statement.close();
+       finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         if (parmList)
         {
             System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex('(?s)^\([^)]+\)\s*(.*)');
@@ -516,17 +608,29 @@ where plan_id = %1
         // Open the code access permission scope.
         permission.assert();
         Map parms  = SqlParams::create();
-        statement = connection.createStatement();
-        sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-      
-        while (sqlResult.next())
+        try
         {
-            sb.append(sqlResult.getString(1));
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlStatementText, SqlParams::create());
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+      
+            while (sqlResult.next())
+            {
+                sb.append(sqlResult.getString(1));
+            }
+            QueryPlan = sb.toString();
         }
-        QueryPlan = sb.toString();
-        sqlResult.close();
-        statement.close();
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
         return QueryPlan;
     }
@@ -664,11 +768,21 @@ where plan_id = %1
         permission = new SqlStatementExecutePermission(sqlQuery);
         // Open the code access permission scope.
         permission.assert();
-        statement = connection.createStatement();
-        Map params = SqlParams::create();
-        params.add('QueryId', _queryId);
-        params.add('PlanId', _queryPlanId);
-        statement.executeUpdateWithParameters(sqlQuery, params);
+        try
+        {
+            statement = connection.createStatement();
+            Map params = SqlParams::create();
+            params.add('QueryId', _queryId);
+            params.add('PlanId', _queryPlanId);
+            statement.executeUpdateWithParameters(sqlQuery, params);
+        }
+        finally
+        {
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         statement.close();
         CodeAccessPermission::revertAssert();
     }
@@ -689,12 +803,21 @@ where plan_id = %1
         permission = new SqlStatementExecutePermission(sqlQuery);
         // Open the code access permission scope.
         permission.assert();
-        statement = connection.createStatement();
-        Map params = SqlParams::create();
-        params.add('QueryId', _queryId);
-        params.add('PlanId', _queryPlanId);
-        statement.executeUpdateWithParameters(sqlQuery, params);
-        statement.close();
+        try
+        {
+            statement = connection.createStatement();
+            Map params = SqlParams::create();
+            params.add('QueryId', _queryId);
+            params.add('PlanId', _queryPlanId);
+            statement.executeUpdateWithParameters(sqlQuery, params);
+        }
+        finally
+        {
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
     }
 
@@ -731,20 +854,29 @@ where plan_id = %1
         permission = new SqlStatementExecutePermission(sqlQuery);
         // Open the code access permission scope.
         permission.assert();
-        statement = connection.createStatement();
-        Map params = SqlParams::create();
-        params.add('QueryId', _queryId);
-        params.add('OptionMode', optionMode);
-        if (_enable)
+        try
         {
-            params.add('Option', 'ON');
+            statement = connection.createStatement();
+            Map params = SqlParams::create();
+            params.add('QueryId', _queryId);
+            params.add('OptionMode', optionMode);
+            if (_enable)
+            {
+                params.add('Option', 'ON');
+            }
+            else
+            {
+                params.add('Option', 'OFF');
+            }
+            statement.executeUpdateWithParameters(sqlQuery, params);
         }
-        else
+        finally
         {
-            params.add('Option', 'OFF');
+            if (statement)
+            {
+                statement.close();
+            }
         }
-        statement.executeUpdateWithParameters(sqlQuery, params);
-        statement.close();
         CodeAccessPermission::revertAssert();
     }
 
@@ -786,11 +918,20 @@ where plan_id = %1
         permission = new SqlStatementExecutePermission(sqlQuery);
         // Open the code access permission scope.
         permission.assert();
-        statement = connection.createStatement();
-        Map params = SqlParams::create();
-        params.add('QueryId', _queryId);
-        statement.executeUpdateWithParameters(sqlQuery, params);
-        statement.close();
+        try
+        {
+            statement = connection.createStatement();
+            Map params = SqlParams::create();
+            params.add('QueryId', _queryId);
+            statement.executeUpdateWithParameters(sqlQuery, params);
+        }
+        finally
+        {
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
     }
 
@@ -810,13 +951,154 @@ where plan_id = %1
         permission = new SqlStatementExecutePermission(sqlQuery);
         // Open the code access permission scope.
         permission.assert();
-        statement = connection.createStatement();
-        Map params = SqlParams::create();
-        params.add('queryId', _queryId);
-        params.add('queryHints', _hints);
-        statement.executeUpdateWithParameters(sqlQuery, params);
-        statement.close();
+        try
+        {
+            statement = connection.createStatement();
+            Map params = SqlParams::create();
+            params.add('queryId', _queryId);
+            params.add('queryHints', _hints);
+            statement.executeUpdateWithParameters(sqlQuery, params);
+        }
+        finally
+        {
+            if (statement)
+            {
+                statement.close();
+            }
+        }
         CodeAccessPermission::revertAssert();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getTableListFromPlanHandle</Name>
+				<Source><![CDATA[
+    public static Set getTableListFromPlanHandle(DBMSQLHandle _planHandle)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        DBMSqlText QuerySqlText;
+        str sqlQuery = strFmt(@"
+WITH XMLNAMESPACES (
+    DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan'
+)
+select REPLACE(REPLACE(Tab.Props.value('@Table', 'nvarchar(128)'), '[', ''), ']', '') AS [TableName]
+FROM sys.dm_exec_query_plan(%1) AS qp
+CROSS APPLY qp.query_plan.nodes('//Object') AS Tab(Props)
+WHERE
+    Tab.Props.value('@Schema', 'nvarchar(128)')='[dbo]'
+    AND Tab.Props.value('@Table', 'nvarchar(128)') IS NOT NULL
+", _planHandle);
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        Set tableSet = new Set(Types::String);
+        try
+        {
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+      
+            while (sqlResult.next())
+            {
+                TableName tableName = sqlResult.getString(1);
+                TableId tableId = tableName2id(tableName);
+                if (tableId)
+                {
+                    SysDictTable dictTable = new SysDictTable(tableId);
+                    if (!dictTable.isTempDb()) //not necessary to be honest, but let's be safe
+                    {
+                        tableSet.add(tableName);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
+        CodeAccessPermission::revertAssert();
+
+        return tableSet;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getTableListFromPlanId</Name>
+				<Source><![CDATA[
+    public static Set getTableListFromPlanId(DBMSQLQueryStorePlanId _queryPlanId)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        DBMSqlText QuerySqlText;
+        str sqlQuery = strFmt(@"
+Declare @QueryStorePlan XML;
+select @QueryStorePlan = convert(XML,qp.query_plan)
+FROM sys.query_store_plan AS qp
+where qp.plan_id=%1;
+WITH XMLNAMESPACES (
+    DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan'
+)
+select REPLACE(REPLACE(Tab.Props.value('@Table', 'nvarchar(128)'), '[', ''), ']', '') AS [TableName]
+FROM @QueryStorePlan.nodes('//Object') AS Tab(Props)
+WHERE
+    Tab.Props.value('@Schema', 'nvarchar(128)')='[dbo]'
+    AND Tab.Props.value('@Table', 'nvarchar(128)') IS NOT NULL
+
+", _queryPlanId);
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        Set tableSet = new Set(Types::String);
+        try
+        {
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+      
+            while (sqlResult.next())
+            {
+                TableName tableName = sqlResult.getString(1);
+                TableId tableId = tableName2id(tableName);
+                if (tableId)
+                {
+                    SysDictTable dictTable = new SysDictTable(tableId);
+                    if (!dictTable.isTempDb()) //not necessary to be honest, but let's be safe 
+                    {
+                        tableSet.add(tableName);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
+        CodeAccessPermission::revertAssert();
+
+        return tableSet;
     }
 
 ]]></Source>

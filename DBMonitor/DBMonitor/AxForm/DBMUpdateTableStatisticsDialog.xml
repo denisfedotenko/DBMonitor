@@ -202,6 +202,10 @@ public class DBMUpdateTableStatisticsDialog extends FormRun
         {
             selectedTables.add(se.current());
         }
+        samplingMode.selection(contract.parmSamplingMode());
+        Sample.enabled(samplingMode.selection() == DBMStatSamplingMode::Sample);
+        SamplingScope.selection(contract.parmSamplingScope());
+        sampleSize.value(contract.parmSampleSize());
     }
 
 ]]></Source>
@@ -240,6 +244,9 @@ public class DBMUpdateTableStatisticsDialog extends FormRun
     internal void applyValuesFromDialogToContract()
     {
         contract.parmTables(tablesToUpdateStats);
+        contract.parmSamplingMode(samplingMode.selection());
+        contract.parmSamplingMode(samplingMode.selection());
+        contract.parmSampleSize(sampleSize.value());
     }
 
 ]]></Source>
@@ -369,6 +376,31 @@ public class DBMUpdateTableStatisticsDialog extends FormRun
 					</Method>
 				</Methods>
 			</Control>
+			<Control>
+				<Name>samplingMode</Name>
+				<Type>RadioButton</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public boolean modified()
+        {
+            boolean ret;
+        
+            ret = super();
+            Sample.enabled(samplingMode.selection() == DBMStatSamplingMode::Sample);
+        
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
 		</DataControls>
 		<Members xmlns="" />
 	</SourceCode>
@@ -492,21 +524,6 @@ public class DBMUpdateTableStatisticsDialog extends FormRun
 							</AxFormControl>
 							<AxFormControl xmlns=""
 								i:type="AxFormGroupControl">
-								<Name>DialogContent</Name>
-								<ElementPosition>715827882</ElementPosition>
-								<FilterExpression>%1</FilterExpression>
-								<HeightMode>SizeToAvailable</HeightMode>
-								<Type>Group</Type>
-								<VerticalSpacing>-1</VerticalSpacing>
-								<WidthMode>SizeToAvailable</WidthMode>
-								<FormControlExtension
-									i:nil="true" />
-								<Controls />
-								<ArrangeMethod>Auto</ArrangeMethod>
-								<Style>DialogContent</Style>
-							</AxFormControl>
-							<AxFormControl xmlns=""
-								i:type="AxFormGroupControl">
 								<Name>SelectedGroup</Name>
 								<ElementPosition>1717986916</ElementPosition>
 								<ExtendedStyle>listPanel_selPanel</ExtendedStyle>
@@ -592,6 +609,64 @@ public class DBMUpdateTableStatisticsDialog extends FormRun
 								<Columns>2</Columns>
 								<HideIfEmpty>No</HideIfEmpty>
 								<FrameType>None</FrameType>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormGroupControl">
+								<Name>DialogContent</Name>
+								<ElementPosition>715827882</ElementPosition>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>SizeToAvailable</HeightMode>
+								<Type>Group</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormRadioButtonControl">
+										<Name>samplingMode</Name>
+										<AutoDeclaration>Yes</AutoDeclaration>
+										<Type>RadioButton</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<Caption>@DBMUpdateTableStats:StatSamplingMode</Caption>
+										<EnumType>DBMStatSamplingMode</EnumType>
+										<Items />
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormGroupControl">
+										<Name>Sample</Name>
+										<AutoDeclaration>Yes</AutoDeclaration>
+										<Type>Group</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<Controls>
+											<AxFormControl xmlns=""
+												i:type="AxFormComboBoxControl">
+												<Name>SamplingScope</Name>
+												<AutoDeclaration>Yes</AutoDeclaration>
+												<Type>ComboBox</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<EnumType>DBMStatSamplingScope</EnumType>
+												<Items />
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormInt64Control">
+												<Name>SampleSize</Name>
+												<AutoDeclaration>Yes</AutoDeclaration>
+												<Type>Int64</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<AllowNegative>No</AllowNegative>
+												<Label>@DBMUpdateTableStats:SampleSize</Label>
+											</AxFormControl>
+										</Controls>
+										<Caption>@DBMUpdateTableStats:StatSamplingMode</Caption>
+									</AxFormControl>
+								</Controls>
+								<ArrangeMethod>Auto</ArrangeMethod>
+								<Style>DialogContent</Style>
 							</AxFormControl>
 						</Controls>
 						<Caption>@CashManagement:BankCurrencyRevalDialogParameters</Caption>

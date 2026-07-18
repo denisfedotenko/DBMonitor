@@ -292,6 +292,16 @@ public class DBMSQLActiveQueriesForm extends FormRun
 									i:nil="true" />
 								<Text>@DBMonitor:LivePlanLabel</Text>
 							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>UpdateStatistics</Name>
+								<HelpText>@DBMonitor:UpdateStatistics</HelpText>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
+								<MenuItemType>Action</MenuItemType>
+							</AxFormControl>
 						</Controls>
 					</AxFormControl>
 				</Controls>

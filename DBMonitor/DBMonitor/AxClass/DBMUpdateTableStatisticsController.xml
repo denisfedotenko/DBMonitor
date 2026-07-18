@@ -68,6 +68,7 @@ public class DBMUpdateTableStatisticsController extends SysOperationServiceContr
     
         controller = new DBMUpdateTableStatisticsController();
         controller.parmArgs(_args);
+        controller.initFromCaller();
 
         return controller;
     }
@@ -90,6 +91,32 @@ public class DBMUpdateTableStatisticsController extends SysOperationServiceContr
     protected void dialogPostBuild()
     {
         super();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initFromCaller</Name>
+				<Source><![CDATA[
+    private void initFromCaller()
+    {
+        DBMUpdateTableStatisticsContract contract = this.getDataContractObject() as DBMUpdateTableStatisticsContract;
+        if (this.parmArgs().caller()
+            && this.parmArgs().caller() is FormRun)
+        {
+            FormRun callerForm = this.parmArgs().caller() as FormRun;
+            Object callerFormRun;
+            if (formHasMethod(callerForm, identifierStr(getPlanHandle)))
+            {
+                contract.parmTables(DBMSQLUtils::getTableListFromPlanHandle(callerForm.getPlanHandle()));
+            }
+            else  if (formHasMethod(callerForm, identifierStr(getQueryPlanId)))
+            {
+                contract.parmTables(DBMSQLUtils::getTableListFromPlanId(callerForm.getQueryPlanId()));
+            }
+            contract.parmSamplingMode(DBMStatSamplingMode::Resample);
+
+        }
     }
 
 ]]></Source>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMStatSamplingMode</Name>
+	<Label>@DBMUpdateTableStats:StatSamplingMode</Label>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Sample</Name>
+			<Label>@DBMUpdateTableStats:Sample</Label>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Resample</Name>
+			<Label>@DBMUpdateTableStats:Resample</Label>
+			<Value>1</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Fullscan</Name>
+			<Label>@DBMUpdateTableStats:FullScan</Label>
+			<Value>2</Value>
+		</AxEnumValue>
+	</EnumValues>
+</AxEnum>
