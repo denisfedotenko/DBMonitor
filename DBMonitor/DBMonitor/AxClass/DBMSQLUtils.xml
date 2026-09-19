@@ -759,7 +759,6 @@ where plan_id = %1
 				<Source><![CDATA[
     public static void forcePlanQueryStore(DBMSQLQueryStoreQueryId _queryId, DBMSQLQueryStorePlanId _queryPlanId)
     {
-        str sqlStatementText;
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
@@ -794,7 +793,6 @@ where plan_id = %1
 				<Source><![CDATA[
     public static void unforcePlanQueryStore(DBMSQLQueryStoreQueryId _queryId, DBMSQLQueryStorePlanId _queryPlanId)
     {
-        str sqlStatementText;
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
@@ -828,7 +826,6 @@ where plan_id = %1
 				<Source><![CDATA[
     public static void setPlanAutoCorrectionQueryStore(DBMSQLQueryStoreQueryId _queryId, boolean _enable)
     {
-        str sqlStatementText;
         str optionMode;
         if (!_enable)
         {
@@ -909,7 +906,6 @@ where plan_id = %1
 				<Source><![CDATA[
     public static void clearQueryHintsQueryStore(DBMSQLQueryStoreQueryId _queryId)
     {
-        str sqlStatementText;
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
@@ -942,7 +938,6 @@ where plan_id = %1
 				<Source><![CDATA[
     public static void setQueryHintsQueryStore(DBMSQLQueryStoreQueryId _queryId, DBMSQLQueryStoreQueryHintText _hints)
     {
-        str sqlStatementText;
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
@@ -976,7 +971,6 @@ where plan_id = %1
 				<Source><![CDATA[
     public static Set getTableListFromPlanHandle(DBMSQLHandle _planHandle)
     {
-        str sqlStatementText;
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
@@ -1040,7 +1034,6 @@ WHERE
 				<Source><![CDATA[
     public static Set getTableListFromPlanId(DBMSQLQueryStorePlanId _queryPlanId)
     {
-        str sqlStatementText;
         Connection connection = new Connection();
         SqlStatementExecutePermission permission;
         Statement statement;
@@ -1099,6 +1092,120 @@ WHERE
         CodeAccessPermission::revertAssert();
 
         return tableSet;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>QueryHashToQueryIds</Name>
+				<Source><![CDATA[
+    public static set QueryHashToQueryIds(DBMSQLQueryStoreQueryHash _queryHash)
+    {
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        Set queryIdSet = new Set(Types::Int64);
+        str sqlQuery = @"select query_id from sys.query_store_query  where query_hash = convert(BINARY(8),@queryHash,1)";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        try
+        {
+            statement = connection.createStatement();
+            Map parms = SqlParams::create();
+            parms.add('queryHash', _queryHash);
+
+            sqlResult = statement.executeQueryWithParameters(sqlQuery, parms);
+      
+            while (sqlResult.next())
+            {
+                queryIdSet.add(sqlResult.getInt64(1));
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
+        CodeAccessPermission::revertAssert();
+
+        return queryIdSet;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>QueryPlanHashToQueryPlanIds</Name>
+				<Source><![CDATA[
+    public static set QueryPlanHashToQueryPlanIds(DBMSQLQueryStoreQueryId _queryId, 
+                    DBMSQLQueryStoreQueryPlanHash _queryPlanHash)
+    {
+        str sqlStatementText;
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str sqlQuery = @"select plan_id from sys.query_store_plan where query_id = @queryId and query_plan_hash = convert(BINARY(8),@queryPlanHash,1)";
+        permission = new SqlStatementExecutePermission(sqlQuery);
+
+        // Open the code access permission scope.
+        permission.assert();
+        Set queryPlanIdSet = new Set(Types::Int64);
+        try
+        {
+            statement = connection.createStatement();
+            Map parms = SqlParams::create();
+            parms.add('queryId', _queryId);
+            parms.add('queryPlanHash', _queryPlanHash);
+            sqlResult = statement.executeQueryWithParameters(sqlQuery, parms);
+      
+            while (sqlResult.next())
+            {
+                queryPlanIdSet.add(sqlResult.getInt64(1));
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
+        CodeAccessPermission::revertAssert();
+
+        return queryPlanIdSet;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setToRange</Name>
+				<Source><![CDATA[
+    public static range setToRange(Set _set)
+    {
+        range rng;
+        SetEnumerator se = _set.getEnumerator();
+        while (se.moveNext())
+        {
+            if (rng)
+            {
+                rng+=',';
+            }
+            rng+=queryValue(se.current());
+        }
+        return rng;
     }
 
 ]]></Source>

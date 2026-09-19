@@ -14,6 +14,11 @@ public class DBMSQLQueryStoreQuery extends FormRun
     QueryBuildRange qbrQueryEnd;
     QueryBuildRange qbrPlanStart;
     QueryBuildRange qbrPlanEnd;
+    QueryBuildRange qbrQueryId;
+    QueryBuildRange qbrQueryPlanId;
+    boolean isPlanCacheBased ;
+    Range queryIdRange;
+    DBMSQLStatsQueryPlanHash queryPlanHash;
     
 }
 ]]></Source>
@@ -90,6 +95,42 @@ public class DBMSQLQueryStoreQuery extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    public void init()
+    {
+        if (element.args().caller()
+       && element.args().caller() is FormRun)
+        {
+            FormRun callerForm = element.args().caller() as FormRun;
+            if (formHasMethod(callerForm, identifierStr(getQueryHash))
+                && formHasMethod(callerForm, identifierStr(getQueryPlanHash)))
+            {
+                isPlanCacheBased = true;
+
+                DBMSQLStatsQueryHash queryHash = callerForm.getQueryHash();
+                queryPlanHash = callerForm.getQueryPlanHash();
+                queryIdRange = DBMSQLUtils::setToRange(DBMSQLUtils::QueryHashToQueryIds(queryHash));
+                if (!queryIdRange)
+                {
+                    throw error("@DBMonitor:NoQueryStoreForQuery");
+                }
+                    
+            }
+        }
+        super();
+        if (isPlanCacheBased)
+        {
+            filterGroup.enabled(true);
+        }
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>
@@ -106,44 +147,54 @@ public class DBMSQLQueryStoreQuery extends FormRun
             query.firstOnly10(false);
             query.firstOnly100(false);
             query.firstOnly1000(false);
-
-            switch (TopSelectionComboBox.selection())
+            if (!queryIdRange)
             {
-                case DBMSQLQueryStatsTopEnum::Top10:
-                    query.firstOnly10(true);
-                    break;
-                case DBMSQLQueryStatsTopEnum::Top100:
-                    query.firstOnly100(true);
-                    break;
-                case DBMSQLQueryStatsTopEnum::Top1000:
-                    query.firstOnly1000(true);
-                    break;
-            }
-            if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
-            {
-                utcdatetime fromDateTime = filterFrom.dateTimeValue();
-                utcdatetime toDateTime = filterTo.dateTimeValue();
-                query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(true);
-                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(true);
-                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(true);
-                switch(true)
+                qbrQueryId.value(SysQuery::valueUnlimited());
+                switch (TopSelectionComboBox.selection())
                 {
-                    case FromDateTime && toDateTime:
-                        qbrQueryStart.value(SysQuery::range(FromDateTime, ToDateTime));
-                        qbrQueryEnd.value(SysQuery::range(FromDateTime, ToDateTime));
+                    case DBMSQLQueryStatsTopEnum::Top10:
+                        query.firstOnly10(true);
                         break;
-                    case FromDateTime && !ToDateTime:
-                        qbrQueryStart.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
-                        qbrQueryEnd.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                    case DBMSQLQueryStatsTopEnum::Top100:
+                        query.firstOnly100(true);
                         break;
-                    case !FromDateTime && ToDateTime:
-                        qbrQueryStart.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
-                        qbrQueryEnd.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                    case DBMSQLQueryStatsTopEnum::Top1000:
+                        query.firstOnly1000(true);
                         break;
+                }
+                if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
+                {
+                    utcdatetime fromDateTime = filterFrom.dateTimeValue();
+                    utcdatetime toDateTime = filterTo.dateTimeValue();
+                    query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(true);
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(true);
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(true);
+                    switch(true)
+                    {
+                        case FromDateTime && toDateTime:
+                            qbrQueryStart.value(SysQuery::range(FromDateTime, ToDateTime));
+                            qbrQueryEnd.value(SysQuery::range(FromDateTime, ToDateTime));
+                            break;
+                        case FromDateTime && !ToDateTime:
+                            qbrQueryStart.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                            qbrQueryEnd.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                            break;
+                        case !FromDateTime && ToDateTime:
+                            qbrQueryStart.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                            qbrQueryEnd.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                            break;
+                    }
+                }
+                else
+                {
+                    query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(false);
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
                 }
             }
             else
             {
+                qbrQueryId.value(queryIdRange);
                 query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(false);
                 query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
                 query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
@@ -165,6 +216,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
             super();
             QueryBuildDataSource qbds = this.queryBuildDataSource();
             qbds.addSortField(fieldNum(DBMSQLQueryStoreExt, totalDuration), SortOrder::Descending);
+            qbrQueryId =  qbds.addRange(fieldNum(DBMSQLQueryStoreExt, queryId));
             QueryBuildDataSource qbdsPlan = qbds.addDataSource(tableNum(DBMSQLQueryStorePlan));
             qbdsPlan.joinMode(JoinMode::ExistsJoin);
             qbdsPlan.fetchMode(QueryFetchMode::One2One);
@@ -179,6 +231,10 @@ public class DBMSQLQueryStoreQuery extends FormRun
             qbdsRuntimeStatsInterval.addLink(fieldNum(DBMSQLQueryStoreRuntimeStats, RuntimeStatsIntervalId), fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, RuntimeStatsIntervalId));
             qbrQueryStart =  qbdsRuntimeStatsInterval.addRange(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, startTime));
             qbrQueryEnd =  qbdsRuntimeStatsInterval.addRange(fieldNum(DBMSQLQueryStoreRuntimeStatsInterval, endTime));
+            if (isPlanCacheBased)
+            {
+                this.autoSearch(true);
+            }
         }
 
 ]]></Source>
@@ -219,6 +275,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
             super();
             QueryBuildDataSource qbds = this.queryBuildDataSource();
             qbds.addDynalink(fieldNum(DBMSQLQueryStorePlanExt,queryId),DBMSQLQueryStoreExt,fieldNum(DBMSQLQueryStoreExt,queryId));
+            qbrQueryPlanId =  qbds.addRange(fieldNum(DBMSQLQueryStorePlanExt, planId));
             QueryBuildDataSource qbdsRuntimeStats = qbds.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStats));
             qbdsRuntimeStats.joinMode(JoinMode::ExistsJoin);
             qbdsRuntimeStats.fetchMode(QueryFetchMode::One2One);
@@ -241,35 +298,46 @@ public class DBMSQLQueryStoreQuery extends FormRun
         /// </summary>
         public void executeQuery()
         {
-            super();
             Query query  = this.query();
-            if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
+            Range queryPlanIdRange;
+            if (!isPlanCacheBased)
             {
-                utcdatetime fromDateTime = filterFrom.dateTimeValue();
-                utcdatetime toDateTime = filterTo.dateTimeValue();
-                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(true);
-                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(true);
-                switch(true)
+                qbrQueryPlanId.value(SysQuery::valueUnlimited());
+                if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
                 {
-                    case FromDateTime && toDateTime:
-                        qbrPlanStart.value(SysQuery::range(FromDateTime, ToDateTime));
-                        qbrPlanEnd.value(SysQuery::range(FromDateTime, ToDateTime));
-                        break;
-                    case FromDateTime && !ToDateTime:
-                        qbrPlanStart.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
-                        qbrPlanEnd.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
-                        break;
-                    case !FromDateTime && ToDateTime:
-                        qbrPlanStart.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
-                        qbrPlanEnd.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
-                        break;
+                    utcdatetime fromDateTime = filterFrom.dateTimeValue();
+                    utcdatetime toDateTime = filterTo.dateTimeValue();
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(true);
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(true);
+                    switch(true)
+                    {
+                        case FromDateTime && toDateTime:
+                            qbrPlanStart.value(SysQuery::range(FromDateTime, ToDateTime));
+                            qbrPlanEnd.value(SysQuery::range(FromDateTime, ToDateTime));
+                            break;
+                        case FromDateTime && !ToDateTime:
+                            qbrPlanStart.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                            qbrPlanEnd.value(SysQuery::range(FromDateTime, DateTimeUtil::maxValue()));
+                            break;
+                        case !FromDateTime && ToDateTime:
+                            qbrPlanStart.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                            qbrPlanEnd.value(SysQuery::range(DateTimeUtil::minValue(), ToDateTime));
+                            break;
+                    }
+                }
+                else
+                {
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
+                    query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
                 }
             }
             else
             {
-                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
-                query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
+                queryPlanIdRange = DBMSQLUtils::setToRange(DBMSQLUtils::QueryPlanHashToQueryPlanIds(DBMSQLQueryStoreExt.queryId, queryPlanHash));
+                qbrQueryPlanId.value(queryPlanIdRange);
             }
+            super();
+
 
         }
 
@@ -342,14 +410,17 @@ public class DBMSQLQueryStoreQuery extends FormRun
 					<Method>
 						<Name>modified</Name>
 						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
         public boolean modified()
         {
             boolean ret;
-
+        
             ret = super();
-
             DBMSQLQueryStoreExt_ds.executeQuery();
-
+        
             return ret;
         }
 
@@ -364,17 +435,13 @@ public class DBMSQLQueryStoreQuery extends FormRun
 					<Method>
 						<Name>modified</Name>
 						<Source><![CDATA[
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
         public boolean modified()
         {
             boolean ret;
-    
+        
             ret = super();
             DBMSQLQueryStoreExt_ds.executeQuery();
-    
+        
             return ret;
         }
 
@@ -389,18 +456,13 @@ public class DBMSQLQueryStoreQuery extends FormRun
 					<Method>
 						<Name>modified</Name>
 						<Source><![CDATA[
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
         public boolean modified()
         {
             boolean ret;
-    
+        
             ret = super();
             DBMSQLQueryStoreExt_ds.executeQuery();
-
-    
+        
             return ret;
         }
 
@@ -627,6 +689,9 @@ public class DBMSQLQueryStoreQuery extends FormRun
 					<DataField>parameterizationType</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>QueryHash</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>QueryId</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
@@ -679,6 +744,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</AxFormDataSourceField>
 			</Fields>
 			<ReferencedDataSources />
+			<AutoSearch>No</AutoSearch>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -727,6 +793,9 @@ public class DBMSQLQueryStoreQuery extends FormRun
 					<DataField>AvgTempdbSpaceUsed</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>CompatibilityLevel</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>CountCompiles</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
@@ -734,9 +803,6 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>EngineVersion</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>InitialCompileStartTime</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>IsForcedPlan</DataField>
@@ -752,18 +818,6 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>IsTrivialPlan</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>LastCompileDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>LastExecutionTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>LastForceFailureReason</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>LastForceFailureReasonDesc</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>MaxClrTime</DataField>
@@ -841,13 +895,13 @@ public class DBMSQLQueryStoreQuery extends FormRun
 					<DataField>PlanForcingType</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
-					<DataField>PlanGroupId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
 					<DataField>PlanId</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>QueryId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryPlanHash</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>RecId</DataField>
@@ -967,6 +1021,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 			<AxFormControl xmlns=""
 				i:type="AxFormGroupControl">
 				<Name>FilterGroup</Name>
+				<AutoDeclaration>Yes</AutoDeclaration>
 				<Pattern>CustomFilters</Pattern>
 				<PatternVersion>1.1</PatternVersion>
 				<Type>Group</Type>
@@ -1367,6 +1422,15 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>APRCMode</DataField>
+										<DataSource>DBMSQLQueryStoreExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormStringControl">
+										<Name>DBMSQLQueryStoreExt_QueryHash</Name>
+										<Type>String</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>QueryHash</DataField>
 										<DataSource>DBMSQLQueryStoreExt</DataSource>
 									</AxFormControl>
 								</Controls>
@@ -1816,6 +1880,15 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>EngineVersion</DataField>
+										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormStringControl">
+										<Name>DBMSQLQueryStorePlanExt_QueryPlanHash</Name>
+										<Type>String</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<DataField>QueryPlanHash</DataField>
 										<DataSource>DBMSQLQueryStorePlanExt</DataSource>
 									</AxFormControl>
 								</Controls>

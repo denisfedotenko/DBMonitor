@@ -474,6 +474,12 @@ public class DBMSQLQueryStoreExt extends common
 			<DataField>APRCMode</DataField>
 			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
 		</AxViewField>
+		<AxViewField xmlns=""
+			i:type="AxViewFieldBound">
+			<Name>QueryHash</Name>
+			<DataField>QueryHash</DataField>
+			<DataSource>DBMSQLQueryStoreQueryExt</DataSource>
+		</AxViewField>
 	</Fields>
 	<Indexes />
 	<Mappings />

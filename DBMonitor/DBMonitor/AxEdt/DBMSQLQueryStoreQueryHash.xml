@@ -4,5 +4,8 @@
 	<Name>DBMSQLQueryStoreQueryHash</Name>
 	<HelpText>@DBMonitor:DBMSQLQueryStoreQueryHashHelp</HelpText>
 	<Label>@DBMonitor:DBMSQLQueryStoreQueryHash</Label>
-	<StringSize>8</StringSize>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+	<StringSize>20</StringSize>
 </AxEdt>

@@ -53,6 +53,26 @@ public class DBMSQLActiveQueriesForm extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>getQueryPlanHash</Name>
+				<Source><![CDATA[
+    public DBMSQLStatsQueryPlanHash getQueryPlanHash()
+    {
+        return DBMSQLActiveQueries.QueryPlanHash;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryHash</Name>
+				<Source><![CDATA[
+    public DBMSQLStatsQueryHash getQueryHash()
+    {
+        return DBMSQLActiveQueries.QueryHash;
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>
@@ -149,6 +169,24 @@ public class DBMSQLActiveQueriesForm extends FormRun
 			<Table>DBMSQLActiveQueries</Table>
 			<Fields>
 				<AxFormDataSourceField>
+					<DataField>AnsiDefaults</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AnsiNullDfltOn</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AnsiNulls</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AnsiPadding</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AnsiWarnings</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Arithabort</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>BlockingSessionId</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
@@ -158,13 +196,28 @@ public class DBMSQLActiveQueriesForm extends FormRun
 					<DataField>Command</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>ConcatNullYieldsNull</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ConnectionId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>contextInfo</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>CPUTime</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>DateFirst</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DateFormat</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>DBName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DeadlockPriority</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>dop</DataField>
@@ -173,13 +226,46 @@ public class DBMSQLActiveQueriesForm extends FormRun
 					<DataField>elapsedTime</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>EstimatedCompletionTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ExecutingManagedCode</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ExternalScriptRequestId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>grantedMemory</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>GroupId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsResumable</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Language</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>lastWaitType</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>LockTimeout</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>logicalReads</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>NestLevel</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>OpenResultsetCount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>OpenTransactionCount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PageResource</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>percentComplete</DataField>
@@ -188,10 +274,28 @@ public class DBMSQLActiveQueriesForm extends FormRun
 					<DataField>PlanHandle</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>PrevError</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHash</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryPlanHash</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QuotedIdentifier</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>reads</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RequestId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>SchedulerId</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>SessionId</DataField>
@@ -206,10 +310,40 @@ public class DBMSQLActiveQueriesForm extends FormRun
 					<DataField>StartTime</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>StatementContextId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StatementEndOffset</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StatementSqlHandle</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StatementStartOffset</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>Status</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TaskAddress</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TextSize</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TransactionId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TransactionIsolationLevel</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>UserId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WaitResource</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>WaitTime</DataField>
@@ -301,6 +435,17 @@ public class DBMSQLActiveQueriesForm extends FormRun
 									i:nil="true" />
 								<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
 								<MenuItemType>Action</MenuItemType>
+								<NeedsRecord>Yes</NeedsRecord>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLQueryStoreQuery</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataSource>DBMSQLActiveQueries</DataSource>
+								<MenuItemName>DBMSQLQueryStoreQuery</MenuItemName>
+								<NeedsRecord>Yes</NeedsRecord>
 							</AxFormControl>
 						</Controls>
 					</AxFormControl>
@@ -532,11 +677,20 @@ public class DBMSQLActiveQueriesForm extends FormRun
 					</AxFormControl>
 					<AxFormControl xmlns=""
 						i:type="AxFormStringControl">
-						<Name>DBMSQLActiveQueries_PlanHandle</Name>
+						<Name>DBMSQLActiveQueries_QueryHash</Name>
 						<Type>String</Type>
 						<FormControlExtension
 							i:nil="true" />
-						<DataField>PlanHandle</DataField>
+						<DataField>QueryHash</DataField>
+						<DataSource>DBMSQLActiveQueries</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLActiveQueries_QueryPlanHash</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryPlanHash</DataField>
 						<DataSource>DBMSQLActiveQueries</DataSource>
 					</AxFormControl>
 				</Controls>

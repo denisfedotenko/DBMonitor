@@ -52,6 +52,26 @@ public class DBMSQLQueryStatsForm extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>getQueryPlanHash</Name>
+				<Source><![CDATA[
+    public DBMSQLStatsQueryPlanHash getQueryPlanHash()
+    {
+        return DBMSQLQueryStats.QueryPlanHash;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getQueryHash</Name>
+				<Source><![CDATA[
+    public DBMSQLStatsQueryHash getQueryHash()
+    {
+        return DBMSQLQueryStats.QueryHash;
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>
@@ -594,6 +614,16 @@ public class DBMSQLQueryStatsForm extends FormRun
 								<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
 								<MenuItemType>Action</MenuItemType>
 							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>DBMSQLQueryStoreQuery</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataSource>DBMSQLQueryStats</DataSource>
+								<MenuItemName>DBMSQLQueryStoreQuery</MenuItemName>
+								<NeedsRecord>Yes</NeedsRecord>
+							</AxFormControl>
 						</Controls>
 					</AxFormControl>
 				</Controls>
@@ -904,6 +934,24 @@ public class DBMSQLQueryStatsForm extends FormRun
 						<FormControlExtension
 							i:nil="true" />
 						<DataField>MinRows</DataField>
+						<DataSource>DBMSQLQueryStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStats_QueryHash</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryHash</DataField>
+						<DataSource>DBMSQLQueryStats</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStats_QueryPlanHash</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryPlanHash</DataField>
 						<DataSource>DBMSQLQueryStats</DataSource>
 					</AxFormControl>
 				</Controls>
