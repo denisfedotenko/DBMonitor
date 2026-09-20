@@ -23,6 +23,7 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
         DBMSQLQueryStoreQuery queryView;
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
+        DBMSQLQueryStoreQueryHintLog logTableDelete;
 
         Map currentHintsMap = new Map(Types::Int64, Types::Container);
         Map snapshotMap = new Map(Types::Int64, Types::Container);
@@ -123,6 +124,27 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
             snapshotTable.QueryHash = conPeek(currentCon, 2);
             snapshotTable.QueryHintText = conPeek(currentCon, 3);
             snapshotTable.insert();
+        }
+
+        Set logQueryIds = new Set(Types::Int64);
+        while select QueryId from logTable
+            group by QueryId
+        {
+            logQueryIds.add(logTable.QueryId);
+        }
+
+        SetEnumerator seLogQueries = logQueryIds.getEnumerator();
+        while (seLogQueries.moveNext())
+        {
+            DBMSQLQueryStoreQueryId checkQueryId = seLogQueries.current();
+            select firstonly RecId from queryView
+                where queryView.QueryId == checkQueryId;
+
+            if (!queryView.RecId)
+            {
+                delete_from logTableDelete
+                    where logTableDelete.QueryId == checkQueryId;
+            }
         }
 
         ttscommit;
