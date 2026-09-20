@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryHintSyncService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Service to synchronize and log changes in query store query hints.
+/// </summary>
+public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBase
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Synchronizes current query hints view with previous snapshot, logs changes, and updates snapshot.
+    /// </summary>
+    public void process()
+    {
+        DBMSQLQueryStoreQueryHints hintsView;
+        DBMSQLQueryStoreQuery queryView;
+        DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
+        DBMSQLQueryStoreQueryHintLog logTable;
+
+        Map currentHintsMap = new Map(Types::Int64, Types::Container);
+        Map snapshotMap = new Map(Types::Int64, Types::Container);
+        Set currentHintIds = new Set(Types::Int64);
+        Set snapshotHintIds = new Set(Types::Int64);
+
+        while select hintsView
+            join QueryHash from queryView
+            where queryView.QueryId == hintsView.QueryId
+        {
+            if (hintsView.QueryHintId)
+            {
+                currentHintsMap.insert(hintsView.QueryHintId, [hintsView.QueryId, queryView.QueryHash, hintsView.QueryHintText]);
+                currentHintIds.add(hintsView.QueryHintId);
+            }
+        }
+
+        while select snapshotTable
+        {
+            snapshotMap.insert(snapshotTable.QueryHintId, [snapshotTable.QueryId, snapshotTable.QueryHash, snapshotTable.QueryHintText]);
+            snapshotHintIds.add(snapshotTable.QueryHintId);
+        }
+
+        ttsbegin;
+
+        SetEnumerator seCurrent = currentHintIds.getEnumerator();
+        while (seCurrent.moveNext())
+        {
+            int64 hintId = seCurrent.current();
+            container currentCon = currentHintsMap.lookup(hintId);
+            DBMSQLQueryStoreQueryId queryId = conPeek(currentCon, 1);
+            DBMSQLQueryStoreQueryHash queryHash = conPeek(currentCon, 2);
+            DBMSQLQueryStoreQueryHintText currentText = conPeek(currentCon, 3);
+
+            if (!snapshotMap.exists(hintId))
+            {
+                logTable.clear();
+                logTable.QueryHintId = hintId;
+                logTable.QueryId = queryId;
+                logTable.QueryHash = queryHash;
+                logTable.ChangeType = DatabaseLogType::Insert;
+                logTable.OldQueryHintText = '';
+                logTable.NewQueryHintText = currentText;
+                logTable.insert();
+            }
+            else
+            {
+                container snapshotCon = snapshotMap.lookup(hintId);
+                DBMSQLQueryStoreQueryHintText oldText = conPeek(snapshotCon, 3);
+
+                if (oldText != currentText)
+                {
+                    logTable.clear();
+                    logTable.QueryHintId = hintId;
+                    logTable.QueryId = queryId;
+                    logTable.QueryHash = queryHash;
+                    logTable.ChangeType = DatabaseLogType::Update;
+                    logTable.OldQueryHintText = oldText;
+                    logTable.NewQueryHintText = currentText;
+                    logTable.insert();
+                }
+            }
+        }
+
+        SetEnumerator seSnapshot = snapshotHintIds.getEnumerator();
+        while (seSnapshot.moveNext())
+        {
+            int64 hintId = seSnapshot.current();
+            if (!currentHintsMap.exists(hintId))
+            {
+                container snapshotCon = snapshotMap.lookup(hintId);
+                DBMSQLQueryStoreQueryId queryId = conPeek(snapshotCon, 1);
+                DBMSQLQueryStoreQueryHash queryHash = conPeek(snapshotCon, 2);
+                DBMSQLQueryStoreQueryHintText oldText = conPeek(snapshotCon, 3);
+
+                logTable.clear();
+                logTable.QueryHintId = hintId;
+                logTable.QueryId = queryId;
+                logTable.QueryHash = queryHash;
+                logTable.ChangeType = DatabaseLogType::Delete;
+                logTable.OldQueryHintText = oldText;
+                logTable.NewQueryHintText = '';
+                logTable.insert();
+            }
+        }
+
+        delete_from snapshotTable;
+
+        seCurrent = currentHintIds.getEnumerator();
+        while (seCurrent.moveNext())
+        {
+            int64 hintId = seCurrent.current();
+            container currentCon = currentHintsMap.lookup(hintId);
+
+            snapshotTable.clear();
+            snapshotTable.QueryHintId = hintId;
+            snapshotTable.QueryId = conPeek(currentCon, 1);
+            snapshotTable.QueryHash = conPeek(currentCon, 2);
+            snapshotTable.QueryHintText = conPeek(currentCon, 3);
+            snapshotTable.insert();
+        }
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
