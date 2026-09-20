@@ -270,3 +270,4 @@ BuildProjectResult.err.xml
 BuildProjectResult.xml
 CompileLabels.xml
 *.xref
+./reference-context
