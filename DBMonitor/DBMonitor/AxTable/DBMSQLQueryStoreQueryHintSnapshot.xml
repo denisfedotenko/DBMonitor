@@ -50,9 +50,6 @@ public class DBMSQLQueryStoreQueryHintSnapshot extends common
 					<DataField>QueryHash</DataField>
 				</AxTableFieldGroupField>
 				<AxTableFieldGroupField>
-					<DataField>QueryHintHash</DataField>
-				</AxTableFieldGroupField>
-				<AxTableFieldGroupField>
 					<DataField>QueryHintText</DataField>
 				</AxTableFieldGroupField>
 			</Fields>
@@ -79,12 +76,6 @@ public class DBMSQLQueryStoreQueryHintSnapshot extends common
 		</AxTableField>
 		<AxTableField xmlns=""
 			i:type="AxTableFieldString">
-			<Name>QueryHintHash</Name>
-			<ExtendedDataType>DBMSQLQueryStoreQueryHash</ExtendedDataType>
-			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
-		</AxTableField>
-		<AxTableField xmlns=""
-			i:type="AxTableFieldString">
 			<Name>QueryHintText</Name>
 			<ExtendedDataType>DBMSQLQueryStoreQueryHintText</ExtendedDataType>
 			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
@@ -93,9 +84,12 @@ public class DBMSQLQueryStoreQueryHintSnapshot extends common
 	<FullTextIndexes />
 	<Indexes>
 		<AxTableIndex>
-			<Name>QueryIdx</Name>
+			<Name>QueryHintIdx</Name>
 			<AllowDuplicates>Yes</AllowDuplicates>
 			<Fields>
+				<AxTableIndexField>
+					<DataField>QueryHintId</DataField>
+				</AxTableIndexField>
 				<AxTableIndexField>
 					<DataField>QueryId</DataField>
 				</AxTableIndexField>

@@ -1208,27 +1208,6 @@ WHERE
         return rng;
     }
 
-    /// <summary>
-    /// Returns a STRING_AGG SQL expression for aggregating strings.
-    /// </summary>
-    public static str stringAgg(str _expression, str _delimiter = ' ', str _orderBy = '')
-    {
-        str ret = strFmt('STRING_AGG(%1, %2)', _expression, SysComputedColumnBase::returnLiteral(_delimiter));
-        if (_orderBy)
-        {
-            ret += strFmt(' WITHIN GROUP (ORDER BY %1)', _orderBy);
-        }
-        return ret;
-    }
-
-    /// <summary>
-    /// Returns a HASHBYTES SQL expression formatted as a hex string.
-    /// </summary>
-    public static str hashBytes(str _algorithm, str _expression)
-    {
-        return strFmt('CONVERT([varchar](64), HASHBYTES(%1, %2), 1)', SysComputedColumnBase::returnLiteral(_algorithm), _expression);
-    }
-
 ]]></Source>
 			</Method>
 		</Methods>

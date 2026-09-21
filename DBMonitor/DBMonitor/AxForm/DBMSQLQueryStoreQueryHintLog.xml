@@ -32,16 +32,13 @@ public class DBMSQLQueryStoreQueryHintLog extends FormRun
 					<DataField>CreatedDateTime</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
-					<DataField>NewQueryHintText</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>OldQueryHintText</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
 					<DataField>QueryHash</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>QueryHintId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHintText</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
 					<DataField>QueryId</DataField>
@@ -166,20 +163,11 @@ public class DBMSQLQueryStoreQueryHintLog extends FormRun
 					</AxFormControl>
 					<AxFormControl xmlns=""
 						i:type="AxFormStringControl">
-						<Name>DBMSQLQueryStoreQueryHintLog_OldQueryHintText</Name>
+						<Name>DBMSQLQueryStoreQueryHintLog_QueryHintText</Name>
 						<Type>String</Type>
 						<FormControlExtension
 							i:nil="true" />
-						<DataField>OldQueryHintText</DataField>
-						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
-					</AxFormControl>
-					<AxFormControl xmlns=""
-						i:type="AxFormStringControl">
-						<Name>DBMSQLQueryStoreQueryHintLog_NewQueryHintText</Name>
-						<Type>String</Type>
-						<FormControlExtension
-							i:nil="true" />
-						<DataField>NewQueryHintText</DataField>
+						<DataField>QueryHintText</DataField>
 						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
 					</AxFormControl>
 				</Controls>

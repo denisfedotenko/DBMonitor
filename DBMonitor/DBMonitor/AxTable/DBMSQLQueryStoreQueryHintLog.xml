@@ -56,10 +56,7 @@ public class DBMSQLQueryStoreQueryHintLog extends common
 					<DataField>QueryHash</DataField>
 				</AxTableFieldGroupField>
 				<AxTableFieldGroupField>
-					<DataField>OldQueryHintText</DataField>
-				</AxTableFieldGroupField>
-				<AxTableFieldGroupField>
-					<DataField>NewQueryHintText</DataField>
+					<DataField>QueryHintText</DataField>
 				</AxTableFieldGroupField>
 			</Fields>
 		</AxTableFieldGroup>
@@ -83,10 +80,7 @@ public class DBMSQLQueryStoreQueryHintLog extends common
 					<DataField>QueryHash</DataField>
 				</AxTableFieldGroupField>
 				<AxTableFieldGroupField>
-					<DataField>OldQueryHintText</DataField>
-				</AxTableFieldGroupField>
-				<AxTableFieldGroupField>
-					<DataField>NewQueryHintText</DataField>
+					<DataField>QueryHintText</DataField>
 				</AxTableFieldGroupField>
 			</Fields>
 		</AxTableFieldGroup>
@@ -119,19 +113,9 @@ public class DBMSQLQueryStoreQueryHintLog extends common
 		</AxTableField>
 		<AxTableField xmlns=""
 			i:type="AxTableFieldString">
-			<Name>OldQueryHintText</Name>
+			<Name>QueryHintText</Name>
 			<ExtendedDataType>DBMSQLQueryStoreQueryHintText</ExtendedDataType>
-			<HelpText>@DBMonitor:DBMSQLQueryStoreOldQueryHintTextHelp</HelpText>
 			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
-			<Label>@DBMonitor:DBMSQLQueryStoreOldQueryHintText</Label>
-		</AxTableField>
-		<AxTableField xmlns=""
-			i:type="AxTableFieldString">
-			<Name>NewQueryHintText</Name>
-			<ExtendedDataType>DBMSQLQueryStoreQueryHintText</ExtendedDataType>
-			<HelpText>@DBMonitor:DBMSQLQueryStoreNewQueryHintTextHelp</HelpText>
-			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
-			<Label>@DBMonitor:DBMSQLQueryStoreNewQueryHintText</Label>
 		</AxTableField>
 	</Fields>
 	<FullTextIndexes />
