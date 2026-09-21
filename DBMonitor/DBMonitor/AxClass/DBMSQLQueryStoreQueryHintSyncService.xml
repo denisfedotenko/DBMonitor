@@ -19,27 +19,27 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
     /// </summary>
     public void process()
     {
-        DBMSQLQueryStoreQueryHints hintsView;
+        DBMSQLQueryStoreQueryHintAgg aggView;
         DBMSQLQueryStoreQuery queryView;
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
 
         ttsbegin;
 
-        // 1. Detect and log INSERT changes (hints in hints view, but not in snapshot)
-        insert_recordset logTable (QueryHintId, QueryId, NewQueryHintText, QueryHash)
-            select QueryHintId, QueryId, QueryHintText from hintsView
+        // 1. Detect and log INSERT changes (new query hints aggregated per QueryId)
+        insert_recordset logTable (QueryId, NewQueryHintText, QueryHash)
+            select QueryId, QueryHintText from aggView
                 join QueryHash from queryView
-                where queryView.QueryId == hintsView.QueryId
+                where queryView.QueryId == aggView.QueryId
                 notexists join snapshotTable
-                where snapshotTable.QueryHintId == hintsView.QueryHintId;
+                where snapshotTable.QueryId == aggView.QueryId;
 
-        // 2. Detect and log UPDATE changes (hints in both, but hint text changed)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHash, OldQueryHintText, NewQueryHintText)
-            select QueryHintId, QueryId, QueryHash, QueryHintText from snapshotTable
-                join QueryHintText from hintsView
-                where hintsView.QueryHintId == snapshotTable.QueryHintId
-                   && hintsView.QueryHintText != snapshotTable.QueryHintText;
+        // 2. Detect and log UPDATE changes (hints aggregated per QueryId changed)
+        insert_recordset logTable (QueryId, QueryHash, OldQueryHintText, NewQueryHintText)
+            select QueryId, QueryHash, QueryHintText from snapshotTable
+                join QueryHintText from aggView
+                where aggView.QueryId == snapshotTable.QueryId
+                   && aggView.QueryHintHash != snapshotTable.QueryHintHash;
 
         update_recordset logTable
             setting ChangeType = DatabaseLogType::Update
@@ -47,11 +47,11 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
                && logTable.OldQueryHintText != ''
                && logTable.NewQueryHintText != '';
 
-        // 3. Detect and log DELETE changes (hints in snapshot, but no longer in hints view)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHash, OldQueryHintText)
-            select QueryHintId, QueryId, QueryHash, QueryHintText from snapshotTable
-                notexists join hintsView
-                where hintsView.QueryHintId == snapshotTable.QueryHintId;
+        // 3. Detect and log DELETE changes (hints aggregated per QueryId no longer exist in view)
+        insert_recordset logTable (QueryId, QueryHash, OldQueryHintText)
+            select QueryId, QueryHash, QueryHintText from snapshotTable
+                notexists join aggView
+                where aggView.QueryId == snapshotTable.QueryId;
 
         update_recordset logTable
             setting ChangeType = DatabaseLogType::Delete
@@ -59,13 +59,13 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
                && logTable.OldQueryHintText != ''
                && logTable.NewQueryHintText == '';
 
-        // 4. Update snapshot table with current hints
+        // 4. Update snapshot table with current hints and hash
         delete_from snapshotTable;
 
-        insert_recordset snapshotTable (QueryId, QueryHintId, QueryHintText, QueryHash)
-            select QueryId, QueryHintId, QueryHintText from hintsView
+        insert_recordset snapshotTable (QueryId, QueryHintText, QueryHintHash, QueryHash)
+            select QueryId, QueryHintText, QueryHintHash from aggView
                 join QueryHash from queryView
-                where queryView.QueryId == hintsView.QueryId;
+                where queryView.QueryId == aggView.QueryId;
 
         // 5. Clean up log records for query IDs that no longer exist in the main query store table
         delete_from logTable
