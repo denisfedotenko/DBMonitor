@@ -23,37 +23,30 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
         DBMSQLQueryStoreQuery queryView;
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
-        DBMSQLQueryStoreQueryHintLog logTableTmp;
 
-        logTableTmp.setTmp();
+        utcdatetime runStartTime = DateTimeUtil::getSystemDateTime();
 
         ttsbegin;
 
         // 1. Detect and log INSERT changes (new hints in hintsView that do not exist in snapshot)
-        insert_recordset logTableTmp (QueryHintId, QueryId, QueryHintText, QueryHash)
+        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
             select QueryHintId, QueryId, QueryHintText from hintsView
                 join QueryHash from queryView
                 where queryView.QueryId == hintsView.QueryId
                 notexists join snapshotTable
                 where snapshotTable.QueryHintId == hintsView.QueryHintId;
 
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
-            select QueryHintId, QueryId, QueryHintText, QueryHash from logTableTmp;
-
-        delete_from logTableTmp;
-
         // 2. Detect and log DELETE changes (hints in snapshot that no longer exist in hintsView)
-        insert_recordset logTableTmp (QueryHintId, QueryId, QueryHintText, QueryHash)
+        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
             select QueryHintId, QueryId, QueryHintText, QueryHash from snapshotTable
                 notexists join hintsView
                 where hintsView.QueryHintId == snapshotTable.QueryHintId;
 
-        DatabaseLogType changeTypeDelete = DatabaseLogType::Delete;
-        update_recordset logTableTmp
-            setting ChangeType = changeTypeDelete;
-
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash, ChangeType)
-            select QueryHintId, QueryId, QueryHintText, QueryHash, ChangeType from logTableTmp;
+        update_recordset logTable
+            setting ChangeType = DatabaseLogType::Delete
+            where logTable.CreatedDateTime >= runStartTime
+            notexists join hintsView
+            where hintsView.QueryHintId == logTable.QueryHintId;
 
         // 3. Update snapshot table with current hints
         delete_from snapshotTable;
