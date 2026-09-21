@@ -23,129 +23,54 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
         DBMSQLQueryStoreQuery queryView;
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
-        DBMSQLQueryStoreQueryHintLog logTableDelete;
-
-        Map currentHintsMap = new Map(Types::Int64, Types::Container);
-        Map snapshotMap = new Map(Types::Int64, Types::Container);
-        Set currentHintIds = new Set(Types::Int64);
-        Set snapshotHintIds = new Set(Types::Int64);
-
-        while select hintsView
-            join QueryHash from queryView
-            where queryView.QueryId == hintsView.QueryId
-        {
-            if (hintsView.QueryHintId)
-            {
-                currentHintsMap.insert(hintsView.QueryHintId, [hintsView.QueryId, queryView.QueryHash, hintsView.QueryHintText]);
-                currentHintIds.add(hintsView.QueryHintId);
-            }
-        }
-
-        while select snapshotTable
-        {
-            snapshotMap.insert(snapshotTable.QueryHintId, [snapshotTable.QueryId, snapshotTable.QueryHash, snapshotTable.QueryHintText]);
-            snapshotHintIds.add(snapshotTable.QueryHintId);
-        }
 
         ttsbegin;
 
-        SetEnumerator seCurrent = currentHintIds.getEnumerator();
-        while (seCurrent.moveNext())
-        {
-            int64 hintId = seCurrent.current();
-            container currentCon = currentHintsMap.lookup(hintId);
-            DBMSQLQueryStoreQueryId queryId = conPeek(currentCon, 1);
-            DBMSQLQueryStoreQueryHash queryHash = conPeek(currentCon, 2);
-            DBMSQLQueryStoreQueryHintText currentText = conPeek(currentCon, 3);
+        // 1. Detect and log INSERT changes (hints in hints view, but not in snapshot)
+        insert_recordset logTable (QueryHintId, QueryId, NewQueryHintText, QueryHash)
+            select QueryHintId, QueryId, QueryHintText from hintsView
+                join QueryHash from queryView
+                where queryView.QueryId == hintsView.QueryId
+                notexists join snapshotTable
+                where snapshotTable.QueryHintId == hintsView.QueryHintId;
 
-            if (!snapshotMap.exists(hintId))
-            {
-                logTable.clear();
-                logTable.QueryHintId = hintId;
-                logTable.QueryId = queryId;
-                logTable.QueryHash = queryHash;
-                logTable.ChangeType = DatabaseLogType::Insert;
-                logTable.OldQueryHintText = '';
-                logTable.NewQueryHintText = currentText;
-                logTable.insert();
-            }
-            else
-            {
-                container snapshotCon = snapshotMap.lookup(hintId);
-                DBMSQLQueryStoreQueryHintText oldText = conPeek(snapshotCon, 3);
+        // 2. Detect and log UPDATE changes (hints in both, but hint text changed)
+        insert_recordset logTable (QueryHintId, QueryId, QueryHash, OldQueryHintText, NewQueryHintText)
+            select QueryHintId, QueryId, QueryHash, QueryHintText from snapshotTable
+                join QueryHintText from hintsView
+                where hintsView.QueryHintId == snapshotTable.QueryHintId
+                   && hintsView.QueryHintText != snapshotTable.QueryHintText;
 
-                if (oldText != currentText)
-                {
-                    logTable.clear();
-                    logTable.QueryHintId = hintId;
-                    logTable.QueryId = queryId;
-                    logTable.QueryHash = queryHash;
-                    logTable.ChangeType = DatabaseLogType::Update;
-                    logTable.OldQueryHintText = oldText;
-                    logTable.NewQueryHintText = currentText;
-                    logTable.insert();
-                }
-            }
-        }
+        update_recordset logTable
+            setting ChangeType = DatabaseLogType::Update
+            where logTable.ChangeType == DatabaseLogType::Insert
+               && logTable.OldQueryHintText != ''
+               && logTable.NewQueryHintText != '';
 
-        SetEnumerator seSnapshot = snapshotHintIds.getEnumerator();
-        while (seSnapshot.moveNext())
-        {
-            int64 hintId = seSnapshot.current();
-            if (!currentHintsMap.exists(hintId))
-            {
-                container snapshotCon = snapshotMap.lookup(hintId);
-                DBMSQLQueryStoreQueryId queryId = conPeek(snapshotCon, 1);
-                DBMSQLQueryStoreQueryHash queryHash = conPeek(snapshotCon, 2);
-                DBMSQLQueryStoreQueryHintText oldText = conPeek(snapshotCon, 3);
+        // 3. Detect and log DELETE changes (hints in snapshot, but no longer in hints view)
+        insert_recordset logTable (QueryHintId, QueryId, QueryHash, OldQueryHintText)
+            select QueryHintId, QueryId, QueryHash, QueryHintText from snapshotTable
+                notexists join hintsView
+                where hintsView.QueryHintId == snapshotTable.QueryHintId;
 
-                logTable.clear();
-                logTable.QueryHintId = hintId;
-                logTable.QueryId = queryId;
-                logTable.QueryHash = queryHash;
-                logTable.ChangeType = DatabaseLogType::Delete;
-                logTable.OldQueryHintText = oldText;
-                logTable.NewQueryHintText = '';
-                logTable.insert();
-            }
-        }
+        update_recordset logTable
+            setting ChangeType = DatabaseLogType::Delete
+            where logTable.ChangeType == DatabaseLogType::Insert
+               && logTable.OldQueryHintText != ''
+               && logTable.NewQueryHintText == '';
 
+        // 4. Update snapshot table with current hints
         delete_from snapshotTable;
 
-        seCurrent = currentHintIds.getEnumerator();
-        while (seCurrent.moveNext())
-        {
-            int64 hintId = seCurrent.current();
-            container currentCon = currentHintsMap.lookup(hintId);
+        insert_recordset snapshotTable (QueryId, QueryHintId, QueryHintText, QueryHash)
+            select QueryId, QueryHintId, QueryHintText from hintsView
+                join QueryHash from queryView
+                where queryView.QueryId == hintsView.QueryId;
 
-            snapshotTable.clear();
-            snapshotTable.QueryHintId = hintId;
-            snapshotTable.QueryId = conPeek(currentCon, 1);
-            snapshotTable.QueryHash = conPeek(currentCon, 2);
-            snapshotTable.QueryHintText = conPeek(currentCon, 3);
-            snapshotTable.insert();
-        }
-
-        Set logQueryIds = new Set(Types::Int64);
-        while select QueryId from logTable
-            group by QueryId
-        {
-            logQueryIds.add(logTable.QueryId);
-        }
-
-        SetEnumerator seLogQueries = logQueryIds.getEnumerator();
-        while (seLogQueries.moveNext())
-        {
-            DBMSQLQueryStoreQueryId checkQueryId = seLogQueries.current();
-            select firstonly RecId from queryView
-                where queryView.QueryId == checkQueryId;
-
-            if (!queryView.RecId)
-            {
-                delete_from logTableDelete
-                    where logTableDelete.QueryId == checkQueryId;
-            }
-        }
+        // 5. Clean up log records for query IDs that no longer exist in the main query store table
+        delete_from logTable
+            notexists join queryView
+            where queryView.QueryId == logTable.QueryId;
 
         ttscommit;
     }
