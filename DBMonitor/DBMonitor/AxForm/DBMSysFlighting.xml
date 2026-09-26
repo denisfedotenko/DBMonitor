@@ -9,6 +9,7 @@
 [Form]
 public class DBMSysFlighting extends FormRun
 {
+
 }
 ]]></Source>
 			</Method>
@@ -21,9 +22,6 @@ public class DBMSysFlighting extends FormRun
 		<AxFormDataSource xmlns="">
 			<Name>SysFlighting</Name>
 			<Table>SysFlighting</Table>
-			<AllowCreate>No</AllowCreate>
-			<AllowDelete>No</AllowDelete>
-			<AllowEdit>No</AllowEdit>
 			<Fields>
 				<AxFormDataSourceField>
 					<DataField>ConfigValue</DataField>
@@ -38,6 +36,9 @@ public class DBMSysFlighting extends FormRun
 					<DataField>FlightServiceID</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
+					<DataField>Partition</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
 					<DataField>RecId</DataField>
 				</AxFormDataSourceField>
 				<AxFormDataSourceField>
@@ -45,6 +46,9 @@ public class DBMSysFlighting extends FormRun
 				</AxFormDataSourceField>
 			</Fields>
 			<ReferencedDataSources />
+			<AllowCreate>No</AllowCreate>
+			<AllowDelete>No</AllowDelete>
+			<AllowEdit>No</AllowEdit>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -127,6 +131,7 @@ public class DBMSysFlighting extends FormRun
 							i:nil="true" />
 						<DataField>Enabled</DataField>
 						<DataSource>SysFlighting</DataSource>
+						<Items />
 					</AxFormControl>
 				</Controls>
 				<DataSource>SysFlighting</DataSource>

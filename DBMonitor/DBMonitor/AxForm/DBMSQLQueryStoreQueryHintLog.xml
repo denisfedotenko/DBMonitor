@@ -21,7 +21,35 @@ public class DBMSQLQueryStoreQueryHintLog extends FormRun
 		<AxFormDataSource xmlns="">
 			<Name>DBMSQLQueryStoreQueryHintLog</Name>
 			<Table>DBMSQLQueryStoreQueryHintLog</Table>
-			<Fields />
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>ChangeType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CreatedDateTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Partition</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHash</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHintId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHintText</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+			</Fields>
 			<ReferencedDataSources />
 			<AllowCreate>No</AllowCreate>
 			<AllowDelete>No</AllowDelete>

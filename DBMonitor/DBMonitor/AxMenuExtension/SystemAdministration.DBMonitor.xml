@@ -72,6 +72,23 @@
 							</AxMenuElement>
 						</Elements>
 					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementSubMenu">
+						<Name>Flights</Name>
+						<Label>@DBMonitor:Flights</Label>
+						<Elements>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSysFlighting</Name>
+								<MenuItemName>DBMSysFlighting</MenuItemName>
+							</AxMenuElement>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSysFlightingLog</Name>
+								<MenuItemName>DBMSysFlightingLog</MenuItemName>
+							</AxMenuElement>
+						</Elements>
+					</AxMenuElement>
 				</Elements>
 			</MenuElement>
 		</AxMenuExtensionElement>
@@ -111,6 +128,12 @@
 						i:type="AxMenuElementMenuItem">
 						<Name>DBMSQLQueryStoreQueryHintSync</Name>
 						<MenuItemName>DBMSQLQueryStoreQueryHintSync</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSysFlightingSync</Name>
+						<MenuItemName>DBMSysFlightingSync</MenuItemName>
 						<MenuItemType>Action</MenuItemType>
 					</AxMenuElement>
 				</Elements>
