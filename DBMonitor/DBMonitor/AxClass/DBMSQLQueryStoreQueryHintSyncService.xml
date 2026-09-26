@@ -24,29 +24,24 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
 
-        utcdatetime runStartTime = DateTimeUtil::getSystemDateTime();
+        DatabaseLogType changeTypeInsert = DatabaseLogType::Insert;
+        DatabaseLogType changeTypeDelete = DatabaseLogType::Delete;
 
         ttsbegin;
 
         // 1. Detect and log INSERT changes (new hints in hintsView that do not exist in snapshot)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
-            select QueryHintId, QueryId, QueryHintText from hintsView
+        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, ChangeType, QueryHash)
+            select QueryHintId, QueryId, QueryHintText, changeTypeInsert from hintsView
                 join QueryHash from queryView
                 where queryView.QueryId == hintsView.QueryId
                 notexists join snapshotTable
                 where snapshotTable.QueryHintId == hintsView.QueryHintId;
 
         // 2. Detect and log DELETE changes (hints in snapshot that no longer exist in hintsView)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
-            select QueryHintId, QueryId, QueryHintText, QueryHash from snapshotTable
+        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash, ChangeType)
+            select QueryHintId, QueryId, QueryHintText, QueryHash, changeTypeDelete from snapshotTable
                 notexists join hintsView
                 where hintsView.QueryHintId == snapshotTable.QueryHintId;
-
-        update_recordset logTable
-            setting ChangeType = DatabaseLogType::Delete
-            where logTable.CreatedDateTime >= runStartTime
-            notexists join hintsView
-            where hintsView.QueryHintId == logTable.QueryHintId;
 
         // 3. Update snapshot table with current hints
         delete_from snapshotTable;
