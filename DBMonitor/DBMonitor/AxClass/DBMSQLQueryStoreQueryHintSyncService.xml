@@ -23,30 +23,26 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
         DBMSQLQueryStoreQuery queryView;
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
-
-        utcdatetime runStartTime = DateTimeUtil::getSystemDateTime();
+        DatabaseLogType changeTypeVar;
 
         ttsbegin;
 
         // 1. Detect and log INSERT changes (new hints in hintsView that do not exist in snapshot)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
-            select QueryHintId, QueryId, QueryHintText from hintsView
+        changeTypeVar = DatabaseLogType::Insert;
+        insert_recordset logTable (changeType, QueryHintId, QueryId, QueryHintText, QueryHash)
+            select ChangeTypeVar, QueryHintId, QueryId, QueryHintText from hintsView
                 join QueryHash from queryView
                 where queryView.QueryId == hintsView.QueryId
                 notexists join snapshotTable
                 where snapshotTable.QueryHintId == hintsView.QueryHintId;
 
+        changeTypeVar = DatabaseLogType::Delete;
+
         // 2. Detect and log DELETE changes (hints in snapshot that no longer exist in hintsView)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash)
-            select QueryHintId, QueryId, QueryHintText, QueryHash from snapshotTable
+        insert_recordset logTable (changeType, QueryHintId, QueryId, QueryHintText, QueryHash)
+            select ChangeTypeVar, QueryHintId, QueryId, QueryHintText, QueryHash from snapshotTable
                 notexists join hintsView
                 where hintsView.QueryHintId == snapshotTable.QueryHintId;
-
-        update_recordset logTable
-            setting ChangeType = DatabaseLogType::Delete
-            where logTable.CreatedDateTime >= runStartTime
-            notexists join hintsView
-            where hintsView.QueryHintId == logTable.QueryHintId;
 
         // 3. Update snapshot table with current hints
         delete_from snapshotTable;

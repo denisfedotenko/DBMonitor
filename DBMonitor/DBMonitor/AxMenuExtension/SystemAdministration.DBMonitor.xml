@@ -41,19 +41,36 @@
 						<MenuItemName>DBMSQLQueryStatsForm</MenuItemName>
 					</AxMenuElement>
 					<AxMenuElement xmlns=""
-						i:type="AxMenuElementMenuItem">
-						<Name>DBMSQLQueryStoreQuery</Name>
-						<MenuItemName>DBMSQLQueryStoreQuery</MenuItemName>
-					</AxMenuElement>
-					<AxMenuElement xmlns=""
-						i:type="AxMenuElementMenuItem">
-						<Name>DBMSQLDBTuningRecommendations</Name>
-						<MenuItemName>DBMSQLDBTuningRecommendations</MenuItemName>
-					</AxMenuElement>
-					<AxMenuElement xmlns=""
-						i:type="AxMenuElementMenuItem">
-						<Name>DBMSQLDBTuningConfigurations</Name>
-						<MenuItemName>DBMSQLDBTuningConfigurations</MenuItemName>
+						i:type="AxMenuElementSubMenu">
+						<Name>QueryStore</Name>
+						<Label>@DBMonitor:QueryStore</Label>
+						<Elements>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSQLQueryStoreQuery</Name>
+								<MenuItemName>DBMSQLQueryStoreQuery</MenuItemName>
+							</AxMenuElement>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSQLDBTuningRecommendations</Name>
+								<MenuItemName>DBMSQLDBTuningRecommendations</MenuItemName>
+							</AxMenuElement>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSQLDBTuningConfigurations</Name>
+								<MenuItemName>DBMSQLDBTuningConfigurations</MenuItemName>
+							</AxMenuElement>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSQLQueryStoreQueryHints</Name>
+								<MenuItemName>DBMSQLQueryStoreQueryHints</MenuItemName>
+							</AxMenuElement>
+							<AxMenuElement xmlns=""
+								i:type="AxMenuElementMenuItem">
+								<Name>DBMSQLQueryStoreQueryHintLog</Name>
+								<MenuItemName>DBMSQLQueryStoreQueryHintLog</MenuItemName>
+							</AxMenuElement>
+						</Elements>
 					</AxMenuElement>
 				</Elements>
 			</MenuElement>
@@ -61,38 +78,42 @@
 		<AxMenuExtensionElement xmlns="">
 			<Parent>Periodic</Parent>
 			<MenuElement xmlns=""
-				i:type="AxMenuElementMenuItem">
-				<Name>DBMLockMonitorBatch</Name>
-				<MenuItemName>DBMLockMonitorBatch</MenuItemName>
-				<MenuItemType>Action</MenuItemType>
-			</MenuElement>
-		</AxMenuExtensionElement>
-		<AxMenuExtensionElement xmlns="">
-			<Parent>Periodic</Parent>
-			<MenuElement xmlns=""
-				i:type="AxMenuElementMenuItem">
-				<Name>DBMDBLockHistoryCleanup</Name>
-				<MenuItemName>DBMDBLockHistoryCleanup</MenuItemName>
-				<MenuItemType>Action</MenuItemType>
-			</MenuElement>
-		</AxMenuExtensionElement>
-		<AxMenuExtensionElement xmlns="">
-			<Parent>Periodic</Parent>
-			<MenuElement xmlns=""
-				i:type="AxMenuElementMenuItem">
-				<Name>DBMDBUsageMonitorBatch</Name>
-				<MenuItemName>DBMDBUsageMonitorBatch</MenuItemName>
-				<MenuItemType>Action</MenuItemType>
-			</MenuElement>
-		</AxMenuExtensionElement>
-		<AxMenuExtensionElement xmlns="">
-			<Parent>Periodic</Parent>
-			<MenuElement xmlns=""
-				i:type="AxMenuElementMenuItem">
-				<Name>DBMUpdateTableStatistics</Name>
-				<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
-				<MenuItemType>Action</MenuItemType>
-				<Parameters>DBMUpdateTableStatisticsService.process</Parameters>
+				i:type="AxMenuElementSubMenu">
+				<Name>DBMonitorPeriodic</Name>
+				<Label>@DBMonitor:DBMonitor</Label>
+				<Elements>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMLockMonitorBatch</Name>
+						<MenuItemName>DBMLockMonitorBatch</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMDBLockHistoryCleanup</Name>
+						<MenuItemName>DBMDBLockHistoryCleanup</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMDBUsageMonitorBatch</Name>
+						<MenuItemName>DBMDBUsageMonitorBatch</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMUpdateTableStatistics</Name>
+						<MenuItemName>DBMUpdateTableStatistics</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+						<Parameters>DBMUpdateTableStatisticsService.process</Parameters>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>DBMSQLQueryStoreQueryHintSync</Name>
+						<MenuItemName>DBMSQLQueryStoreQueryHintSync</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+					</AxMenuElement>
+				</Elements>
 			</MenuElement>
 		</AxMenuExtensionElement>
 	</Elements>
