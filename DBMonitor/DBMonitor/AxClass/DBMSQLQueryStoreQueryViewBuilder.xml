@@ -84,7 +84,7 @@ public final class DBMSQLQueryStoreQueryViewBuilder extends DBMSQLObjects
             r.context_settings_id AS %3,
             r.object_id AS %4,
             r.batch_sql_handle AS %5,
-            r.query_hash AS %6,
+            CONVERT([VARCHAR](20), r.query_hash, 1) AS %6,
             r.is_internal_query AS %7,
             r.query_parameterization_type AS %8,
             CONVERT([NVARCHAR](MAX), r.query_parameterization_type_desc) AS %9,

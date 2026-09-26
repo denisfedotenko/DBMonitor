@@ -44,6 +44,7 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
         public void executeQuery()
         {
             QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            queryId = 0;
             if (element.args().dataSet() == tableNum(DBMSQLQueryStoreExt))
             {
                 DBMSQLQueryStoreExt queryExt = element.args().record() as DBMSQLQueryStoreExt;
@@ -58,10 +59,81 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
                     queryId = query.queryId;
                 }
             }
-            QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
-            qbrQueryId.value(queryValue(queryId));
+            if (queryId)
+            {
+                QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
+                qbrQueryId.value(queryValue(queryId));
+            }
+            else
+            {
+                QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
+                qbrQueryId.value(SysQuery::valueUnlimited());
+            }
 
             super();
+        }
+
+]]></Source>
+					</Method>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+            super();
+            FormDataObject fdoThis = this.object(fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
+            fdoThis.visible(element.args().dataset() == 0);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+			<DataSource>
+				<Name>DBMSQLQueryStoreQuery</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            qbdsThis.addLink(fieldNum(DBMSQLQueryStoreQueryHints, QueryId),fieldNum(DBMSQLQueryStoreQuery, QueryId));
+            FormDataObject fdoThis = this.object(fieldNum(DBMSQLQueryStoreQuery, QueryHash));
+            fdoThis.visible(element.args().dataset() == 0);
+            qbdsThis.enabled(element.args().dataset() == 0);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+			<DataSource>
+				<Name>DBMSQLQueryStoreQueryText</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            qbdsThis.addLink(fieldNum(DBMSQLQueryStoreQuery, QueryTextId),fieldNum(DBMSQLQueryStoreQueryText, QueryTextId));
+            FormDataObject fdoThis = this.object(fieldNum(DBMSQLQueryStoreQueryText, QuerySQLText));
+            fdoThis.visible(element.args().dataset() == 0);
+            qbdsThis.enabled(element.args().dataset() == 0);
         }
 
 ]]></Source>
@@ -152,6 +224,149 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
 				</AxFormDataSourceField>
 			</Fields>
 			<ReferencedDataSources />
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreQuery</Name>
+			<Table>DBMSQLQueryStoreQuery</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>AvgBindCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgBindDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileMemoryKb</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgOptimizeCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgOptimizeDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>BatchSqlHandle</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ContextSettingsId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CountCompiles</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InitialCompileStartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsClouddbInternalQuery</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsInternalQuery</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastBindCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastBindDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileBatchOffsetEnd</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileBatchOffsetStart</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileBatchSqlHandle</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileMemoryKb</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastCompileStartTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastExecutionTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastOptimizeCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>LastOptimizeDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>MaxCompileMemoryKb</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ObjectId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>parameterizationType</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHash</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryParameterizationTypeDesc</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryTextId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<JoinSource>DBMSQLQueryStoreQueryHints</JoinSource>
+			<LinkType>InnerJoin</LinkType>
+			<OnlyFetchActive>Yes</OnlyFetchActive>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreQueryText</Name>
+			<Table>DBMSQLQueryStoreQueryText</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>HasRestrictedText</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IsPartOfEncryptedModule</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QuerySqlText</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryTextId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>StatementSqlHandle</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<JoinSource>DBMSQLQueryStoreQuery</JoinSource>
+			<LinkType>InnerJoin</LinkType>
+			<OnlyFetchActive>Yes</OnlyFetchActive>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -324,6 +539,33 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
 							i:nil="true" />
 						<DataField>SourceDesc</DataField>
 						<DataSource>DBMSQLQueryStoreQueryHints</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreQueryHints_QueryId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryId</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHints</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreQuery_QueryHash</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryHash</DataField>
+						<DataSource>DBMSQLQueryStoreQuery</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreQueryText_QuerySqlText</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QuerySqlText</DataField>
+						<DataSource>DBMSQLQueryStoreQueryText</DataSource>
 					</AxFormControl>
 				</Controls>
 				<DataSource>DBMSQLQueryStoreQueryHints</DataSource>

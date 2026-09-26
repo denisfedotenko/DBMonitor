@@ -21,36 +21,11 @@ public class DBMSQLQueryStoreQueryHintLog extends FormRun
 		<AxFormDataSource xmlns="">
 			<Name>DBMSQLQueryStoreQueryHintLog</Name>
 			<Table>DBMSQLQueryStoreQueryHintLog</Table>
+			<Fields />
+			<ReferencedDataSources />
 			<AllowCreate>No</AllowCreate>
 			<AllowDelete>No</AllowDelete>
 			<AllowEdit>No</AllowEdit>
-			<Fields>
-				<AxFormDataSourceField>
-					<DataField>ChangeType</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>CreatedDateTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryHash</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryHintId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryHintText</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>RecId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TableId</DataField>
-				</AxFormDataSourceField>
-			</Fields>
-			<ReferencedDataSources />
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -117,30 +92,21 @@ public class DBMSQLQueryStoreQueryHintLog extends FormRun
 					i:nil="true" />
 				<Controls>
 					<AxFormControl xmlns=""
-						i:type="AxFormDateTimeControl">
-						<Name>DBMSQLQueryStoreQueryHintLog_CreatedDateTime</Name>
-						<Type>DateTime</Type>
-						<FormControlExtension
-							i:nil="true" />
-						<DataField>CreatedDateTime</DataField>
-						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
-					</AxFormControl>
-					<AxFormControl xmlns=""
-						i:type="AxFormComboBoxControl">
-						<Name>DBMSQLQueryStoreQueryHintLog_ChangeType</Name>
-						<Type>ComboBox</Type>
-						<FormControlExtension
-							i:nil="true" />
-						<DataField>ChangeType</DataField>
-						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
-					</AxFormControl>
-					<AxFormControl xmlns=""
 						i:type="AxFormInt64Control">
 						<Name>DBMSQLQueryStoreQueryHintLog_QueryId</Name>
 						<Type>Int64</Type>
 						<FormControlExtension
 							i:nil="true" />
 						<DataField>QueryId</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_QueryHash</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryHash</DataField>
 						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
 					</AxFormControl>
 					<AxFormControl xmlns=""
@@ -154,20 +120,30 @@ public class DBMSQLQueryStoreQueryHintLog extends FormRun
 					</AxFormControl>
 					<AxFormControl xmlns=""
 						i:type="AxFormStringControl">
-						<Name>DBMSQLQueryStoreQueryHintLog_QueryHash</Name>
-						<Type>String</Type>
-						<FormControlExtension
-							i:nil="true" />
-						<DataField>QueryHash</DataField>
-						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
-					</AxFormControl>
-					<AxFormControl xmlns=""
-						i:type="AxFormStringControl">
 						<Name>DBMSQLQueryStoreQueryHintLog_QueryHintText</Name>
 						<Type>String</Type>
 						<FormControlExtension
 							i:nil="true" />
 						<DataField>QueryHintText</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormComboBoxControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_ChangeType</Name>
+						<Type>ComboBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>ChangeType</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+						<Items />
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_CreatedDateTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CreatedDateTime</DataField>
 						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
 					</AxFormControl>
 				</Controls>

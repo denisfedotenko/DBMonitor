@@ -23,23 +23,24 @@ public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBas
         DBMSQLQueryStoreQuery queryView;
         DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
         DBMSQLQueryStoreQueryHintLog logTable;
-
-        DatabaseLogType changeTypeInsert = DatabaseLogType::Insert;
-        DatabaseLogType changeTypeDelete = DatabaseLogType::Delete;
+        DatabaseLogType changeTypeVar;
 
         ttsbegin;
 
         // 1. Detect and log INSERT changes (new hints in hintsView that do not exist in snapshot)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, ChangeType, QueryHash)
-            select QueryHintId, QueryId, QueryHintText, changeTypeInsert from hintsView
+        changeTypeVar = DatabaseLogType::Insert;
+        insert_recordset logTable (changeType, QueryHintId, QueryId, QueryHintText, QueryHash)
+            select ChangeTypeVar, QueryHintId, QueryId, QueryHintText from hintsView
                 join QueryHash from queryView
                 where queryView.QueryId == hintsView.QueryId
                 notexists join snapshotTable
                 where snapshotTable.QueryHintId == hintsView.QueryHintId;
 
+        changeTypeVar = DatabaseLogType::Delete;
+
         // 2. Detect and log DELETE changes (hints in snapshot that no longer exist in hintsView)
-        insert_recordset logTable (QueryHintId, QueryId, QueryHintText, QueryHash, ChangeType)
-            select QueryHintId, QueryId, QueryHintText, QueryHash, changeTypeDelete from snapshotTable
+        insert_recordset logTable (changeType, QueryHintId, QueryId, QueryHintText, QueryHash)
+            select ChangeTypeVar, QueryHintId, QueryId, QueryHintText, QueryHash from snapshotTable
                 notexists join hintsView
                 where hintsView.QueryHintId == snapshotTable.QueryHintId;
 

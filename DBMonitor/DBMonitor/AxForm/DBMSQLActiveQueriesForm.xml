@@ -73,6 +73,20 @@ public class DBMSQLActiveQueriesForm extends FormRun
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    public void init()
+    {
+        super();
+        LivePlan.enabled(DBMSQLUtils::canGetLiveQueryPlan());
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>
@@ -128,10 +142,10 @@ public class DBMSQLActiveQueriesForm extends FormRun
         {
             super();
             Filename fileName = strFmt('QPL%1.sqlplan', DBMSQLActiveQueries.QueryPlanHash);
-            XML LivePlan = DBMSQLUtils::getLiveQueryPlan(DBMSQLActiveQueries.SessionId);
-            if (strLen(LivePlan) != 0)
+            XML LivePlanXML = DBMSQLUtils::getQueryPlan(DBMSQLActiveQueries.PlanHandle);
+            if (strLen(LivePlanXML) != 0)
             {
-                File::SendStringAsFileToUser(LivePlan, fileName);
+                File::SendStringAsFileToUser(LivePlanXML, fileName);
             }
         }
 
@@ -153,7 +167,7 @@ public class DBMSQLActiveQueriesForm extends FormRun
         {
             super();
             Filename fileName = strFmt('QP%1.sqlplan', DBMSQLActiveQueries.QueryPlanHash);
-            File::SendStringAsFileToUser(DBMSQLUtils::getQueryPlan(DBMSQLActiveQueries.PlanHandle),fileName);
+            File::SendStringAsFileToUser(DBMSQLUtils::getLiveQueryPlan(DBMSQLActiveQueries.SessionId),fileName);
         }
 
 ]]></Source>
@@ -420,6 +434,7 @@ public class DBMSQLActiveQueriesForm extends FormRun
 							<AxFormControl xmlns=""
 								i:type="AxFormButtonControl">
 								<Name>LivePlan</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
 								<HelpText>@DBMonitor:LivePlanHelp</HelpText>
 								<Type>Button</Type>
 								<FormControlExtension
