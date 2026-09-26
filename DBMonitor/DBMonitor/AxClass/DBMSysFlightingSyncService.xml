@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSysFlightingSyncService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Service to synchronize and log changes in SysFlighting.
+/// </summary>
+public class DBMSysFlightingSyncService extends SysOperationServiceBase
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Synchronizes current SysFlighting table with previous snapshot, logs changes, and updates snapshot.
+    /// </summary>
+    public void process()
+    {
+        SysFlighting flightTable;
+        DBMSysFlightingSnapshot snapshotTable;
+        DBMSysFlightingLog logTable;
+
+        DatabaseLogType changeTypeInsert = DatabaseLogType::Insert;
+        DatabaseLogType changeTypeUpdate = DatabaseLogType::Update;
+        DatabaseLogType changeTypeDelete = DatabaseLogType::Delete;
+
+        ttsbegin;
+
+        // 1. Detect and log INSERT changes (flights in SysFlighting not in snapshot)
+        insert_recordset logTable (FlightName, NewEnabled, ChangeType)
+            select FlightName, Enabled, changeTypeInsert from flightTable
+                notexists join snapshotTable
+                where snapshotTable.FlightName == flightTable.FlightName;
+
+        // 2. Detect and log UPDATE changes (flights in both, but Enabled state changed)
+        insert_recordset logTable (FlightName, OldEnabled, ChangeType, NewEnabled)
+            select FlightName, Enabled, changeTypeUpdate from snapshotTable
+                join Enabled from flightTable
+                where flightTable.FlightName == snapshotTable.FlightName
+                   && flightTable.Enabled != snapshotTable.Enabled;
+
+        // 3. Detect and log DELETE changes (flights in snapshot no longer in SysFlighting)
+        insert_recordset logTable (FlightName, OldEnabled, ChangeType)
+            select FlightName, Enabled, changeTypeDelete from snapshotTable
+                notexists join flightTable
+                where flightTable.FlightName == snapshotTable.FlightName;
+
+        // 4. Update snapshot table
+        delete_from snapshotTable;
+
+        insert_recordset snapshotTable (FlightName, Enabled)
+            select FlightName, Enabled from flightTable;
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
