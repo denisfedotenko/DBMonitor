@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>DBMSQLQueryStoreQueryHintLog</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class DBMSQLQueryStoreQueryHintLog extends FormRun
+{
+}
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="" />
+		<DataControls xmlns="" />
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreQueryHintLog</Name>
+			<Table>DBMSQLQueryStoreQueryHintLog</Table>
+			<Fields />
+			<ReferencedDataSources />
+			<AllowCreate>No</AllowCreate>
+			<AllowDelete>No</AllowDelete>
+			<AllowEdit>No</AllowEdit>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Design>
+		<Caption xmlns="">@DBMonitor:DBMSQLQueryStoreQueryHintLogFormCaption</Caption>
+		<Pattern xmlns="">SimpleList</Pattern>
+		<PatternVersion xmlns="">1.1</PatternVersion>
+		<Style xmlns="">SimpleList</Style>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ApplicationBar</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls />
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>CustomFilterGroup</Name>
+				<Pattern>CustomAndQuickFilters</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl>
+						<Name>QuickFilter</Name>
+						<FormControlExtension>
+							<Name>QuickFilterControl</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>targetControlName</Name>
+									<Type>String</Type>
+									<Value>SimpleListGrid</Value>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>placeholderText</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>defaultColumnName</Name>
+									<Type>String</Type>
+									<Value>DBMSQLQueryStoreQueryHintLog_QueryHash</Value>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+				<FrameType>None</FrameType>
+				<Style>CustomFilter</Style>
+				<ViewEditMode>Edit</ViewEditMode>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGridControl">
+				<Name>SimpleListGrid</Name>
+				<Type>Grid</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreQueryHintLog_QueryId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryId</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_QueryHash</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryHash</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormInt64Control">
+						<Name>DBMSQLQueryStoreQueryHintLog_QueryHintId</Name>
+						<Type>Int64</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryHintId</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_QueryHintText</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>QueryHintText</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormComboBoxControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_ChangeType</Name>
+						<Type>ComboBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>ChangeType</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+						<Items />
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateTimeControl">
+						<Name>DBMSQLQueryStoreQueryHintLog_CreatedDateTime</Name>
+						<Type>DateTime</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CreatedDateTime</DataField>
+						<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataSource>DBMSQLQueryStoreQueryHintLog</DataSource>
+				<Style>Tabular</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

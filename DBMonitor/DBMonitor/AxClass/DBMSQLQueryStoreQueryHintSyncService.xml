@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>DBMSQLQueryStoreQueryHintSyncService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Service to synchronize and log changes in query store query hints.
+/// </summary>
+public class DBMSQLQueryStoreQueryHintSyncService extends SysOperationServiceBase
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Synchronizes current query hints view with previous snapshot, logs changes, and updates snapshot.
+    /// </summary>
+    public void process()
+    {
+        DBMSQLQueryStoreQueryHints hintsView;
+        DBMSQLQueryStoreQuery queryView;
+        DBMSQLQueryStoreQueryHintSnapshot snapshotTable;
+        DBMSQLQueryStoreQueryHintLog logTable;
+        DatabaseLogType changeTypeVar;
+
+        ttsbegin;
+
+        // 1. Detect and log INSERT changes (new hints in hintsView that do not exist in snapshot)
+        changeTypeVar = DatabaseLogType::Insert;
+        insert_recordset logTable (changeType, QueryHintId, QueryId, QueryHintText, QueryHash)
+            select ChangeTypeVar, QueryHintId, QueryId, QueryHintText from hintsView
+                join QueryHash from queryView
+                where queryView.QueryId == hintsView.QueryId
+                notexists join snapshotTable
+                where snapshotTable.QueryHintId == hintsView.QueryHintId;
+
+        changeTypeVar = DatabaseLogType::Delete;
+
+        // 2. Detect and log DELETE changes (hints in snapshot that no longer exist in hintsView)
+        insert_recordset logTable (changeType, QueryHintId, QueryId, QueryHintText, QueryHash)
+            select ChangeTypeVar, QueryHintId, QueryId, QueryHintText, QueryHash from snapshotTable
+                notexists join hintsView
+                where hintsView.QueryHintId == snapshotTable.QueryHintId;
+
+        // 3. Update snapshot table with current hints
+        delete_from snapshotTable;
+
+        insert_recordset snapshotTable (QueryHintId, QueryId, QueryHintText, QueryHash)
+            select QueryHintId, QueryId, QueryHintText from hintsView
+                join QueryHash from queryView
+                where queryView.QueryId == hintsView.QueryId;
+
+        // 4. Clean up log records for query IDs that no longer exist in the main query store table
+        delete_from logTable
+            notexists join queryView
+            where queryView.QueryId == logTable.QueryId;
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
