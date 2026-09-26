@@ -1210,6 +1210,60 @@ WHERE
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>hasPermission</Name>
+				<Source><![CDATA[
+    public static boolean hasPermission(str _permissionName, DBMSQLPermissionScope _permissionScope = DBMSQLPermissionScope::Database)
+    {
+        Connection connection = new Connection();
+        SqlStatementExecutePermission permission;
+        Statement statement;
+        ResultSet sqlResult;
+        str scopeText = (_permissionScope == DBMSQLPermissionScope::Server) ? 'NULL' : strFmt('\'%1\'', _permissionScope);
+        str securableText = (_permissionScope == DBMSQLPermissionScope::Server) ? 'NULL' : 'db_name()';
+        str sqlQuery = strFmt(@"SELECT HAS_PERMS_BY_NAME(%1, %2, '%3')", securableText, scopeText, _permissionName);
+        permission = new SqlStatementExecutePermission(sqlQuery);
+        // Open the code access permission scope.
+        permission.assert();
+        boolean hasPermission = false;
+        try
+        {
+            statement = connection.createStatement();
+            sqlResult = statement.executeQueryWithParameters(sqlQuery, SqlParams::create());
+      
+            if (sqlResult.next())
+            {
+                hasPermission = (sqlResult.getInt(1) == 1);
+            }
+        }
+        finally
+        {
+            if (sqlResult)
+            {
+                sqlResult.close();
+            }
+            if (statement)
+            {
+                statement.close();
+            }
+        }
+        CodeAccessPermission::revertAssert();
+        return hasPermission;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>canGetLiveQueryPlan</Name>
+				<Source><![CDATA[
+    public static boolean canGetLiveQueryPlan()
+    {
+        return DBMSQLUtils::hasPermission('VIEW SERVER PERFORMANCE STATE', DBMSQLPermissionScope::Server)
+            && DBMSQLUtils::hasPermission('VIEW DATABASE STATE', DBMSQLPermissionScope::DATABASE);
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 	</SourceCode>
 </AxClass>
