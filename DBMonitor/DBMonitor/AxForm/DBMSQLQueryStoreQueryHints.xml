@@ -33,6 +33,17 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
 
 ]]></Source>
 			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        super();
+        addHint.enabled(false);
+    }
+
+]]></Source>
+			</Method>
 		</Methods>
 		<DataSources xmlns="">
 			<DataSource>
@@ -63,11 +74,13 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
             {
                 QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
                 qbrQueryId.value(queryValue(queryId));
+                addHint.enabled(true);
             }
             else
             {
                 QueryBuildRange qbrQueryId = findOrCreateRange_W(qbdsThis,fieldNum(DBMSQLQueryStoreQueryHints, QueryId));
                 qbrQueryId.value(SysQuery::valueUnlimited());
+                addHint.enabled(false);
             }
 
             super();
@@ -406,6 +419,7 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
 							<AxFormControl xmlns=""
 								i:type="AxFormDropDialogButtonControl">
 								<Name>addHint</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
 								<Type>DropDialogButton</Type>
 								<FormControlExtension
 									i:nil="true" />
