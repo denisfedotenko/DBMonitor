@@ -147,7 +147,7 @@ flowchart TD
 
 ---
 
-### 2. Database Resource Usage Monitor (Azure SQL & Fabric SQL)
+### 2. Database Resource Usage Monitor (Azure SQL)
 
 - **Menu Paths**:
   - Live Log: *System administration > Inquiries > DBMonitor > Database resource usage* (`DBMDBResourceUsage`)
@@ -173,10 +173,10 @@ flowchart TD
 
 - **Menu Path**: *System administration > Inquiries > DBMonitor > Active queries* (`DBMSQLRunningQueries` / `DBMSQLActiveQueriesForm`)
 - **Underlying DMVs**: [`sys.dm_exec_requests`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql), [`sys.dm_exec_sql_text`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sql-text-transact-sql), [`sys.dm_exec_query_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-transact-sql), [`sys.dm_exec_query_statistics_xml`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-statistics-xml-transact-sql).
-- **Real-Time Request Metrics**: Captures Session ID, Command, Status, Start time, Elapsed time, CPU time, Reads, Logical Reads, Writes, Row Count, Granted Query Memory, Degree of Parallelism (DOP), Parallel Worker Count, Blocking Session ID, Wait Type, Wait Time, Last Wait Type, and Wait Resource.
+- **Real-Time Request Metrics**: Captures Session ID, Command, Status, Start time, Elapsed time, CPU time, Reads, Logical Reads, Writes, Row Count, Granted Query Memory, Degree of Parallelism (DOP), Parallel Worker Count, Blocking Session ID, Wait Type, Wait Time, Last Wait Type, and Wait Resource. More columns are available in the underlying view; They can be added via usage of saved form views.
 - **Interactive Action Bar Operations**:
   - **SQL Text Sample** (`DBMSQLText`): Extracts the full statement text for the running request (using statement offset boundaries) and inspects the compiled XML plan's `<ParameterList>` to reconstruct parameterized `DECLARE @p...` variables.
-  - **Drop Plan**: Executes `DBCC FREEPROCCACHE(plan_handle)` to immediately evict the problematic execution plan from cache so subsequent executions recompile.
+  - **Drop Plan**: Executes `ALTER DATABASE SCOPED CONFIGURATION CLEAR PROCEDURE_CACHE(plan_handle)` to immediately evict the problematic execution plan from cache so subsequent executions recompile.
   - **Query Plan**: Downloads the estimated query execution plan in native `.sqlplan` XML format.
   - **Live Plan (In-Flight Execution Progress)**: Retrieves the real-time operational execution plan via `sys.dm_exec_query_statistics_xml(session_id)`. Verifies permissions (`VIEW SERVER PERFORMANCE STATE` / `VIEW DATABASE STATE` via `DBMSQLUtils::canGetLiveQueryPlan`). Allows watching operator-by-operator row counts and progress while long-running transactions are actively executing.
   - **Update Table Statistics**: Analyzes the query plan XML, extracts all referenced D365FO tables (`DBMSQLUtils::getTableListFromPlanHandle`), and opens the Update Table Statistics dialog pre-populated with those tables.
@@ -264,7 +264,7 @@ flowchart TD
   - Active Flights: *System administration > Inquiries > DBMonitor > Flights > SysFlighting* (`DBMSysFlighting`)
   - Flight Change History: *System administration > Inquiries > DBMonitor > Flights > SysFlighting log* (`DBMSysFlightingLog`)
   - Periodic Sync: *System administration > Periodic > DBMonitor > Sync SysFlighting* (`DBMSysFlightingSync` / `DBMSysFlightingSyncService`)
-- **Background**: Dynamics 365 uses the `SysFlighting` table to toggle platform and application feature flags (flights). Changes to flights can substantially alter application queries and execution behavior, making historical tracking vital for root-cause analysis of sudden regressions.
+- **Background**: In Tier1 environment Dynamics 365 uses the `SysFlighting` table to toggle platform and application feature flags (flights). In Tier2+ environments flights are read by AOS from an external web service. Yet, since about early 2025 flight configuration is periodically downloaded from the web service to the 'SysFlighting' table even in Tier2+ configurations. By tracking changes to this table one can undrestand what flights Microsoft enabled in backgroundfor the given environment. 
 - **Automated Differential Snapshot Engine**:
   - `DBMSysFlightingSyncService` runs periodically or on-demand via the SysOperation framework.
   - Automatically identifies **Insert** events (new flights added), **Update** events (flights toggled enabled/disabled, capturing both `OldEnabled` and `NewEnabled`), and **Delete** events (flights removed).
@@ -272,7 +272,7 @@ flowchart TD
 
 ---
 
-### 9. Deep Table Statistics Update Utility
+### 9. Table Statistics Update Utility
 
 - **Menu Paths**:
   - Periodic / Dialog: *System administration > Periodic > DBMonitor > Update table statistics* (`DBMUpdateTableStatistics` / `DBMUpdateTableStatisticsService`)
