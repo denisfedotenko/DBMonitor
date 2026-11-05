@@ -1,355 +1,128 @@
-# DBMonitor: Database Performance & Telemetry Monitor for D365FO
+# DBMonitor
+Database monitor for D365FO
 
-**DBMonitor** is an enterprise-grade database monitoring, diagnostics, and performance optimization suite built natively for **Microsoft Dynamics 365 for Finance and Operations (D365FO)**. It provides real-time visibility into SQL Server and Azure SQL Database internals directly from the D365FO client interface, bridging the gap between X++ application execution and SQL Server engine internals.
+A good part of the logic in this extension relies on the infrastructure of setup classes in D365FO (`SysSetup` and `SysSetupAsync`). Because the standard D365FO view designer cannot directly query SQL Server Dynamic Management Views (`sys.dm_*`) or Query Store catalog views (`sys.query_store_*`), the model declares regular views in the AOT and uses `*ViewSetup` and `*ViewBuilder` classes during database synchronization to recreate those views in SQL Server directly on top of the system DMVs.
 
-A substantial portion of DBMonitor functions as a specialized, high-performance wrapper around **SQL Server Dynamic Management Views (DMVs)**, Dynamic Management Functions (DMFs), Query Store catalog views, and Automatic Tuning engines. The implementation is verified and aligned with **Microsoft SQL Server 2025** and **Azure SQL Database** / **Microsoft Fabric SQL Database**.
-
----
-
-## Table of Contents
-
-1. [Architecture & DMV Integration](#architecture--dmv-integration)
-2. [Prerequisites & Deployment](#prerequisites--deployment)
-3. [Features & Capabilities](#features--capabilities)
-   - [1. Database Sessions & Lock Monitor](#1-database-sessions--lock-monitor)
-   - [2. Database Resource Usage Monitor (Azure SQL & Fabric SQL)](#2-database-resource-usage-monitor-azure-sql--fabric-sql)
-   - [3. Active Queries Telemetry](#3-active-queries-telemetry)
-   - [4. SQL Statement Cache Analysis](#4-sql-statement-cache-analysis)
-   - [5. Query Store Suite & Plan Management](#5-query-store-suite--plan-management)
-   - [6. Query Store Query Hints & Change Tracking](#6-query-store-query-hints--change-tracking)
-   - [7. Automatic Tuning Recommendations & Configuration](#7-automatic-tuning-recommendations--configuration)
-   - [8. SysFlighting Tracking & Change History](#8-sysflighting-tracking--change-history)
-   - [9. Deep Table Statistics Update Utility](#9-deep-table-statistics-update-utility)
-   - [10. Data Entities for DMF & OData Export](#10-data-entities-for-dmf--odata-export)
-   - [11. Security Roles, Duties, and Privileges](#11-security-roles-duties-and-privileges)
-4. [SQL Server 2025 & Azure SQL DMV Reference Guide](#sql-server-2025--azure-sql-dmv-reference-guide)
-
----
-
-## Architecture & DMV Integration
-
-In standard D365FO development, the Application Object Tree (AOT) metadata designer cannot directly create views targeting SQL Server Dynamic Management Views (`sys.dm_*`) or Query Store catalog views (`sys.query_store_*`) because they reside in the system schema rather than application tables.
-
-DBMonitor overcomes this limitation using an automated deployment pattern:
-- **AOT Views (`AxView`)**: Standard views are declared in the AOT defining the schema, field types, and labels so that forms, queries, and security privileges can consume them natively.
-- **SysSetup Framework (`SysSetup` / `SysSetupAsync`)**: Each view is paired with an internal setup class decorated with `[SysSetupTable(tableStr(...))]` and `[SysSetupConfig(false, 300, 0.0)]` (e.g., `DBMSQLMonActiveQueriesViewSetup`, `DBMSQLSessionInfoViewSetup`, `DBMSQLQueryStore*ViewSetup`).
-- **View Builders (`DBMSQLObjects`)**: During database synchronization (`db sync`), the setup classes trigger specialized View Builder classes (e.g., `DBMSQLMonActiveQueriesViewBuilder`, `DBMSQLSessionInfoViewBuilder`). The builders execute direct DDL (`CREATE OR ALTER VIEW`) on the SQL engine, replacing the empty view definitions with direct, optimized SELECT queries against SQL Server 2025 DMVs and system catalog views while preserving column aliases mapped to the D365FO view fields.
-
-This approach gives administrators and developers real-time, interactive access to low-level SQL Server diagnostics directly inside D365FO forms with zero external tooling or SSMS required.
-
----
-
-## Prerequisites & Deployment
-
-### SQL Server Version Requirements
-- **Tier 2+ Sandbox and Production (Azure SQL Database / SQL 2025)**: Supported out-of-the-box. All DMVs, Query Store views, and resource usage statistics (`sys.dm_db_resource_stats`) are available natively.
-- **Tier 1 / Cloud-Hosted Environments (CHE) / Local Development VMs**:
-  - Recommended SQL Server version: **Microsoft SQL Server 2025 Developer or Enterprise Edition**.
-  - If upgrading a Tier 1 development VM to SQL Server 2025:
-    1. Run the MS SQL 2025 Developer Edition installer in **Upgrade** mode, retaining default settings.
-    2. *DIXF / SSIS Compatibility*: The SQL 2025 installer keeps SSIS 15.0 running but may affect shared assemblies used by DIXF. If DIXF fails, launch the **MS SQL 2019** installer in **Repair** mode. Once the repair completes, reboot the VM. DIXF and SQL 2025 will function in harmony.
-
-### Database Synchronization ("Full Monty" Sync)
-Because the custom SQL view definitions are injected through the `SysSetup` / `SysSetupAsync` pipeline, a standard incremental sync from Visual Studio may skip setup classes. When deploying to a Tier 1 environment or after model changes, run a full database synchronization from the command line:
-
+If you want to test the logic in a Tier1 box, you need to run a 'Full Monty' database sync with the following command:
 ```cmd
-X:\AosService\PackagesLocalDirectory\bin\Microsoft.Dynamics.AX.Deployment.Setup.exe ^
-  -bindir "X:\AosService\PackagesLocalDirectory" ^
-  -metadatadir "X:\AosService\PackagesLocalDirectory" ^
-  -sqluser axdbadmin ^
-  -sqlserver localhost ^
-  -sqldatabase axdb ^
-  -setupmode sync ^
-  -syncmode fullall ^
-  -isazuresql false ^
-  -sqlpwd <axdbadmin_password>
+X:\AosService\PackagesLocalDirectory\bin\Microsoft.Dynamics.AX.Deployment.Setup.exe -bindir "X:\AosService\PackagesLocalDirectory" -metadatadir "X:\AosService\PackagesLocalDirectory" -sqluser axdbadmin -sqlserver localhost -sqldatabase axdb -setupmode sync -syncmode fullall -isazuresql false -sqlpwd <axdbadmin_password>
 ```
 
----
+Many of the views and functions described below rely on SQL Server 2025. If you run your code in Tier2+ instances (and respectively Azure SQL), you should have SQL 2025 installed out of the box (at least to my experience, all Tier2+ instances use an Azure SQL version corresponding to MS SQL 2025). If you want to try the logic in CHE or a locally installed development VM, I recommend upgrading your SQL Server to version 2025:
+1. Download the installer for MS SQL 2025 Developer Enterprise edition and run it in upgrade mode, leaving all the settings with the default values. After you install SQL 2025, everything in D365FO works EXCEPT DIXF. SQL 2025 installer leaves the old SSIS 15.0 (used by DIXF) running, but it somehow messes up some of the associated dlls.
+2. Now download the installer for MS SQL *2019* Developer Enterprise edition and run it in the "Repair installation" mode. After the run is finished, reboot your VM. Now DIXF works as usual.
 
-## Features & Capabilities
+## Lock monitor
+First of all, in the menu *System administration->Inquiries->Database monitor->Database sessions* we have information about all current connections to the database. Under the hood, the view behind the form (`DBMDBSessionInfo`) builds a recursive blocking tree on top of the SQL Server DMVs [sys.dm_exec_sessions](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sessions-transact-sql?view=sql-server-ver17), [sys.dm_exec_requests](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql?view=sql-server-ver17), [sys.dm_exec_connections](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql?view=sql-server-ver17), [sys.dm_exec_cursors](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-cursors-transact-sql?view=sql-server-ver17), [sys.dm_tran_locks](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-tran-locks-transact-sql?view=sql-server-ver17) (joined with `sys.partitions` and `sys.indexes`), and [sys.dm_exec_sql_text](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sql-text-transact-sql?view=sql-server-ver17).
 
-```mermaid
-flowchart TD
-    subgraph Engine["SQL Server 2025 / Azure SQL Engine"]
-        DMV_REQ["sys.dm_exec_requests / sys.dm_exec_sessions"]
-        DMV_LOCKS["sys.dm_tran_locks / sys.partitions / sys.indexes"]
-        DMV_STATS["sys.dm_exec_query_stats / sys.dm_exec_query_plan_stats"]
-        DMV_RES["sys.dm_db_resource_stats"]
-        QS["sys.query_store_query / sys.query_store_plan / sys.query_store_runtime_stats"]
-        AUTO_TUNE["sys.dm_db_tuning_recommendations / sys.database_automatic_tuning_configurations"]
-    end
+The logic of the lock monitor itself is based on a batch that wakes up periodically and scans the database view behind the form. The form contains the following fields:
+- Root SPID - SPID of the database session that is currently creating a lock chain.
+- Level - nesting level of the current session (up to 29 levels deep).
+- Current SPID - SPID of the current database session
+- Blocking SPID - the SPID of the session directly blocking the current session
+- Current SQL - the SQL statement that is currently being executed in the session
+- Cursor SQL - the SQL statement that is or was executed in the last cursor open in the session
+- Recent SQL - the last SQL statement executed in the session
+- User context - the context saved in the session via the SQL function `CONTEXT_INFO()`
+- Login datetime - the login date and time of the current session
+- Login name - the SQL login name of the session
+- Start time - the start time of the currently executing SQL statement (if any)
+- Host name - name of the client computer from where the session is run (in most cases - name of the AOS)
+- Program name - name of the program executing the session
+- Resource description - description of the locked resource (if any)
+- Resource type - type of the locked resource (if any, e.g., `KEY`, `PAGE`, `OBJECT`)
+- Request type - lock request mode (`request_mode` from `sys.dm_tran_locks`, e.g., `X`, `U`, `S`, `IX`) for a waiting lock
+- Object name - name of the locked object (usually - a table name)
+- Index name - name of the locked index (if any)
+- User id - D365FO user name of the session (it is calculated via heuristic that works for 95-98% of times; do not expect 100% reliability)
+- Session Id - Session number in D365FO (the one you can see in the online users form)
+- Batch job id, job description and class name - are calculated from the session id by joining with executing records in `Batch`, `BatchJob`, and `ClassIdTable`. Again - it is a heuristic, do not expect 100% reliability
 
-    subgraph SyncEngine["DBMonitor SysSetup & ViewBuilder Pipeline"]
-        Builders["*ViewBuilder Classes (DBMSQLObjects)"]
-    end
+I should also mention that the kernel of D365FO reuses database sessions. All browsing from UI and form navigation is run from a single readonly database session shared by multiple user connections. When the user starts a database transaction, the kernel allocates a session to this user session and stores the user/session info in the `context_info()`. When the database transaction is ended, the session is returned to a pool and the `context_info` is not cleared. If you see a session from a specific user, it is quite possible that this user logged out and left office, so do not suspect that an inactive session with a certain user name actually corresponds to an active user. From the other side, if the session is locking someone else, it is quite obviously active and the user/session info is correct.
 
-    subgraph D365FO["D365FO Application Interface"]
-        F1["Database Sessions & Lock Monitor"]
-        F2["Database Resource Usage & Archive"]
-        F3["Active Queries (Live Plan, Plan Drop)"]
-        F4["SQL Statement Cache"]
-        F5["Query Store (Plan Forcing, APRC)"]
-        F6["Query Store Hints & Changelog"]
-        F7["Tuning Recommendations & Auto Tuning"]
-        F8["SysFlighting & Snapshot Changelog"]
-        F9["Update Table Statistics (AOD Searcher)"]
-    end
+To start the lock monitor, you need to run the menu item *System administration->Periodic tasks->Database monitor->Lock Monitor*. The menuItem spawns a batch that is scheduled to be run every 5 minutes. Normally, if the lock monitor is enabled, it starts, but never ends (so - keep in mind that it always consumes one batch thread of your batch servers).
 
-    DMV_REQ --> Builders
-    DMV_LOCKS --> Builders
-    DMV_STATS --> Builders
-    DMV_RES --> Builders
-    QS --> Builders
-    AUTO_TUNE --> Builders
+The configuration of the lock monitor is specified on the new tab *Lock monitor* in the standard form *System job parameters*. The configuration has three parameters: *Activate lock monitor*, *Monitoring frequency (sec)* and *Lock re-scan frequency (sec)*. If the first parameter is not set, the batch job simply ends immediately after every activation. If it is set, the job keeps running permanently. Every `<Monitoring frequency>` seconds it wakes up and checks whether the Database sessions view has any locks. If no locks are found it sleeps for another `<Monitoring frequency>` seconds. If locks are found, it goes into more active scanning mode and re-checks Database session views every `<Lock re-scan frequency>` seconds. If on the next re-scan the picture is improved (some of the root blocking sessions ended transactions), the lock monitor dumps the last saved state of the Database session view into a table. If the lock is resolved after just 1 re-scan, it does not do anything (we do not want to save blocking info for blocks that lasted less than `<Lock re-scan frequency>` seconds). If all locks are resolved, the lock monitor returns to the standard mode and rescans the session info every `<Monitoring frequency>` seconds.
 
-    Builders --> F1
-    Builders --> F2
-    Builders --> F3
-    Builders --> F4
-    Builders --> F5
-    Builders --> F6
-    Builders --> F7
-    F8 -.-> D365FO
-    F9 -.-> Engine
-```
+The dumped lock info can be viewed via the menuItem *System administration->Inquiries->Database monitor->Locking history* (which also displays when the snapshot was recorded and a calculated *Duration* field).
+To clean up locking history, one can use the menuItem *System administration->Periodic tasks->Database monitor->Clean up DB Locking History*, specifying the number of days to keep.
 
----
+**DO NOT TRY TO SET MONITORING AND RE-SCAN FREQUENCIES TO LESS THAN 15 AND 5 SECONDS** The process of fetching this info itself creates considerable load on the SQL Server; if you do it too often, you can kill your performance on attempt to improve it.
 
-### 1. Database Sessions & Lock Monitor
+## DB Resource usage monitor
+Azure SQL has a standard DMV that keeps information about the database resource usage for the last 60 minutes: [sys.dm_db_resource_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-resource-stats-azure-sql-database?view=fabric-sqldb). It reports compute and storage utilization in percentages of your service tier limits (`CPU percent`, `Data IO percent`, `Log Write percent`, `Memory usage percent`, `Max worker percent`, `Max session percent`, `Instance CPU percent`, `Instance memory percent`, plus the vCore `CPU Limit`).
 
-#### Real-Time Database Sessions
-- **Menu Path**: *System administration > Inquiries > DBMonitor > Database sessions* (`DBMDBSessionInfo`)
-- **Underlying DMVs**: [`sys.dm_exec_sessions`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sessions-transact-sql), [`sys.dm_exec_requests`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql), [`sys.dm_exec_cursors(0)`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-cursors-transact-sql), [`sys.dm_exec_connections`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql), [`sys.dm_tran_locks`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-tran-locks-transact-sql), [`sys.partitions`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-partitions-transact-sql), [`sys.indexes`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-indexes-transact-sql).
-- **Hierarchical Blocking Tree**: Utilizes a recursive Common Table Expression (CTE) to calculate `rootSPID`, hierarchical `nestingLevel`, and indentation/sorting paths up to 29 levels deep.
-- **SQL Text Identification**:
-  - `currentSQL`: Query currently executing via `sys.dm_exec_sql_text(request.sql_handle)`.
-  - `cursorSQL`: Query executed by the last open cursor via `sys.dm_exec_cursors(0)`.
-  - `recentSQL`: Most recent query executed on the connection via `sys.dm_exec_connections.most_recent_sql_handle`.
-- **D365FO Session & Batch Heuristics**:
-  - D365FO connection pooling reuses database sessions. When a transaction begins, the AOS writes user and session identifiers into the SQL session context. DBMonitor parses `context_info` using SQL Server JSON extraction functions (`isJSON`, `JSON_VALUE`) to resolve the **D365FO User ID** (`axUserId`) and **Session ID** (`axSessionId`).
-  - Automatically joins the executing session with the `Batch`, `BatchJob`, and `ClassIdTable` tables (`STATUS = 2` / Executing) to display the **Batch Job ID**, **Batch Caption**, and **Batch Class Name** responsible for locks or active work.
-- **Lock Detail Resolution**: Identifies lock resource type (`OBJECT`, `KEY`, `PAGE`, `RID`), lock mode (`X`, `IX`, `U`, `S`), locked Table name, and Index name for sessions in `WAIT` status.
+If you click on the menuItem *System administration->Periodic tasks->Database monitor->Database resource usage monitor batch*, the system spawns the necessary batch. It activates every 20 minutes and copies the data from the DMV to the form *System administration->Inquiries->Database monitor->Database resource usage*. The form contains an exact copy of the data from the DMV and it means that the data granularity is 15 seconds (and in one week we will have 40K new records). I added into the batch also an archival function that calculates an average/min/max of every utilization parameter (skipping any incomplete current interval) and saves it into the form *System administration->Inquiries->Database monitor->DB Resource Usage Archive*.
 
-#### Automated Lock Monitor Batch
-- **Menu Path**: *System administration > Periodic > DBMonitor > DBM Lock monitor* (`DBMLockMonitorBatch`)
-- **Configuration**: *System administration > Setup > System job parameters* (tab *Lock monitor*):
-  - `Activate lock monitor` (`DBMActivateLockMonitor`): Enables or disables background polling.
-  - `Monitoring frequency` (`DBMLockMonMonitorFreq`): Idle polling frequency in seconds (default: 15s).
-  - `Lock re-scan frequency` (`DBMLockMonReScanFreq`): Polling frequency while blocking chains are active (default: 5s).
-- **Generations Engine**: When blocking occurs, the batch switches to rapid re-scanning mode and increments lock tree generations. To eliminate noise from transient row locks, only locks surviving more than one re-scan generation before resolution are captured.
-- **Lock History Snapshot**: Dumps the blocking chain, user context, queries, and locked objects into `DBMDbLockHistory`.
-- **Locking History Inquiry**: *System administration > Inquiries > DBMonitor > Locking history* (`DBMDBLockHistory`). Includes calculated duration computed via computed column view `DBMDbLockHistoryCalc`.
-- **History Cleanup**: *System administration > Periodic > DBMonitor > Clean up DB locking history* (`DBMDBLockHistoryCleanup`) allows scheduled or manual purging of historical records older than a configured number of days.
+To configure the data archival and retention, I added parameters to the new tab *DB Resource usage monitoring options* of the *System Job Parameters* form: *Activate DB Resource monitor* turns the collection on or off; *Archival unit (minutes)* specifies how many minutes of the utilization history we need to group into one record in the database usage archive; *Number of days to keep* specifies the number of days to keep in the Database resource usage table/form (do not set it to more than 7, I do not see any point in keeping high-frequency utilization info for a longer period); *Number of days to keep in archive* specifies the retention time in the archive.
 
-> [!WARNING]
-> Do not set monitoring or re-scan frequencies below 15 and 5 seconds respectively. Polling SQL lock structures too aggressively consumes server resources and can degrade database performance.
+If you try to run the job on a Tier1 instance (where we do not have the DMV), the batch just does nothing (it starts every 20 minutes, checks `SERVERPROPERTY('Edition')`, realizes that it is not an Azure SQL and quits). So, if you try to run the Database usage monitor on a non-Azure SQL Server, it does nothing.
 
----
+The current database resource usage log is available under *System administration->Inquiries->Database monitor->Database resource usage*.
+The archived database resource usage log is available under *System administration->Inquiries->Database monitor->DB Resource Usage Archive*.
 
-### 2. Database Resource Usage Monitor (Azure SQL)
+## Active queries
+The form shows currently active queries and their execution stats.
+The list of the currently executed queries is available under *System administration->Inquiries->Database monitor->Active queries*.
+The form shows currently executing queries, based on the DMV [sys.dm_exec_requests](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql?view=sql-server-ver17) joined with [sys.dm_exec_sql_text](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sql-text-transact-sql?view=sql-server-ver17). Less important fields of the DMV are not included into the form grid by default, but can be added via personalization / saved form views.
 
-- **Menu Paths**:
-  - Live Log: *System administration > Inquiries > DBMonitor > Database resource usage* (`DBMDBResourceUsage`)
-  - Aggregated Archive: *System administration > Inquiries > DBMonitor > DB Resource usage archive* (`DBMDBResourceUsageArchive`)
-  - Periodic Batch: *System administration > Periodic > DBMonitor > DBM Database resource usage monitor batch* (`DBMDBUsageMonitorBatch`)
-- **Underlying DMV**: [`sys.dm_db_resource_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-resource-stats-azure-sql-database)
-- **Engine Awareness**: The batch inspects the engine edition (`DBMSQLUtils::isSqlAzure()`). In non-Azure instances (such as on-prem SQL Server or Tier 1 where `sys.dm_db_resource_stats` does not exist), the batch cleanly terminates without errors.
-- **Granular Telemetry Collected (15-second intervals)**:
-  - `CPUPercent`, `instanceCPUPercent`, `CPULimit`
-  - `dataIOPercent` (Data storage I/O consumption)
-  - `logWritePercent` (Transaction log write consumption)
-  - `memoryUsagePercent`, `instanceMemoryPercent`
-  - `maxWorkerPercent` (Worker thread consumption against limits)
-  - `maxSessionPercent` (Active session count against database tier limits)
-- **Aggregation & Archival Pipeline**:
-  - High-frequency data produces ~40,000 records weekly. An automated background archival pipeline computes **Average**, **Minimum**, and **Maximum** metrics for every metric over user-configurable time windows (`DBMDBResArchivalUnit` in minutes).
-  - Computed views `DBMDBResourceUsageArchiveViewInternal` and `DBMDBResourceUsageArchiveRaw` group data into time buckets, while `DBMDBUsageArchiveView` uses windowing functions (`ROW_NUMBER()`) to safely exclude the in-progress time bucket from archival.
-- **Retention Management**: Configured in *System job parameters* (`DBMDBResDaysToKeep` for high-frequency logs, `DBMDBResDaysToKeepInArchive` for the aggregated archive).
+The following actions are available in the action bar:
+- SQL Text sample. This form shows a combination of the query text and the parameters gathered from the query plan in the plan cache. First of all - these parameters are the parameters used for the query compilation/first execution. Most probably the current execution uses different parameters. Second - in the latest versions of SQL Server not every executed statement makes it into the query plan cache. So, if you see an empty screen, most probably the query is not in the plan cache. Finally, if the query is complex, my logic to fetch the query parameter values fails. (It happens if the parametrized query fetches data from another parametrized query. My logic cannot find the correct `<ParameterList>` block in the query plan. To be fixed). Yet for the queries generated from more or less regular X++ code, the query text is fetched without issues.
+- Drop plan. Drops the plan of the current statement from the plan cache (via `ALTER DATABASE SCOPED CONFIGURATION CLEAR PROCEDURE_CACHE <plan_handle>`). The statement continues execution with the old plan, but on the next execution the plan will be regenerated. If you get the SQL Server message *"Cannot free the plan because a plan was not found in the database plan cache that corresponds to the specified plan handle. Specify a cached plan handle for the database. For a list of cached plan handles, query the sys.dm_exec_query_stats dynamic management view."*, it means that your query is not in the plan cache.
+- Query plan. Returns the estimated query plan in `.sqlplan` format for the current statement, taken from the query plan cache via [sys.dm_exec_query_plan](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-transact-sql?view=sql-server-ver17). If it does not return anything, it means that the query is not in the plan cache.
+- Live plan. The live query plan fetched from the DMF [sys.dm_exec_query_statistics_xml](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-statistics-xml-transact-sql?view=sql-server-ver17). On older SQL Server versions this DMF required enabling trace flag 7412, whereas in SQL Server 2019/2025 and Azure SQL lightweight query profiling is enabled by default (the button also checks that the SQL login has `VIEW SERVER PERFORMANCE STATE` and `VIEW DATABASE STATE` permissions). It returns the current in-flight query plan for the SPID even if the plan is not cached. This function is useful if one of your statements that usually takes seconds to execute is now running for 5 minutes and you have no idea whether it is going to finish anywhere soon. The Live query plan shows information about the query progress (actual rows flowing through operators so far) and if you download it several times, you can gauge the execution progress.
+- Update table statistics. Opens the dialog / spawns a batch that updates statistics for all D365FO tables found in the query plan of the current active query.
+- Query store. Drills down to the *Query store* form filtered by the `query_hash` and `query_plan_hash` of the current active query, allowing you to inspect its historical behavior, previous plans, or force a better plan right away.
 
----
+## SQL Statement cache
+The form shows content of the SQL Server statement cache.
+The form is available under *System administration->Inquiries->Database monitor->SQL Statement cache*. The form is based on the DMV [sys.dm_exec_query_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-stats-transact-sql?view=sql-server-ver17). By default it shows the top 10/100/1000 queries with the highest total execution/worker time.
+- SQL Text sample. This form shows a combination of the query text and the parameters gathered from the query plan in the plan cache. First of all - these parameters are the parameters used for the query compilation/first execution. Most probably the current execution uses different parameters. If the query is complex, my logic to fetch the query parameter values fails. (It happens if the parametrized query fetches data from another parametrized query. My logic cannot find the correct `<ParameterList>` block in the query plan. To be fixed). Yet for the queries generated from more or less regular X++ code, the query text is fetched without issues.
+- Drop plan. Drops the plan of the current statement from the plan cache. The statement continues execution with the old plan, but on the next execution the plan will be regenerated. If you get the SQL Server message *"Cannot free the plan because a plan was not found in the database plan cache that corresponds to the specified plan handle. Specify a cached plan handle for the database. For a list of cached plan handles, query the sys.dm_exec_query_stats dynamic management view."*, it means that your query is not in the plan cache.
+- Clear cache. Removes all cached query plans from the cache (`ALTER DATABASE SCOPED CONFIGURATION CLEAR PROCEDURE_CACHE`). Do not use in production. (Ok - you can use, but the SQL Server will have high CPU utilization in the next 3-5 minutes, because almost every query would require a new compilation). Yet it is a very useful feature for testing. You can clear the statement cache before executing your piece of code and in the end check the heaviest queries, check their parameters, plans and so on.
+- Query plan. Returns the estimated query plan in `.sqlplan` format for the current statement, taken from the query plan cache via [sys.dm_exec_query_plan](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-transact-sql?view=sql-server-ver17).
+- Actual query plan. The query plan taken from the DMF [sys.dm_exec_query_plan_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-stats-transact-sql?view=sql-server-ver17). The plan contains the timing and actual row count info from the last actual execution of the query (not just estimated numbers from the query compilation). Note that in SQL Server this feature requires `LAST_QUERY_PLAN_STATS` to be enabled on the database (`ALTER DATABASE SCOPED CONFIGURATION SET LAST_QUERY_PLAN_STATS = ON` or trace flag 2451), otherwise it may return nothing.
+- Update table statistics. Opens the dialog / spawns a batch that updates statistics for all D365FO tables in the query plan of the selected query.
+- Query store. Drills down to the *Query store* form filtered by the `query_hash` and `query_plan_hash` of the selected cached statement.
 
-### 3. Active Queries Telemetry
+## Query store
+The form is available under *System administration->Inquiries->Database monitor->Query store->Query store*.
+The upper part of the form contains a list of the heaviest (by default) queries in the Query Store, built on [sys.query_store_query](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-transact-sql?view=sql-server-ver17) and [sys.query_store_query_text](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-text-transact-sql?view=sql-server-ver17). You can choose the sort order and the number of the queries to display (Top 10/100/1000). In the filter part of the form it also shows a datetime filter (*From* / *To*) that allows you to include only the queries that were executed during the specified time window. The following actions are available in the upper action bar:
+- Enable/Disable APRC. Enables or disables automatic plan regression correction (`FORCE_LAST_GOOD_PLAN_EXTENDED_CHECK`) for the selected query, described [here](https://learn.microsoft.com/en-us/sql/relational-databases/automatic-tuning/automatic-tuning?view=sql-server-ver17#automatic-plan-correction) and [here](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-configure-automatic-tuning-transact-sql?view=sql-server-ver17).
+- Query hints. Drills down to another form, showing the query hints associated with the query (from [sys.query_store_query_hints](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-hints-transact-sql?view=sql-server-ver17)). It is not the query hints embedded into the X++ query text, but the Query Store hints attached to the `query_id` via the mechanism described [here](https://learn.microsoft.com/en-us/sql/relational-databases/performance/query-store-hints?view=sql-server-ver17). In the form you can clear up the list of the hints for the query ([sp_query_store_clear_hints](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-clear-hints-transact-sql?view=sql-server-ver17)) or add new hints ([sp_query_store_set_hints](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-set-hints-transact-sql?view=sql-server-ver17), for example `OPTION (RECOMPILE, MAXDOP 2)`).
 
-- **Menu Path**: *System administration > Inquiries > DBMonitor > Active queries* (`DBMSQLRunningQueries` / `DBMSQLActiveQueriesForm`)
-- **Underlying DMVs**: [`sys.dm_exec_requests`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql), [`sys.dm_exec_sql_text`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sql-text-transact-sql), [`sys.dm_exec_query_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-transact-sql), [`sys.dm_exec_query_statistics_xml`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-statistics-xml-transact-sql).
-- **Real-Time Request Metrics**: Captures Session ID, Command, Status, Start time, Elapsed time, CPU time, Reads, Logical Reads, Writes, Row Count, Granted Query Memory, Degree of Parallelism (DOP), Parallel Worker Count, Blocking Session ID, Wait Type, Wait Time, Last Wait Type, and Wait Resource. More columns are available in the underlying view; They can be added via usage of saved form views.
-- **Interactive Action Bar Operations**:
-  - **SQL Text Sample** (`DBMSQLText`): Extracts the full statement text for the running request (using statement offset boundaries) and inspects the compiled XML plan's `<ParameterList>` to reconstruct parameterized `DECLARE @p...` variables.
-  - **Drop Plan**: Executes `ALTER DATABASE SCOPED CONFIGURATION CLEAR PROCEDURE_CACHE(plan_handle)` to immediately evict the problematic execution plan from cache so subsequent executions recompile.
-  - **Query Plan**: Downloads the estimated query execution plan in native `.sqlplan` XML format.
-  - **Live Plan (In-Flight Execution Progress)**: Retrieves the real-time operational execution plan via `sys.dm_exec_query_statistics_xml(session_id)`. Verifies permissions (`VIEW SERVER PERFORMANCE STATE` / `VIEW DATABASE STATE` via `DBMSQLUtils::canGetLiveQueryPlan`). Allows watching operator-by-operator row counts and progress while long-running transactions are actively executing.
-  - **Update Table Statistics**: Analyzes the query plan XML, extracts all referenced D365FO tables (`DBMSQLUtils::getTableListFromPlanHandle`), and opens the Update Table Statistics dialog pre-populated with those tables.
-  - **Navigate to Query Store**: Directly opens Query Store filtered by `query_hash` / `query_plan_hash` to compare live execution behavior against historical performance.
+In the lower part of the form there is a list of the query plans ([sys.query_store_plan](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-plan-transact-sql?view=sql-server-ver17)) for the query selected in the upper part of the form. If the datetime filter is active, the lower part also shows only the query plans used during the time window.
+- SQL Text sample. This form shows a combination of the query text from `sys.query_store_query_text` and the parameters gathered from the selected plan in `sys.query_store_plan`. First of all - these parameters are the parameters used for the plan compilation/first execution. Most probably later executions use different parameters. Finally, if the query is complex, my logic to fetch the query parameter values fails. (It happens if the parametrized query fetches data from another parametrized query. My logic cannot find the correct `<ParameterList>` block in the query plan. To be fixed). Yet for the queries generated from more or less regular X++ code, the query text is fetched without issues.
+- Query plan. Returns the query plan in `.sqlplan` format for the selected plan, taken directly from `sys.query_store_plan`.
+- Force plan/Unforce plan. Marks the current plan as forced or unforces it through the stored procedures [sp_query_store_force_plan](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-force-plan-transact-sql?view=sql-server-ver17) and [sp_query_store_unforce_plan](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-unforce-plan-transact-sql?view=sql-server-ver17).
+- Update table statistics. Opens the dialog / spawns a batch that updates statistics for all D365FO tables in the selected query plan of the current query.
+- Execution statistic. Drills down to another window with the query plan execution statistics, taken from the views [sys.query_store_runtime_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-runtime-stats-transact-sql?view=sql-server-ver17) and [sys.query_store_runtime_stats_interval](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-runtime-stats-interval-transact-sql?view=sql-server-ver17). The form shows the execution statistics 'as is' (`None`) or grouped per one of the predefined periods (`Hour`/`Day`/`Week`/`Month`).
+- Plan wait stats. Drills down to another window with the query plan wait statistics, taken from the view [sys.query_store_wait_stats](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-wait-stats-transact-sql?view=sql-server-ver17). The form shows the wait statistics by wait category 'as is' (`None`) or grouped per one of the predefined periods (`Hour`/`Day`/`Week`/`Month`).
 
----
+## Query hints and Query hint change log
+Besides drilling down to hints for a single query from the *Query store* form, you can view all Query Store hints across the entire database under *System administration->Inquiries->Database monitor->Query store->Query hints*. When opened directly from the menu, the form shows [sys.query_store_query_hints](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-hints-transact-sql?view=sql-server-ver17) joined with the query hash and SQL text, including hint source and any hint application failure counts/reasons, and lets you remove hints for a selected query via *Clear all*.
 
-### 4. SQL Statement Cache Analysis
+Because SQL Server (or automatic tuning / support engineers) can add or remove Query Store hints behind the scenes and `sys.query_store_query_hints` only shows the current state without any history, I also added a snapshot-based change log:
+- *System administration->Periodic tasks->Database monitor->Scan query hints for changes* runs a job (which you can schedule as a recurring batch) that compares the current contents of `sys.query_store_query_hints` against a saved snapshot table, records any added (`Insert`) or removed (`Delete`) hints into a log table (along with `Query Id`, `Query Hash`, and `Query Hint Text`), updates the snapshot, and cleans up old log entries for queries that no longer exist in Query Store.
+- *System administration->Inquiries->Database monitor->Query store->Query hint change log* displays that history so you can see when hints appeared or disappeared.
 
-- **Menu Path**: *System administration > Inquiries > DBMonitor > SQL Statement cache* (`DBMSQLQueryStatsForm`)
-- **Underlying DMVs**: [`sys.dm_exec_query_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-stats-transact-sql), [`sys.dm_exec_sql_text`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sql-text-transact-sql), [`sys.dm_exec_query_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-transact-sql), [`sys.dm_exec_query_plan_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-stats-transact-sql).
-- **Execution Cache Telemetry**: Displays plan-cached statements with aggregate and min/max/last execution statistics: Execution Count, Total/Avg Worker Time (CPU), Total/Avg Elapsed Time, Physical Reads, Logical Reads, Logical Writes, and Creation/Last Execution Timestamps.
-- **Top N Filtering**: Filter by Top 10, 25, 50, 100, 500, or 1000 heaviest statements ordered by total worker time.
-- **Interactive Action Bar Operations**:
-  - **SQL Text Sample**: Reconstructs the SQL statement and parameter bindings from the cached plan.
-  - **Drop Plan**: Drops the selected plan from cache via `DBCC FREEPROCCACHE(plan_handle)`.
-  - **Clear Cache**: Executes `DBCC FREEPROCCACHE` to flush the entire procedural cache (ideal for benchmarking and performance testing in development/test tiers).
-  - **Query Plan**: Retrieves the estimated XML execution plan from `sys.dm_exec_query_plan`.
-  - **Actual Query Plan**: Retrieves the last actual execution plan via `sys.dm_exec_query_plan_stats(plan_handle)` (available in SQL Server 2019+, SQL Server 2025, and Azure SQL when `LAST_QUERY_PLAN_STATS` is enabled), providing actual row counts and resource metrics from the last execution without needing SQL Profiler or Extended Events.
-  - **Update Table Statistics**: Automatically discovers all tables referenced in the plan and prepares them for statistics updates.
-  - **Navigate to Query Store**: Cross-references the cached plan directly with historical Query Store data by `query_hash` and `query_plan_hash`.
+## Tuning recommendations
+The form shows content of SQL Server DMV [sys.dm_db_tuning_recommendations](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-tuning-recommendations-transact-sql?view=sql-server-ver17).
+The form is available under *System administration->Inquiries->Database monitor->Query store->Tuning recommendations*. I have not really used this DMV a lot in practice, so take it with a grain of salt, but according to SQL Server Books Online, SQL Server continuously monitors Query Store for plan regressions and logs recommendations here even when Automatic Tuning is turned off. Key columns include the recommendation `Type` (e.g., `FORCE_LAST_GOOD_PLAN`), `Reason` (for example, regressed average CPU time), `Score` (estimated impact on a 0–100 scale), `State`, whether the action is executable/revertable, when an automatic or manual action was initiated/reverted, and a `Details` JSON block at the bottom of the form containing the `query_id`, regressed and recommended `plan_id`s, and the T-SQL script to force the recommended plan.
 
----
+## Auto tuning configuration
+The form shows content of SQL Server catalog view [sys.database_automatic_tuning_configurations](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-database-automatic-tuning-configurations-transact-sql?view=sql-server-ver17).
+The form is available under *System administration->Inquiries->Database monitor->Query store->Auto tuning configuration*. It displays the granular Automatic Plan Correction overrides configured via [sp_configure_automatic_tuning](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-configure-automatic-tuning-transact-sql?view=sql-server-ver17) for the current database (for example, individual Query Store `query_id`s where you enabled APRC / `FORCE_LAST_GOOD_PLAN_EXTENDED_CHECK` in the *Query store* form), including `Type`, `Type value`, `Option`, `Option value`, and `Details`.
 
-### 5. Query Store Suite & Plan Management
+## Flights (SysFlighting) and change log
+Changes in D365FO flights (`SysFlighting`) can change how the application generates queries or executes business logic, so it is useful to inspect them and know when they changed:
+- *System administration->Inquiries->Database monitor->Flights->SysFlighting* shows the contents of the `SysFlighting` table so you can check and maintain flights from the UI.
+- *System administration->Periodic tasks->Database monitor->Scan SysFlighting for changes* compares the current `SysFlighting` table against a saved snapshot and logs any `Insert`, `Update` (recording both `Old Enabled` and `New Enabled` states), and `Delete` changes. Schedule it as a recurring batch job if you want continuous tracking.
+- *System administration->Inquiries->Database monitor->Flights->SysFlighting change log* displays the logged history of flight changes with timestamps.
 
-- **Menu Path**: *System administration > Inquiries > DBMonitor > Query store > Query store* (`DBMSQLQueryStoreQuery`)
-- **Underlying Catalog Views**:
-  - Queries: [`sys.query_store_query`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-transact-sql), [`sys.query_store_query_text`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-text-transact-sql)
-  - Plans: [`sys.query_store_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-plan-transact-sql)
-  - Runtime Stats: [`sys.query_store_runtime_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-runtime-stats-transact-sql), [`sys.query_store_runtime_stats_interval`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-runtime-stats-interval-transact-sql)
-  - Wait Stats: [`sys.query_store_wait_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-wait-stats-transact-sql)
-- **Top Queries & Time Window Filtering**:
-  - Filter by Top 10, 25, 50, 100, 500, or 1000 heaviest queries.
-  - Apply `From Date/Time` and `To Date/Time` filters to isolate workload regressions to specific maintenance windows, deployments, or peak business hours.
-- **Automatic Plan Regression Correction (APRC)**:
-  - Actions `Enable APRC` and `Disable APRC` invoke stored procedure `sys.sp_configure_automatic_tuning @OptionMode, 'QUERY', @QueryId, 'FORCE_LAST_GOOD_PLAN'` to turn Automatic Tuning on or off for specific, individual query IDs.
-- **Query Plan Pinning / Forcing**:
-  - Force a high-performing execution plan or unforce a degraded plan directly from the D365FO client using `sys.sp_query_store_force_plan @QueryId, @PlanId` and `sys.sp_query_store_unforce_plan @QueryId, @PlanId`.
-  - Shows forced status, force failure count, and failure reasons.
-- **Execution Statistics Drill-Down** (`DBMSQLQueryStorePlanStats`):
-  - In-depth runtime statistics per plan: execution count, average/min/max/stdev duration, CPU time, logical reads, logical writes, physical reads, memory grant, tempdb space used, and row count.
-  - **Dynamic Time Aggregation**: Switch grouping on the fly between **None** (raw intervals), **Hour**, **Day**, **Week**, or **Month**.
-- **Wait Statistics Drill-Down** (`DBMSQLQueryStorePlanWaitStats`):
-  - Categorized query wait telemetry (`sys.query_store_wait_stats`) detailing CPU, Locks, Latches, Buffer I/O, Network I/O, and Memory waits.
-  - Dynamically groupable by **None**, **Hour**, **Day**, **Week**, or **Month** to diagnose bottlenecks over time.
+## Update table statistics
+The batch is available under *System administration->Periodic tasks->Database monitor->Update table statistics*. At the top of the form, there is a selection that allows you to choose the object from which the list of tables for the statistics update is generated. If you choose a *Form*, it lists all tables used in the form directly and indirectly (via SQL Views); in case of a *View*, it shows all the tables included in the view directly and indirectly (via nested views); in case of a *Data Entity*, it shows all the tables included in the data entity directly or indirectly; in case of a *Table*, it simply allows you to directly include the table in the statistics update. You can choose one or several of the tables displayed for the selected object. In the lower part of the form you can choose the statistics update method (*Resample*/*Full scan*/*Sample*), and, in case of the *Sample* mode, the sample size in percents of the table or in the number of rows to sample (executing `UPDATE STATISTICS dbo.<Table> WITH FULLSCAN | RESAMPLE | SAMPLE <N> PERCENT | ROWS`).
 
----
-
-### 6. Query Store Query Hints & Change Tracking
-
-- **Menu Paths**:
-  - Hints Overview: *System administration > Inquiries > DBMonitor > Query store > Query Store query hints* (`DBMSQLQueryStoreQueryHints`)
-  - Change Log: *System administration > Inquiries > DBMonitor > Query store > Query Store query hint log* (`DBMSQLQueryStoreQueryHintLog`)
-  - Periodic Sync: *System administration > Periodic > DBMonitor > Sync Query Store query hints* (`DBMSQLQueryStoreQueryHintSync` / `DBMSQLQueryStoreQueryHintSyncService`)
-- **Underlying Views & Procedures**: [`sys.query_store_query_hints`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-hints-transact-sql), [`sp_query_store_set_hints`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-set-hints-transact-sql), [`sp_query_store_clear_hints`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-clear-hints-transact-sql).
-- **Non-Invasive Query Tuning**:
-  - Query Store hints (introduced in SQL Server 2022 and Azure SQL, fully supported in SQL Server 2025) allow applying query optimizer hints (e.g., `OPTION (RECOMPILE)`, `MAXDOP 1`, `OPTIMIZE FOR (@p1 = ...)`, `USE HINT('...')`) to statements executed by standard X++ code without modifying application code or deploying binary updates.
-  - Use the **Add Hint** drop dialog (`DBMSQLHint`) to assign hints to any query ID, or **Clear All Hints** to remove hints.
-- **Historical Audit & Change Tracking**:
-  - The periodic synchronization service (`DBMSQLQueryStoreQueryHintSyncService`) takes snapshots of current hints into `DBMSQLQueryStoreQueryHintSnapshot` and writes audit records to `DBMSQLQueryStoreQueryHintLog`.
-  - Captures `ChangeType` (`Insert`, `Delete`), `QueryId`, `QueryHash`, `QueryHintText`, and `CreatedDateTime`, maintaining a change log of who tuned what query and when.
-
----
-
-### 7. Automatic Tuning Recommendations & Configuration
-
-- **Menu Paths**:
-  - Recommendations: *System administration > Inquiries > DBMonitor > Query store > Tuning recommendations* (`DBMSQLDBTuningRecommendations`)
-  - Auto Tuning Configuration: *System administration > Inquiries > DBMonitor > Query store > Auto tuning configuration* (`DBMSQLDBTuningConfigurations`)
-- **Underlying Catalog Views**:
-  - [`sys.dm_db_tuning_recommendations`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-tuning-recommendations-transact-sql)
-  - [`sys.database_automatic_tuning_configurations`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-database-automatic-tuning-configurations-transact-sql)
-- **Tuning Recommendations Telemetry**:
-  - Displays engine-generated optimization recommendations (such as `FORCE_LAST_GOOD_PLAN`, `CREATE_INDEX`, `DROP_INDEX`).
-  - Tracks recommendation state, reason, valid since timestamp, estimated performance gain score, whether the recommendation is executable or revertable, execution/revert durations, and raw JSON analysis details.
-- **Auto Tuning Configuration**:
-  - Inspects database-level automatic tuning options (`FORCE_LAST_GOOD_PLAN`, `MAINTAIN_INDEX`), option values, type, current state, and details.
-
----
-
-### 8. SysFlighting Tracking & Change History
-
-- **Menu Paths**:
-  - Active Flights: *System administration > Inquiries > DBMonitor > Flights > SysFlighting* (`DBMSysFlighting`)
-  - Flight Change History: *System administration > Inquiries > DBMonitor > Flights > SysFlighting log* (`DBMSysFlightingLog`)
-  - Periodic Sync: *System administration > Periodic > DBMonitor > Sync SysFlighting* (`DBMSysFlightingSync` / `DBMSysFlightingSyncService`)
-- **Background**: In Tier1 environment Dynamics 365 uses the `SysFlighting` table to toggle platform and application feature flags (flights). In Tier2+ environments flights are read by AOS from an external web service. Yet, since about early 2025 flight configuration is periodically downloaded from the web service to the 'SysFlighting' table even in Tier2+ configurations. By tracking changes to this table one can undrestand what flights Microsoft enabled in backgroundfor the given environment. 
-- **Automated Differential Snapshot Engine**:
-  - `DBMSysFlightingSyncService` runs periodically or on-demand via the SysOperation framework.
-  - Automatically identifies **Insert** events (new flights added), **Update** events (flights toggled enabled/disabled, capturing both `OldEnabled` and `NewEnabled`), and **Delete** events (flights removed).
-  - Maintains current state in `DBMSysFlightingSnapshot` and writes audit entries with timestamps to `DBMSysFlightingLog`.
-
----
-
-### 9. Table Statistics Update Utility
-
-- **Menu Paths**:
-  - Periodic / Dialog: *System administration > Periodic > DBMonitor > Update table statistics* (`DBMUpdateTableStatistics` / `DBMUpdateTableStatisticsService`)
-  - Contextual Actions: Available on *Active queries*, *SQL statement cache*, and *Query store*.
-- **AOD Object-to-Table Dependency Searcher (`DBMObjectToTableSearcher`)**:
-  - Rather than updating statistics on one table at a time or guessing which tables participate in an operation, users can select an AOD object type:
-    - **Form**: Recursively navigates form data sources and underlying views/tables.
-    - **Data Entity**: Recursively resolves all physical mapped tables in the entity.
-    - **View**: Recursively traverses nested SQL views to extract all underlying physical tables.
-    - **Table**: Targets the specific table directly.
-    - **Query Plan**: Extracts all tables directly from the XML statement plan.
-- **Sampling Options (T-SQL `UPDATE STATISTICS`)**:
-  - `FULLSCAN`: Updates statistics with full table scan (`WITH FULLSCAN`).
-  - `RESAMPLE`: Updates statistics using inherited sampling rates (`WITH RESAMPLE`).
-  - `SAMPLE`: Updates statistics using a custom sample size (`WITH SAMPLE [X] [PERCENT | ROWS]`).
-- **Execution Architecture**: Runs synchronously or queues as a multi-threaded batch job via the SysOperation framework, providing elapsed update time diagnostics in the Infolog.
-
----
-
-### 10. Data Entities for DMF & OData Export
-
-DBMonitor includes standard D365FO Data Entities enabling integration with Data Management Framework (DMF), Bring Your Own Database (BYOD), Azure Synapse Link, Power BI, or OData reporting tools:
-
-| Entity Name | Public Entity Name | Public Collection Name | Staging Table | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| `DBMDBLockHistoryEntity` | `DBLockHistory` | `DBLockHistories` | `DBMDBLockHistoryStaging` | Export historical blocking chains and root SPID telemetry |
-| `DBMDBResourceUsageEntity` | `DBResourceUsage` | `DBResourceUsages` | `DBMDBResourceUsageStaging` | Export high-frequency 15-second Azure SQL resource utilization data |
-| `DBMDBResourceUsageArchiveEntity` | `DBResourceUsageArchive` | `DBResourceUsageArchives` | `DBMDBResourceUsageArchiveStaging` | Export hourly/daily aggregated CPU, I/O, log write, and memory trends |
-
----
-
-### 11. Security Roles, Duties, and Privileges
-
-DBMonitor includes role-based access control (RBAC) to ensure telemetry and maintenance actions are restricted to authorized database administrators and system engineers:
-
-- **Security Role**:
-  - `DBMDBMonitor` (Database Monitor Administrator)
-- **Security Duties**:
-  - `DBMDBMonitor` (Inquiries, active queries, cached plans, Query Store, and resource usage)
-  - `DBMDBLockView` (View locking history and session hierarchies)
-  - `DBMDBLockMaintain` (Execute lock history cleanup routines)
-- **Security Privileges**:
-  - Dedicated View and Maintain privileges across all forms, services, periodic batch jobs, and data entities (e.g., `DBMDBLockHistoryEntityMaintain`, `DBMDBLockHistoryEntityView`, `DBMDBResourceUsageEntityMaintain`, `DBMDBResourceUsageEntityView`).
-
----
-
-## SQL Server 2025 & Azure SQL DMV Reference Guide
-
-The following table summarizes the SQL Server 2025 and Azure SQL Database Dynamic Management Views, Dynamic Management Functions, and system catalog objects wrapped by DBMonitor:
-
-| SQL Object / Stored Procedure | Type | DBMonitor View / Class | Description & Books Online Reference |
-| :--- | :--- | :--- | :--- |
-| [`sys.dm_exec_sessions`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sessions-transact-sql) | DMV | `DBMDBSessionInfo` | Active session metadata, login time, host name, client interface, and context info. |
-| [`sys.dm_exec_requests`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql) | DMV | `DBMSQLActiveQueries`, `DBMDBSessionInfo` | In-flight request telemetry, CPU time, elapsed time, reads, writes, blocking SPID, wait types, and memory grants. |
-| [`sys.dm_tran_locks`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-tran-locks-transact-sql) | DMV | `DBMDBSessionInfo`, `DBMLockMonitorBatch` | Active lock requests and lock waits (`WAIT` status), resource type, and request mode. |
-| [`sys.dm_exec_cursors(0)`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-cursors-transact-sql) | DMF | `DBMDBSessionInfo` | Active database cursors, fetch status, and cursor query handles. |
-| [`sys.dm_exec_connections`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql) | DMV | `DBMDBSessionInfo` | Physical connection attributes and `most_recent_sql_handle`. |
-| [`sys.dm_exec_sql_text`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sql-text-transact-sql) | DMF | `DBMSQLUtils`, View Builders | Retrieves T-SQL statement text from SQL handles. |
-| [`sys.dm_exec_query_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-transact-sql) | DMF | `DBMSQLUtils` | Retrieves estimated query execution plans in XML (`.sqlplan`) format. |
-| [`sys.dm_exec_query_plan_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-plan-stats-transact-sql) | DMF | `DBMSQLUtils` | Retrieves last known actual execution plan with runtime operational statistics. |
-| [`sys.dm_exec_query_statistics_xml`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-statistics-xml-transact-sql) | DMF | `DBMSQLUtils` | Retrieves live query plan execution statistics while queries are running. |
-| [`sys.dm_exec_query_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-stats-transact-sql) | DMV | `DBMSQLQueryStats` | Aggregated performance metrics for cached execution plans (execution count, CPU, I/O, elapsed time). |
-| [`sys.dm_db_resource_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-resource-stats-azure-sql-database) | DMV | `DBMDBUsageMonitorBatch` | Azure SQL / Fabric SQL Database resource utilization history (CPU, I/O, Log Write, Workers, Sessions) in 15-second intervals. |
-| [`sys.query_store_query`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-transact-sql) | Catalog | `DBMSQLQueryStoreQuery` | Query Store tracked unique queries, query hash, compile counts, and first/last execution timestamps. |
-| [`sys.query_store_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-plan-transact-sql) | Catalog | `DBMSQLQueryStorePlan` | Query Store execution plans, plan hash, forced plan state, force failure counts, and XML plans. |
-| [`sys.query_store_query_text`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-text-transact-sql) | Catalog | `DBMSQLQueryStoreQueryText` | Query Store SQL statement texts. |
-| [`sys.query_store_runtime_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-runtime-stats-transact-sql) | Catalog | `DBMSQLQueryStoreRuntimeStats` | Query Store runtime performance metrics (duration, CPU, logical reads, memory, row count) per plan and interval. |
-| [`sys.query_store_runtime_stats_interval`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-runtime-stats-interval-transact-sql) | Catalog | `DBMSQLQueryStoreRuntimeStatsInterval` | Time boundaries and aggregation intervals for Query Store runtime statistics. |
-| [`sys.query_store_wait_stats`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-wait-stats-transact-sql) | Catalog | `DBMSQLQueryStoreWaitStats` | Query Store wait category metrics (CPU, lock, latch, network, memory) per plan and interval. |
-| [`sys.query_store_query_hints`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-query-hints-transact-sql) | Catalog | `DBMSQLQueryStoreQueryHints` | Query Store hints applied to queries. |
-| [`sys.dm_db_tuning_recommendations`](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-tuning-recommendations-transact-sql) | DMV | `DBMSQLDBTuningRecommendations` | Dynamic optimization recommendations (plan forcing, missing indexes) generated by Automatic Tuning. |
-| [`sys.database_automatic_tuning_configurations`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-database-automatic-tuning-configurations-transact-sql) | Catalog | `DBMSQLDBTuningConfigurations` | Database automatic tuning options and operational states. |
-| [`sp_query_store_force_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-force-plan-transact-sql) | Stored Proc | `DBMSQLUtils` | Enforces a specific execution plan for a query. |
-| [`sp_query_store_unforce_plan`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-force-plan-transact-sql) | Stored Proc | `DBMSQLUtils` | Removes plan forcing for a query. |
-| [`sp_query_store_set_hints`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-set-hints-transact-sql) | Stored Proc | `DBMSQLUtils` | Injects query optimizer hints for a Query Store query without code modifications. |
-| [`sp_query_store_clear_hints`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-query-store-clear-hints-transact-sql) | Stored Proc | `DBMSQLUtils` | Removes hints associated with a Query Store query. |
-| [`sp_configure_automatic_tuning`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-configure-automatic-tuning-transact-sql) | Stored Proc | `DBMSQLUtils` | Enables or disables Automatic Plan Regression Correction (`FORCE_LAST_GOOD_PLAN`) for individual queries. |
-| `DBCC FREEPROCCACHE` | Command | `DBMSQLUtils` | Evicts a specific plan from cache using its plan handle or flushes the procedural cache. |
-| `UPDATE STATISTICS` | Command | `DBMUpdateTableStatisticsService` | Updates index and column statistics using `FULLSCAN`, `RESAMPLE`, or `SAMPLE X [PERCENT|ROWS]`. |
-| `HAS_PERMS_BY_NAME` | Security | `DBMSQLUtils` | Evaluates caller database and server permissions (`VIEW SERVER PERFORMANCE STATE`, `VIEW DATABASE STATE`). |
+## Data entities and Security
+- **Data entities**: If you want to export the collected history via DMF, OData, or BYOD/Synapse Link, there are three data entities included: `DBMDBLockHistoryEntity` (*DBLockHistories*), `DBMDBResourceUsageEntity` (*DBResourceUsages*), and `DBMDBResourceUsageArchiveEntity` (*DBResourceUsageArchives*).
+- **Security**: For non-admin users, access to all forms, periodic jobs, and data entities is grouped into the security role *Database monitor* (`DBMDBMonitor`), with separate duties for general monitoring (`DBMDBMonitor`), viewing lock history (`DBMDBLockView`), and maintaining/cleaning up lock history (`DBMDBLockMaintain`).
