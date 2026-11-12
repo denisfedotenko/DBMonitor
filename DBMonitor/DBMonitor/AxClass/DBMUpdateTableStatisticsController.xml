@@ -115,6 +115,8 @@ public class DBMUpdateTableStatisticsController extends SysOperationServiceContr
                 contract.parmTables(DBMSQLUtils::getTableListFromPlanId(callerForm.getQueryPlanId()));
             }
             contract.parmSamplingMode(DBMStatSamplingMode::Resample);
+            contract.parmSampleSize(0);
+            contract.parmSamplingScope(DBMStatSamplingScope::Rows);
 
         }
     }
