@@ -37,6 +37,7 @@ public class DBMUpdateTableStatisticsContract implements SysOperationInitializab
 			<Method>
 				<Name>parmSamplingMode</Name>
 				<Source><![CDATA[
+    [DataMember]
     public DBMStatSamplingMode parmSamplingMode(DBMStatSamplingMode _samplingMode = samplingMode)
     {
         samplingMode = _samplingMode;
@@ -48,6 +49,7 @@ public class DBMUpdateTableStatisticsContract implements SysOperationInitializab
 			<Method>
 				<Name>parmSamplingScope</Name>
 				<Source><![CDATA[
+    [DataMember]
     public DBMStatSamplingScope parmSamplingScope(DBMStatSamplingScope _samplingScope = samplingScope)
     {
         samplingScope = _samplingScope;
@@ -59,11 +61,20 @@ public class DBMUpdateTableStatisticsContract implements SysOperationInitializab
 			<Method>
 				<Name>parmSampleSize</Name>
 				<Source><![CDATA[
+    [DataMember]
     public int64 parmSampleSize(int64 _sampleSize = sampleSize)
     {
-        if (samplingScope == DBMStatSamplingScope::Percent && _sampleSize>100)
+        if (samplingMode == DBMStatSamplingMode::Sample &&
+            samplingScope == DBMStatSamplingScope::Percent 
+            && (_sampleSize>100 || _sampleSize <=0  ))
         {
-            _sampleSize = 100;
+            _sampleSize = 30;
+        }
+        else if (samplingMode == DBMStatSamplingMode::Sample &&
+            samplingScope == DBMStatSamplingScope::Rows
+            &&  _sampleSize <=0 )
+        {
+            _sampleSize = 10000;
         }
         sampleSize = _sampleSize;
         return sampleSize;
@@ -77,6 +88,9 @@ public class DBMUpdateTableStatisticsContract implements SysOperationInitializab
     public void initialize()
     {
         tables = new Set(Types::String);
+        samplingScope = DBMStatSamplingScope::Percent;
+        samplingMode = DBMStatSamplingMode::Resample;
+        sampleSize = 30;
     }
 
 ]]></Source>
