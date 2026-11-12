@@ -539,6 +539,7 @@ EnabledForAPRCHelp=Is query enabled for automatic plan regression correction?
 EnabledForAPRCLabel=Enabled for APRC
 FilterFrom=From
 FilterTo=To
+ShowSummaries=Show summaries
 Flights=Flights
 forcePlanHelp=Forces plan with the stored proc sp_query_store_force_plan
 forcePlanLabel=Force plan

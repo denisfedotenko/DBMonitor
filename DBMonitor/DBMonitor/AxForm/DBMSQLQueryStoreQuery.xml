@@ -77,6 +77,42 @@ public class DBMSQLQueryStoreQuery extends FormRun
         disableAPRC.enabled(DBMSQLQueryStoreExt.isEnabledForAPRC);
     }
 
+	private void setSummaryFieldsVisible(boolean _visible)
+	{
+		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgBindCpuTime)).visible(_visible);
+		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgBindDuration)).visible(_visible);
+		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgCompileDuration)).visible(_visible);
+		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgCompileMemoryKb)).visible(_visible);
+		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgOptimizeCpuTime)).visible(_visible);
+		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgOptimizeDuration)).visible(_visible);
+
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, CountExecutions)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalDuration)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalCpuTime)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalLogicalIoReads)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalLogicalIoWrites)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalRowcount)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalNumPhysicalIoReads)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalClrTime)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalDop)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalLogBytesUsed)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalPhysicalIoReads)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalQueryMaxUsedMemory)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, TotalTempdbSpaceUsed)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgClrTime)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgCpuTime)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgDop)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgDuration)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgLogBytesUsed)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgLogicalIoReads)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgLogicalIoWrites)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgNumPhysicalIoReads)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgPhysicalIoReads)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgQueryMaxUsedMemory)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgRowcount)).visible(_visible);
+		DBMSQLQueryStoreExtSummary_ds.object(fieldNum(DBMSQLQueryStoreExt, AvgTempdbSpaceUsed)).visible(_visible);
+	}
+
 ]]></Source>
 			</Method>
 			<Method>
@@ -84,9 +120,9 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				<Source><![CDATA[
     private void refreshQueryView()
     {
-        DBMSQLQueryStoreExt localQuery;
+		DBMSQLQueryStoreQueryExt localQuery;
         select firstonly localQuery
-        where localQuery.queryId == DBMSQLQueryStoreExt.QueryId;
+		where localQuery.queryId == DBMSQLQueryStoreExt.QueryId;
         DBMSQLQueryStoreExt.data(localQuery);
         DBMSQLQueryStoreExt_ds.setCurrent();
         DBMSQLQueryStoreExt_ds.refresh();
@@ -123,6 +159,8 @@ public class DBMSQLQueryStoreQuery extends FormRun
             }
         }
         super();
+		ShowSummaries.value(NoYes::No);
+		element.setSummaryFieldsVisible(false);
         if (isPlanCacheBased)
         {
             filterGroup.enabled(true);
@@ -142,6 +180,8 @@ public class DBMSQLQueryStoreQuery extends FormRun
         public void executeQuery()
         {
             Query query = this.query();
+			DBMSQLQueryStoreExtSummary_ds.queryBuildDataSource().enabled(ShowSummaries.value());
+			element.setSummaryFieldsVisible(ShowSummaries.value());
 
             // Reset limits first
             query.firstOnly10(false);
@@ -215,12 +255,11 @@ public class DBMSQLQueryStoreQuery extends FormRun
         {
             super();
             QueryBuildDataSource qbds = this.queryBuildDataSource();
-            qbds.addSortField(fieldNum(DBMSQLQueryStoreExt, totalDuration), SortOrder::Descending);
-            qbrQueryId =  qbds.addRange(fieldNum(DBMSQLQueryStoreExt, queryId));
+			qbrQueryId =  qbds.addRange(fieldNum(DBMSQLQueryStoreQueryExt, queryId));
             QueryBuildDataSource qbdsPlan = qbds.addDataSource(tableNum(DBMSQLQueryStorePlan));
             qbdsPlan.joinMode(JoinMode::ExistsJoin);
             qbdsPlan.fetchMode(QueryFetchMode::One2One);
-            qbdsPlan.addLink(fieldNum(DBMSQLQueryStoreExt, queryId), fieldNum(DBMSQLQueryStorePlan, queryId));
+			qbdsPlan.addLink(fieldNum(DBMSQLQueryStoreQueryExt, queryId), fieldNum(DBMSQLQueryStorePlan, queryId));
             QueryBuildDataSource qbdsRuntimeStats = qbdsPlan.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStats));
             qbdsRuntimeStats.joinMode(JoinMode::InnerJoin);
             qbdsRuntimeStats.fetchMode(QueryFetchMode::One2One);
@@ -274,7 +313,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
         {
             super();
             QueryBuildDataSource qbds = this.queryBuildDataSource();
-            qbds.addDynalink(fieldNum(DBMSQLQueryStorePlanExt,queryId),DBMSQLQueryStoreExt,fieldNum(DBMSQLQueryStoreExt,queryId));
+			qbds.addDynalink(fieldNum(DBMSQLQueryStorePlanExt,queryId),DBMSQLQueryStoreExt,fieldNum(DBMSQLQueryStoreQueryExt,queryId));
             qbrQueryPlanId =  qbds.addRange(fieldNum(DBMSQLQueryStorePlanExt, planId));
             QueryBuildDataSource qbdsRuntimeStats = qbds.addDataSource(tableNum(DBMSQLQueryStoreRuntimeStats));
             qbdsRuntimeStats.joinMode(JoinMode::ExistsJoin);
@@ -429,6 +468,24 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</Methods>
 			</Control>
 			<Control>
+				<Name>ShowSummaries</Name>
+				<Type>CheckBox</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        public boolean modified()
+        {
+            boolean ret = super();
+            DBMSQLQueryStoreExt_ds.executeQuery();
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
 				<Name>FilterFrom</Name>
 				<Type>DateTime</Type>
 				<Methods>
@@ -539,212 +596,106 @@ public class DBMSQLQueryStoreQuery extends FormRun
 	<DataSources>
 		<AxFormDataSource xmlns="">
 			<Name>DBMSQLQueryStoreExt</Name>
-			<Table>DBMSQLQueryStoreExt</Table>
+			<Table>DBMSQLQueryStoreQueryExt</Table>
 			<Fields>
-				<AxFormDataSourceField>
-					<DataField>APRCMode</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgBindCpuTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgBindDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgClrTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgCompileDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgCompileMemoryKb</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgCpuTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgDop</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgLogBytesUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgLogicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgLogicalIoWrites</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgNumPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgOptimizeCpuTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgOptimizeDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgQueryMaxUsedMemory</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgRowcount</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>AvgTempdbSpaceUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>CountCompiles</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>CountExecutions</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>InitialCompileStartTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>isEnabledForAPRC</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxClrTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxCompileMemoryKb</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxCpuTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxDop</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxLogBytesUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxLogicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxLogicalIoWrites</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxNumPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxQueryMaxUsedMemory</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxRowcount</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MaxTempdbSpaceUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinClrTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinCpuTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinDop</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinLogBytesUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinLogicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinLogicalIoWrites</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinNumPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinQueryMaxUsedMemory</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinRowcount</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>MinTempdbSpaceUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>parameterizationType</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryHash</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QuerySqlText</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>QueryTextId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>RecId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TableId</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalClrTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalCpuTime</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalDop</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalDuration</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalLogBytesUsed</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalLogicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalLogicalIoWrites</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalNumPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalPhysicalIoReads</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalQueryMaxUsedMemory</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalRowcount</DataField>
-				</AxFormDataSourceField>
-				<AxFormDataSourceField>
-					<DataField>TotalTempdbSpaceUsed</DataField>
-				</AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgBindCpuTime</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgBindDuration</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgCompileDuration</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgCompileMemoryKb</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgOptimizeCpuTime</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgOptimizeDuration</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>APRCMode</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>isEnabledForAPRC</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>QueryHash</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>QueryId</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>QueryTextId</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>RecId</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TableId</DataField></AxFormDataSourceField>
 			</Fields>
 			<ReferencedDataSources />
 			<AutoSearch>No</AutoSearch>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreQueryText</Name>
+			<Table>DBMSQLQueryStoreQueryText</Table>
+			<Methods>
+				<Method>
+					<Name>init</Name>
+					<Source><![CDATA[
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbds = this.queryBuildDataSource();
+            qbds.joinMode(JoinMode::OuterJoin);
+            qbds.fetchMode(QueryFetchMode::One2One);
+            qbds.addLink(fieldNum(DBMSQLQueryStoreQueryExt, QueryTextId), fieldNum(DBMSQLQueryStoreQueryText, QueryTextId));
+        }
+
+]]></Source>
+				</Method>
+			</Methods>
+			<Fields>
+				<AxFormDataSourceField><DataField>QuerySqlText</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>QueryTextId</DataField></AxFormDataSourceField>
+			</Fields>
+			<JoinSource>DBMSQLQueryStoreExt</JoinSource>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+		<AxFormDataSource xmlns="">
+			<Name>DBMSQLQueryStoreExtSummary</Name>
+			<Table>DBMSQLQueryStoreExt</Table>
+			<Methods>
+				<Method>
+					<Name>init</Name>
+					<Source><![CDATA[
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbds = this.queryBuildDataSource();
+			qbds.enabled(false);
+            qbds.joinMode(JoinMode::OuterJoin);
+            qbds.fetchMode(QueryFetchMode::One2One);
+            qbds.addLink(fieldNum(DBMSQLQueryStoreQueryExt, QueryId), fieldNum(DBMSQLQueryStoreExt, QueryId));
+            qbds.addSortField(fieldNum(DBMSQLQueryStoreExt, TotalDuration), SortOrder::Descending);
+        }
+
+]]></Source>
+				</Method>
+			</Methods>
+			<Fields>
+				<AxFormDataSourceField><DataField>AvgClrTime</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgCpuTime</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgDop</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgDuration</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgLogBytesUsed</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgLogicalIoReads</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgLogicalIoWrites</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgNumPhysicalIoReads</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgPhysicalIoReads</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgQueryMaxUsedMemory</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgRowcount</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>AvgTempdbSpaceUsed</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>CountExecutions</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>QueryId</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalClrTime</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalCpuTime</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalDop</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalDuration</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalLogBytesUsed</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalLogicalIoReads</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalLogicalIoWrites</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalNumPhysicalIoReads</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalPhysicalIoReads</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalQueryMaxUsedMemory</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalRowcount</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField><DataField>TotalTempdbSpaceUsed</DataField></AxFormDataSourceField>
+			</Fields>
+			<JoinSource>DBMSQLQueryStoreExt</JoinSource>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -1063,6 +1014,15 @@ public class DBMSQLQueryStoreQuery extends FormRun
 						<Items />
 					</AxFormControl>
 					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>ShowSummaries</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>@DBMonitor:ShowSummaries</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
 						i:type="AxFormDateTimeControl">
 						<Name>FilterFrom</Name>
 						<AutoDeclaration>Yes</AutoDeclaration>
@@ -1125,7 +1085,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>QuerySqlText</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreQueryText</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormInt64Control">
@@ -1134,7 +1094,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>CountExecutions</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1143,7 +1103,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalDuration</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1152,7 +1112,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalCpuTime</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1161,7 +1121,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalLogicalIoReads</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1170,7 +1130,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalLogicalIoWrites</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1179,7 +1139,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalRowcount</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1188,7 +1148,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalNumPhysicalIoReads</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1197,7 +1157,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalClrTime</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1206,7 +1166,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalDop</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1215,7 +1175,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalLogBytesUsed</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1224,7 +1184,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalPhysicalIoReads</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1233,7 +1193,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalQueryMaxUsedMemory</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1242,7 +1202,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>TotalTempdbSpaceUsed</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1269,7 +1229,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgClrTime</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1296,7 +1256,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgCpuTime</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1305,7 +1265,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgDop</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1314,7 +1274,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgDuration</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1323,7 +1283,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgLogBytesUsed</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1332,7 +1292,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgLogicalIoReads</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1341,7 +1301,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgLogicalIoWrites</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1350,7 +1310,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgNumPhysicalIoReads</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1377,7 +1337,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgPhysicalIoReads</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1386,7 +1346,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgQueryMaxUsedMemory</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1395,7 +1355,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgRowcount</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormRealControl">
@@ -1404,7 +1364,7 @@ public class DBMSQLQueryStoreQuery extends FormRun
 										<FormControlExtension
 											i:nil="true" />
 										<DataField>AvgTempdbSpaceUsed</DataField>
-										<DataSource>DBMSQLQueryStoreExt</DataSource>
+										<DataSource>DBMSQLQueryStoreExtSummary</DataSource>
 									</AxFormControl>
 									<AxFormControl xmlns=""
 										i:type="AxFormCheckBoxControl">
