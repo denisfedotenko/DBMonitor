@@ -37,7 +37,6 @@ public class DBMSQLQueryStoreQueryExt extends common
 	<SubscriberAccessLevel>
 		<Read>Allow</Read>
 	</SubscriberAccessLevel>
-	<Visible>No</Visible>
 	<FieldGroups>
 		<AxTableFieldGroup>
 			<Name>AutoReport</Name>
