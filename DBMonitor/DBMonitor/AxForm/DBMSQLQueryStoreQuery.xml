@@ -77,6 +77,11 @@ public class DBMSQLQueryStoreQuery extends FormRun
         disableAPRC.enabled(DBMSQLQueryStoreExt.isEnabledForAPRC);
     }
 
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setSummaryFieldsVisible</Name>
+				<Source><![CDATA[
 	private void setSummaryFieldsVisible(boolean _visible)
 	{
 		DBMSQLQueryStoreExt_ds.object(fieldNum(DBMSQLQueryStoreQueryExt, AvgBindCpuTime)).visible(_visible);
@@ -179,29 +184,20 @@ public class DBMSQLQueryStoreQuery extends FormRun
 						<Source><![CDATA[
         public void executeQuery()
         {
-            Query query = this.query();
+            boolean unpackRanges = false;
+            container packedRanges;
+            if (this.queryRun())
+            {
+                unpackRanges = true;
+                packedRanges = SysQuery::packRangeAndSortorder(this.queryRun().query());
+            }
+
+            Query query  = this.query();
 			DBMSQLQueryStoreExtSummary_ds.queryBuildDataSource().enabled(ShowSummaries.value());
 			element.setSummaryFieldsVisible(ShowSummaries.value());
 
-            // Reset limits first
-            query.firstOnly10(false);
-            query.firstOnly100(false);
-            query.firstOnly1000(false);
             if (!queryIdRange)
             {
-                qbrQueryId.value(SysQuery::valueUnlimited());
-                switch (TopSelectionComboBox.selection())
-                {
-                    case DBMSQLQueryStatsTopEnum::Top10:
-                        query.firstOnly10(true);
-                        break;
-                    case DBMSQLQueryStatsTopEnum::Top100:
-                        query.firstOnly100(true);
-                        break;
-                    case DBMSQLQueryStatsTopEnum::Top1000:
-                        query.firstOnly1000(true);
-                        break;
-                }
                 if (filterFrom.dateTimeValue() || filterTo.dateTimeValue())
                 {
                     utcdatetime fromDateTime = filterFrom.dateTimeValue();
@@ -238,6 +234,10 @@ public class DBMSQLQueryStoreQuery extends FormRun
                 query.dataSourceTable(tableNum(DBMSQLQueryStorePlan)).enabled(false);
                 query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStats)).enabled(false);
                 query.dataSourceTable(tableNum(DBMSQLQueryStoreRuntimeStatsInterval)).enabled(false);
+            }
+            if (unpackRanges)
+            {
+                SysQuery::unpackRangeAndSortorder(this.query(), packedRanges);
             }
 
             super();
@@ -293,6 +293,50 @@ public class DBMSQLQueryStoreQuery extends FormRun
             element.enableQueryButtons();
         
             return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+			<DataSource>
+				<Name>DBMSQLQueryStoreQueryText</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+                super();
+                QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+                qbdsThis.addLink(fieldNum(DBMSQLQueryStoreQueryExt, queryTextId), fieldNum(DBMSQLQueryStoreQueryText, queryTextId));
+                qbdsThis.fetchMode(QueryFetchMode::One2One);
+                qbdsThis.joinMode(JoinMode::InnerJoin);
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+			<DataSource>
+				<Name>DBMSQLQueryStoreExtSummary</Name>
+				<Methods>
+					<Method>
+						<Name>init</Name>
+						<Source><![CDATA[
+        public void init()
+        {
+            super();
+            QueryBuildDataSource qbdsThis = this.queryBuildDataSource();
+            qbdsThis.addLink(fieldNum(DBMSQLQueryStoreQueryExt, queryId), fieldNum(DBMSQLQueryStoreExt, queryId));
+            qbdsThis.fetchMode(QueryFetchMode::One2One);
+            qbdsThis.joinMode(JoinMode::InnerJoin);
+            qbdsThis.enabled(false);
         }
 
 ]]></Source>
@@ -443,49 +487,6 @@ public class DBMSQLQueryStoreQuery extends FormRun
 				</Methods>
 			</Control>
 			<Control>
-				<Name>TopSelectionComboBox</Name>
-				<Type>ComboBox</Type>
-				<Methods>
-					<Method>
-						<Name>modified</Name>
-						<Source><![CDATA[
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public boolean modified()
-        {
-            boolean ret;
-        
-            ret = super();
-            DBMSQLQueryStoreExt_ds.executeQuery();
-        
-            return ret;
-        }
-
-]]></Source>
-					</Method>
-				</Methods>
-			</Control>
-			<Control>
-				<Name>ShowSummaries</Name>
-				<Type>CheckBox</Type>
-				<Methods>
-					<Method>
-						<Name>modified</Name>
-						<Source><![CDATA[
-        public boolean modified()
-        {
-            boolean ret = super();
-            DBMSQLQueryStoreExt_ds.executeQuery();
-            return ret;
-        }
-
-]]></Source>
-					</Method>
-				</Methods>
-			</Control>
-			<Control>
 				<Name>FilterFrom</Name>
 				<Type>DateTime</Type>
 				<Methods>
@@ -520,6 +521,24 @@ public class DBMSQLQueryStoreQuery extends FormRun
             ret = super();
             DBMSQLQueryStoreExt_ds.executeQuery();
         
+            return ret;
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>ShowSummaries</Name>
+				<Type>CheckBox</Type>
+				<Methods>
+					<Method>
+						<Name>modified</Name>
+						<Source><![CDATA[
+        public boolean modified()
+        {
+            boolean ret = super();
+            DBMSQLQueryStoreExt_ds.executeQuery();
             return ret;
         }
 
@@ -598,22 +617,47 @@ public class DBMSQLQueryStoreQuery extends FormRun
 			<Name>DBMSQLQueryStoreExt</Name>
 			<Table>DBMSQLQueryStoreQueryExt</Table>
 			<Fields>
-				<AxFormDataSourceField><DataField>AvgBindCpuTime</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgBindDuration</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgCompileDuration</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgCompileMemoryKb</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgOptimizeCpuTime</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgOptimizeDuration</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>APRCMode</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>isEnabledForAPRC</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>QueryHash</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>QueryId</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>QueryTextId</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>RecId</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TableId</DataField></AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgBindCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgBindDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgCompileMemoryKb</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgOptimizeCpuTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>AvgOptimizeDuration</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>APRCMode</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>isEnabledForAPRC</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryHash</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>QueryTextId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
 			</Fields>
 			<ReferencedDataSources />
-			<AutoSearch>No</AutoSearch>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -621,27 +665,10 @@ public class DBMSQLQueryStoreQuery extends FormRun
 		<AxFormDataSource xmlns="">
 			<Name>DBMSQLQueryStoreQueryText</Name>
 			<Table>DBMSQLQueryStoreQueryText</Table>
-			<Methods>
-				<Method>
-					<Name>init</Name>
-					<Source><![CDATA[
-        public void init()
-        {
-            super();
-            QueryBuildDataSource qbds = this.queryBuildDataSource();
-            qbds.joinMode(JoinMode::OuterJoin);
-            qbds.fetchMode(QueryFetchMode::One2One);
-            qbds.addLink(fieldNum(DBMSQLQueryStoreQueryExt, QueryTextId), fieldNum(DBMSQLQueryStoreQueryText, QueryTextId));
-        }
-
-]]></Source>
-				</Method>
-			</Methods>
-			<Fields>
-				<AxFormDataSourceField><DataField>QuerySqlText</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>QueryTextId</DataField></AxFormDataSourceField>
-			</Fields>
+			<Fields />
+			<ReferencedDataSources />
 			<JoinSource>DBMSQLQueryStoreExt</JoinSource>
+			<LinkType>InnerJoin</LinkType>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -649,53 +676,10 @@ public class DBMSQLQueryStoreQuery extends FormRun
 		<AxFormDataSource xmlns="">
 			<Name>DBMSQLQueryStoreExtSummary</Name>
 			<Table>DBMSQLQueryStoreExt</Table>
-			<Methods>
-				<Method>
-					<Name>init</Name>
-					<Source><![CDATA[
-        public void init()
-        {
-            super();
-            QueryBuildDataSource qbds = this.queryBuildDataSource();
-			qbds.enabled(false);
-            qbds.joinMode(JoinMode::OuterJoin);
-            qbds.fetchMode(QueryFetchMode::One2One);
-            qbds.addLink(fieldNum(DBMSQLQueryStoreQueryExt, QueryId), fieldNum(DBMSQLQueryStoreExt, QueryId));
-            qbds.addSortField(fieldNum(DBMSQLQueryStoreExt, TotalDuration), SortOrder::Descending);
-        }
-
-]]></Source>
-				</Method>
-			</Methods>
-			<Fields>
-				<AxFormDataSourceField><DataField>AvgClrTime</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgCpuTime</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgDop</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgDuration</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgLogBytesUsed</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgLogicalIoReads</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgLogicalIoWrites</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgNumPhysicalIoReads</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgPhysicalIoReads</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgQueryMaxUsedMemory</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgRowcount</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>AvgTempdbSpaceUsed</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>CountExecutions</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>QueryId</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalClrTime</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalCpuTime</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalDop</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalDuration</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalLogBytesUsed</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalLogicalIoReads</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalLogicalIoWrites</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalNumPhysicalIoReads</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalPhysicalIoReads</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalQueryMaxUsedMemory</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalRowcount</DataField></AxFormDataSourceField>
-				<AxFormDataSourceField><DataField>TotalTempdbSpaceUsed</DataField></AxFormDataSourceField>
-			</Fields>
+			<Fields />
+			<ReferencedDataSources />
 			<JoinSource>DBMSQLQueryStoreExt</JoinSource>
+			<LinkType>InnerJoin</LinkType>
 			<InsertIfEmpty>No</InsertIfEmpty>
 			<DataSourceLinks />
 			<DerivedDataSources />
@@ -1004,25 +988,6 @@ public class DBMSQLQueryStoreQuery extends FormRun
 						</FormControlExtension>
 					</AxFormControl>
 					<AxFormControl xmlns=""
-						i:type="AxFormComboBoxControl">
-						<Name>TopSelectionComboBox</Name>
-						<AutoDeclaration>Yes</AutoDeclaration>
-						<Type>ComboBox</Type>
-						<FormControlExtension
-							i:nil="true" />
-						<EnumType>DBMSQLQueryStatsTopEnum</EnumType>
-						<Items />
-					</AxFormControl>
-					<AxFormControl xmlns=""
-						i:type="AxFormCheckBoxControl">
-						<Name>ShowSummaries</Name>
-						<AutoDeclaration>Yes</AutoDeclaration>
-						<Type>CheckBox</Type>
-						<FormControlExtension
-							i:nil="true" />
-						<Label>@DBMonitor:ShowSummaries</Label>
-					</AxFormControl>
-					<AxFormControl xmlns=""
 						i:type="AxFormDateTimeControl">
 						<Name>FilterFrom</Name>
 						<AutoDeclaration>Yes</AutoDeclaration>
@@ -1039,6 +1004,15 @@ public class DBMSQLQueryStoreQuery extends FormRun
 						<FormControlExtension
 							i:nil="true" />
 						<Label>@DBMonitor:FilterTo</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>ShowSummaries</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>@DBMonitor:ShowSummaries</Label>
 					</AxFormControl>
 				</Controls>
 				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
