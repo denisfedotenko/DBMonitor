@@ -62,13 +62,16 @@ public class DBMSQLQueryStoreQueryHints extends FormRun implements IRefreshable
                 queryId = queryExt.queryId;
         
             }
-            else
-            {
-                if (element.args().dataSet() == tableNum(DBMSQLQueryStoreQuery))
+            else if (element.args().dataSet() == tableNum(DBMSQLQueryStoreQuery))
                 {
                     DBMSQLQueryStoreQuery query = element.args().record() as DBMSQLQueryStoreQuery;
                     queryId = query.queryId;
                 }
+            else if (element.args().dataSet() == tableNum(DBMSQLQueryStoreQueryExt))
+            {
+                DBMSQLQueryStoreQueryExt queryStoreQueryExt = element.args().record() as DBMSQLQueryStoreQueryExt;
+                queryId = queryStoreQueryExt.queryId;
+
             }
             if (queryId)
             {
